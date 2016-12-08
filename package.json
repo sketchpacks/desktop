@@ -1,0 +1,11 @@
+{
+  "name": "sketchpacks-client",
+  "version": "0.1.0",
+  "description": "Sketchpacks Web & Desktop Client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Adam Kirkwood <hello@adamkirkwood.com>",
+  "license": "ISC"
+}

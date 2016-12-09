@@ -13,7 +13,7 @@ let options ={
     loaders: [{
       test: /\.jsx?$/,
       loaders: ['babel-loader'],
-      exclude: /node_modules/,
+      include: ['./app'],
     }]
   },
   output: {

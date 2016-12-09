@@ -1,34 +1,24 @@
 /* eslint strict: 0 */
 'use strict';
 
-const electron = require('electron');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
-const Menu = electron.Menu;
-const crashReporter = electron.crashReporter;
-const shell = electron.shell;
-let menu;
-let template;
-let mainWindow = null;
+const path = require('path');
+const menubar = require('menubar');
 
+const opts = {
+  dir: __dirname,
+  icon: __dirname + '/app/IconTemplate.png',
+  width: 640,
+  height: 600,
+  index: `file://${__dirname}/app/index-electron.html`,
+  resizable: false
+}
 
-crashReporter.start();
+const menuBar = menubar(opts)
 
+menuBar.on('ready', function () {
+  console.log('app is ready')
+})
 
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
-
-
-app.on('ready', () => {
-  mainWindow = new BrowserWindow({ width: 1024, height: 728 });
-
-  mainWindow.loadURL(`file://${__dirname}/app/index-electron.html`);
-
-  mainWindow.webContents.openDevTools();
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
+menuBar.on('after-create-window', function () {
+  menuBar.window.show()
 })

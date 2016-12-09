@@ -1,11 +1,49 @@
 {
-  "name": "sketchpacks-client",
+  "name": "sketchpacks-app",
+  "productName": "Sketchpacks",
+  "companyName": "Sketchpacks",
+  "description": "Discover and manage Sketch Plugins from the menu bar",
   "version": "0.1.0",
-  "description": "Sketchpacks Web & Desktop Client",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "install-app-deps",
+    "electron": "webpack && electron .",
+    "web": "webpack --target web && webpack-dev-server --target web",
+    "build": "webpack --progress --profile --colors --config webpack.config.js",
+    "build:dist": "webpack --progress --profile --colors --config webpack.config.dist.js",
+    "pack": "npm run build && build --dir",
+    "dist": "npm run build && build"
   },
-  "author": "Adam Kirkwood <hello@adamkirkwood.com>",
-  "license": "ISC"
+  "author": "",
+  "license": "ISC",
+  "build": {
+    "appId": "DGHF878J4A.com.sketchpacks.macos",
+    "asar": false,
+    "protocols": {
+      "name": "Sketchpacks",
+      "schemes": [
+        "sketchpacks"
+      ]
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns"
+    }
+  },
+  "devDependencies": {
+    "babel-core": "^6.3.26",
+    "babel-loader": "^6.2.0",
+    "electron-builder": "^10.6.1",
+    "electron-packager": "^8.4.0",
+    "electron-prebuilt": "^0.36.2",
+    "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^2.1.1",
+    "webpack": "^1.12.9",
+    "webpack-dev-server": "^1.14.0",
+    "webpack-target-electron-renderer": "^0.3.0"
+  },
+  "dependencies": {
+    "is-electron-renderer": "^2.0.0",
+    "minimist": "^1.2.0"
+  }
 }

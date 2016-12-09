@@ -35,7 +35,7 @@
     "babel-loader": "^6.2.0",
     "electron-builder": "^10.6.1",
     "electron-packager": "^8.4.0",
-    "electron-prebuilt": "^0.36.2",
+    "electron-prebuilt": "^1.4.11",
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^2.1.1",
     "webpack": "^1.12.9",
@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "is-electron-renderer": "^2.0.0",
+    "menubar": "^5.1.0",
     "minimist": "^1.2.0"
   }
 }

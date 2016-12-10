@@ -12,23 +12,29 @@ let options ={
   module: {
     loaders: [{
       test: /\.jsx?$/,
-      loaders: ['babel-loader'],
-      exclude: /node_modules/,
+      loaders: ['babel-loader?presets[]=es2015,presets[]=stage-0'],
+      include: ['./app'],
     }]
   },
+
   output: {
     path: path.join(__dirname, output),
     publicPath: path.join(__dirname, 'app'),
     filename: 'bundle.js',
   },
+
   resolve: {
     extensions: ['', '.js', '.jsx'],
     packageMains: ['webpack', 'browser', 'web', 'browserify', ['jam', 'main'], 'main'],
   },
+
   entry: [
     './app/index',
   ],
+
   debug: true,
+
+  plugins: []
 
 };
 

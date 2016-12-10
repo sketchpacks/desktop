@@ -7,11 +7,12 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "install-app-deps",
-    "electron": "webpack && electron .",
-    "web": "webpack --target web && webpack-dev-server --target web",
-    "build": "webpack --progress --profile --colors --config webpack.config.js",
-    "build:dist": "webpack --progress --profile --colors --config webpack.config.dist.js",
-    "pack": "npm run build && build --dir",
+    "electron": "BUILD_DEV=1 webpack && BUILD_DEV=1 electron .",
+    "web": "BUILD_DEV=1 webpack --target web && webpack-dev-server --target web",
+    "build": "webpack --progress --profile --colors",
+    "build:dist": "webpack --progress --profile --colors",
+    "pack": "PRODUCTION=1 npm run build && build --dir",
+    "pack:dev": "PRODUCTION=1 BUILD_DEV=1 npm run build && build --dir",
     "dist": "npm run build && build"
   },
   "author": "",
@@ -31,8 +32,10 @@
     }
   },
   "devDependencies": {
-    "babel-core": "^6.3.26",
+    "babel-core": "^6.20.0",
     "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-0": "^6.16.0",
     "electron-builder": "^10.6.1",
     "electron-packager": "^8.4.0",
     "electron-prebuilt": "^1.4.11",
@@ -45,6 +48,8 @@
   "dependencies": {
     "is-electron-renderer": "^2.0.0",
     "menubar": "^5.1.0",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "ms": "^0.7.2",
+    "os": "^0.1.1"
   }
 }

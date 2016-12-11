@@ -6,14 +6,19 @@ const webpack = require('webpack');
 const webpackTargetElectronRenderer = require('webpack-target-electron-renderer');
 var argv = require('minimist')(process.argv.slice(2));
 const isWeb = (argv && argv.target === 'web');
+const isProd = process.env.NODE_ENV === 'production';
 const output = (isWeb ? 'assets/platform/web' : 'assets/platform/electron');
+const config = require('./app/config.js')
 
 let options ={
   module: {
     loaders: [{
       test: /\.jsx?$/,
-      loaders: ['babel-loader?presets[]=es2015,presets[]=stage-0'],
-      include: ['./app'],
+      loader: 'babel',
+      query: {
+        presets: ['es2015', 'stage-0']
+      },
+      include: ['./app']
     }]
   },
 
@@ -32,9 +37,22 @@ let options ={
     './app/index',
   ],
 
-  debug: true,
+  devtool: !isProd && 'eval',
 
-  plugins: []
+  debug: !isProd && true,
+
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin({
+      compress:{
+        warnings: true
+      }
+    }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': isProd ? JSON.stringify('production') : JSON.stringify('development')
+      }
+    })
+  ]
 
 };
 

@@ -7,15 +7,15 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "install-app-deps",
-    "electron": "BUILD_DEV=1 webpack && BUILD_DEV=1 electron .",
-    "web": "BUILD_DEV=1 webpack --target web && webpack-dev-server --target web",
-    "build": "webpack --progress --profile --colors",
-    "build:dist": "webpack --progress --profile --colors",
-    "pack": "PRODUCTION=1 npm run build && build --dir",
-    "pack:dev": "PRODUCTION=1 BUILD_DEV=1 npm run build && build --dir",
+    "electron": "NODE_ENV=development webpack -p && electron .",
+    "web": "NODE_ENV=development webpack -p --target web && webpack-dev-server --target web",
+    "build": "NODE_ENV=production webpack -p --progress --profile --colors",
+    "build:dist": "NODE_ENV=production webpack -p --progress --profile --colors",
+    "pack": "npm run build && build --dir",
+    "pack:dev": "npm run build && build --dir",
     "dist": "npm run build && build"
   },
-  "author": "",
+  "author": "Adam Kirkwood <hello@adamkirkwood.com>",
   "license": "ISC",
   "build": {
     "appId": "DGHF878J4A.com.sketchpacks.macos",
@@ -46,10 +46,12 @@
     "webpack-target-electron-renderer": "^0.3.0"
   },
   "dependencies": {
+    "electron-log": "^1.2.2",
     "is-electron-renderer": "^2.0.0",
     "menubar": "^5.1.0",
     "minimist": "^1.2.0",
     "ms": "^0.7.2",
+    "node-notifier": "^4.6.1",
     "os": "^0.1.1"
   }
 }

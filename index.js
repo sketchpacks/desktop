@@ -1,11 +1,16 @@
 /* eslint strict: 0 */
 'use strict';
 
-const PRODUCTION = process.env.PRODUCTION;
-const BUILD_DEV = process.env.BUILD_DEV;
 const config = require('./app/config');
 
 const path = require('path');
+const os = require('os')
+const ms = require('ms')
+const electron = require('electron');
+const app = electron.app;
+const dialog = electron.dialog;
+const autoUpdater = electron.autoUpdater;
+const log = require('electron-log');
 const menubar = require('menubar');
 
 const opts = {
@@ -19,25 +24,23 @@ const opts = {
 
 const menuBar = menubar(opts)
 
-
 menuBar.on('ready', function () {
-  if (process.env.BUILD_DEV) {
-    console.log(`Sketchpacks v${config.APP_VERSION}`)
-  }
+  log.info(`Sketchpacks v${config.APP_VERSION} ready to go`)
+})
 
-  if (process.env.PRODUCTION) {
-    console.log(`Checking for client updates...`)
-
-    const updater = require('./app/main/updater')
-    updater.init()
+menuBar.on('after-show', function () {
+  if (process.env.NODE_ENV == 'development') {
+    // require('devtron').install()
+    menuBar.window.openDevTools({ mode: 'detach' })
   }
 })
 
 menuBar.on('after-create-window', function () {
   menuBar.window.show()
+})
 
-  if (process.env.BUILD_DEV) {
-    // require('devtron').install()
-    menuBar.window.openDevTools({ mode: 'detach' })
-  }
+
+app.on('ready', () => {
+  const updater = require('./app/main/updater')
+  updater.init()
 })

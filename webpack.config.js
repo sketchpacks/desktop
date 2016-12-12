@@ -13,12 +13,9 @@ const config = require('./app/config.js')
 let options ={
   module: {
     loaders: [{
-      test: /\.jsx?$/,
-      loader: 'babel',
-      query: {
-        presets: ['es2015', 'stage-0']
-      },
-      include: ['./app']
+      test: /\.js?$/,
+      loaders: [ 'babel-loader?presets[]=es2015,presets[]=stage-0,presets[]=react' ],
+      exclude: /node_modules/
     }]
   },
 
@@ -55,6 +52,8 @@ let options ={
   ]
 
 };
+
+if (!isProd) { options.entry.push('webpack-dev-server/client?http://localhost:8080/')}
 
 options.target = webpackTargetElectronRenderer(options);
 

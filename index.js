@@ -18,29 +18,31 @@ const opts = {
   icon: __dirname + '/app/IconTemplate.png',
   width: 640,
   height: 600,
-  index: `file://${__dirname}/app/index-electron.html`,
+  index: `file://${__dirname}/app/dist/index.html`,
   resizable: false
 }
 
 const menuBar = menubar(opts)
 
-menuBar.on('ready', function () {
-  log.info(`Sketchpacks v${config.APP_VERSION} ready to go`)
+menuBar.on('ready', () => {
+  log.info(`Sketchpacks v${config.APP_VERSION} launched in ${process.env.NODE_ENV} mode`)
 })
 
-menuBar.on('after-show', function () {
-  if (process.env.NODE_ENV == 'development') {
+menuBar.on('after-show', () => {
+  if (process.env.NODE_ENV === 'development') {
     // require('devtron').install()
     menuBar.window.openDevTools({ mode: 'detach' })
   }
 })
 
-menuBar.on('after-create-window', function () {
+menuBar.on('after-create-window', () => {
   menuBar.window.show()
 })
 
 
 app.on('ready', () => {
-  const updater = require('./app/main/updater')
-  updater.init()
+  if (process.env.NODE_ENV === 'production') {
+    const updater = require('./app/main/updater')
+    updater.init()
+  }
 })

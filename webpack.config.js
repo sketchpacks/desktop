@@ -3,58 +3,76 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpackTargetElectronRenderer = require('webpack-target-electron-renderer');
+
 var argv = require('minimist')(process.argv.slice(2));
 const isWeb = (argv && argv.target === 'web');
 const isProd = process.env.NODE_ENV === 'production';
 const output = (isWeb ? 'assets/platform/web' : 'assets/platform/electron');
-const config = require('./app/config.js')
+const htmlTemplate = isWeb ? 'index.web.html' : 'index.electron.html'
 
-let options ={
-  module: {
-    loaders: [{
-      test: /\.js?$/,
-      loaders: [ 'babel-loader?presets[]=es2015,presets[]=stage-0,presets[]=react' ],
-      exclude: /node_modules/
-    }]
-  },
-
+let options = {
   output: {
-    path: path.join(__dirname, output),
-    publicPath: path.join(__dirname, 'app'),
-    filename: 'bundle.js',
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'app', 'dist'),
+    publicPath: './'
   },
 
-  resolve: {
-    extensions: ['', '.js', '.jsx'],
-    packageMains: ['webpack', 'browser', 'web', 'browserify', ['jam', 'main'], 'main'],
+  context: path.resolve(__dirname, 'app'),
+
+  devtool: isProd ? false : 'inline-source-map',
+
+  module: {
+    rules: [
+      {
+        test: /\.js?$/,
+        loader: 'babel-loader',
+        options: {
+          presets: ['es2015','stage-0','react']
+        },
+        exclude: [
+          /node_modules/,
+          /dist/
+        ]
+      }
+    ]
   },
-
-  entry: [
-    './app/index',
-  ],
-
-  devtool: !isProd && 'eval',
-
-  debug: !isProd && true,
 
   plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress:{
-        warnings: true
-      }
-    }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        'NODE_ENV': isProd ? JSON.stringify('production') : JSON.stringify('development')
-      }
+    new webpack.NamedModulesPlugin(),
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, 'build', htmlTemplate)
     })
   ]
+}
 
-};
+if (isProd) {
+  options.entry = './index.js'
+  options.plugins.push(
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        screw_ie8: true
+      }
+    })
+  )
+}
 
-if (!isProd) { options.entry.push('webpack-dev-server/client?http://localhost:8080/')}
+if (!isProd) {
+  options.plugins.push(new webpack.HotModuleReplacementPlugin())
+  options.entry = {
+    server: [
+      'react-hot-loader/patch',
+      'webpack-dev-server/client?http://localhost:8080',
+      'webpack/hot/only-dev-server'
+    ],
+    main: './index.js'
+  }
+  options.devServer = {
+    hot: true,
+    contentBase: path.resolve(__dirname, 'app', 'dist'),
+    publicPath: '/'
+  }
+}
 
-options.target = webpackTargetElectronRenderer(options);
-
-module.exports = options;
+module.exports = options

@@ -2,20 +2,24 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, Route, browserHistory } from 'react-router'
 
-class App extends React.Component {
-  render () {
-    return (
-      <div>
-        <h1>Hello, from Sketchpacks!</h1>
-      </div>
-    )
-  }
+import { AppContainer } from 'react-hot-loader'
+
+import App from './containers/App'
+
+const render = () => {
+  ReactDOM.render(
+    <AppContainer>
+      <App />
+    </AppContainer>,
+
+    document.getElementById('root')
+  )
 }
 
-ReactDOM.render(
-  <Router history={browserHistory}>
-    <Route path="/app/" component={App} />
-  </Router>,
+render()
 
-  document.getElementById('root')
-)
+if (process.env.NODE_ENV === 'development') {
+  if (module.hot) {
+    module.hot.accept('./containers/App', render)
+  }
+}

@@ -38,6 +38,10 @@ let options = {
       },
       {
         test: /\.sass|\.scss?$/,
+        exclude: [
+          /node_modules/,
+          /dist/
+        ],
         loaders: ['style-loader', 'css-loader', 'sass-loader']
       }
     ]
@@ -56,7 +60,9 @@ let options = {
 }
 
 if (isProd) {
-  options.entry = './index.js'
+  options.entry = {
+    main: './index.js'
+  }
   options.plugins.push(
     new webpack.optimize.UglifyJsPlugin({
       compress: {

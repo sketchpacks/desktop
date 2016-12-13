@@ -35,6 +35,10 @@ let options = {
           /node_modules/,
           /dist/
         ]
+      },
+      {
+        test: /\.sass|\.scss?$/,
+        loaders: ['style-loader', 'css-loader', 'sass-loader']
       }
     ]
   },
@@ -44,7 +48,11 @@ let options = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'build', htmlTemplate)
     })
-  ]
+  ],
+
+  resolve: {
+    extensions: ['.js', '.json', '.coffee', '.css', '.scss', '.sass']
+  }
 }
 
 if (isProd) {

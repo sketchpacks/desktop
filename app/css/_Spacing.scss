@@ -1,4 +1,3 @@
-
 // Spacing
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 
@@ -6,14 +5,16 @@
 button,
 dd,
 dt,
-li
-	margin-bottom: 1.0rem
+li {
+  margin-bottom: 1rem;
+}
 
 fieldset,
 input,
 select,
-textarea
-	margin-bottom: 1.5rem
+textarea {
+  margin-bottom: 1.5rem;
+}
 
 blockquote,
 dl,
@@ -23,5 +24,6 @@ ol,
 p,
 pre,
 table,
-ul
-	margin-bottom: 2.5rem
+ul {
+  margin-bottom: 2.5rem;
+}

@@ -1,0 +1,44 @@
+@import "Tokens";
+
+// Utility
+// ––––––––––––––––––––––––––––––––––––––––––––––––––
+
+// Clear a float with .clearfix
+.clearfix {
+  &:after {
+    clear: both;
+    content: " ";
+    display: table;
+  }
+}
+
+// Float either direction
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+
+@function getSize($key) {
+  @if map-has-key($sizing, $key) {
+    @return map-get($sizing, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $colors.";
+
+  @return null;
+}
+
+.u-mar-left-x-small {
+  margin-left: getSize("x-small");
+}
+
+.u-mar-right-x-small {
+  margin-right: getSize("x-small");
+}
+
+.u-mar-left-large {
+  margin-left: getSize("large");
+}

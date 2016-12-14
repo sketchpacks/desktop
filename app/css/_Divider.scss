@@ -1,11 +1,8 @@
-
-// Link
+// Divider
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 
-a
-	color: $color-primary
-	text-decoration: none
-
-	&:focus,
-	&:hover
-		color: $color-secondary
+hr {
+  border: 0;
+  border-top: 0.1rem solid $color-tertiary;
+  margin: 3rem 0;
+}

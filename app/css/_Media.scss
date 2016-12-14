@@ -1,0 +1,28 @@
+$margin: 1.2rem;
+
+.o-media {
+  display: flex;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.o-media__content {
+  flex-grow: 1;
+  flex-shrink: 1;
+  text-align: left;
+
+  h5 {
+    font-weight: 600;
+    margin-bottom: 0;
+  }
+}
+
+.o-media__left,
+.o-media__right {
+  flex-grow: 0;
+  flex-shrink: 0;
+
+  img {
+    max-width: 16rem;
+  }
+}

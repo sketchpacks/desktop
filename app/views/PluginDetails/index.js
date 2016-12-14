@@ -19,10 +19,10 @@ class PluginDetailsContainer extends Component {
 
   componentDidMount () {
     const { dispatch } = this.props
-    const { id } = this.props.params
+    const { owner, id } = this.props.params
 
     dispatch(pluginReadmeRequest())
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins/${id}/readme`)
+    fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}/plugins/${id}/readme`)
       .then(response => {
         return response.text()
       })
@@ -31,7 +31,7 @@ class PluginDetailsContainer extends Component {
       })
 
     dispatch(pluginDetailsRequest())
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins/${id}`)
+    fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}/plugins/${id}`)
       .then(response => {
         return response.json()
       })

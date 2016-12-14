@@ -10,11 +10,13 @@ import {
 
 class UserRecommendsContainer extends Component {
   componentDidMount () {
+    console.log(this.props)
     const { dispatch } = this.props
+    const { owner } = this.props.params
 
     dispatch(pluginsRequest())
 
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins`)
+    fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}/plugins`)
       .then(response => {
         return response.json()
       })

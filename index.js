@@ -18,7 +18,7 @@ const opts = {
   icon: __dirname + '/app/IconTemplate.png',
   width: 640,
   height: 600,
-  index: `file://${__dirname}/app/dist/index.html`,
+  index: process.env.NODE_ENV === 'production' ? `file://${__dirname}/app/dist/index.html` : 'http://localhost:8080',
   resizable: false
 }
 

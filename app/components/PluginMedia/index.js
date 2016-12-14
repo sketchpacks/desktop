@@ -4,6 +4,7 @@ import _ from 'lodash'
 
 import { Link } from 'react-router'
 
+import './plugin_media.scss'
 
 class PluginMedia extends Component {
   constructor (props) {
@@ -14,7 +15,7 @@ class PluginMedia extends Component {
 
   renderPreview () {
     const { thumbnail_url } = this.props.plugin
-    if (thumbnail_url === '') return 
+    if (thumbnail_url === '') return
 
     return (
       <figure className="media-right">

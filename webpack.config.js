@@ -16,7 +16,7 @@ let options = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'app', 'dist'),
-    publicPath: './'
+    publicPath: '/'
   },
 
   context: path.resolve(__dirname, 'app'),
@@ -39,7 +39,6 @@ let options = {
       {
         test: /\.sass|\.scss?$/,
         exclude: [
-          /node_modules/,
           /dist/
         ],
         loaders: ['style-loader', 'css-loader', 'sass-loader']
@@ -55,7 +54,7 @@ let options = {
   ],
 
   resolve: {
-    extensions: ['.js', '.json', '.coffee', '.css', '.scss', '.sass']
+    extensions: ['.js', '.json', '.coffee', '.css', '.scss']
   }
 }
 
@@ -85,7 +84,8 @@ if (!isProd) {
   options.devServer = {
     hot: true,
     contentBase: path.resolve(__dirname, 'app', 'dist'),
-    publicPath: '/'
+    publicPath: 'http://localhost:8080',
+    historyApiFallback: true
   }
 }
 

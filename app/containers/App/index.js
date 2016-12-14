@@ -7,7 +7,7 @@ import {
   logoutRequest
 } from '../../actions'
 
-import '../../css/milligram.sass'
+import '../../css/milligram.scss'
 
 class App extends Component {
   constructor (props) {
@@ -41,7 +41,7 @@ class App extends Component {
 
             <div className="nav-left">
               <a className="nav-item is-brand" href="#">
-                <img src="http://bulma.io/images/bulma-type.png" alt="Bulma logo" />
+                <strong>Sketchpacks</strong>
               </a>
             </div>
 

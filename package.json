@@ -56,6 +56,7 @@
   },
   "dependencies": {
     "electron-log": "^1.2.2",
+    "fs": "0.0.1-security",
     "is-electron-renderer": "^2.0.0",
     "jwt-simple": "^0.5.1",
     "marky-markdown": "^9.0.1",

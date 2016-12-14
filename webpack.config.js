@@ -1,15 +1,15 @@
 /* eslint strict: 0 */
 'use strict';
 
-const path = require('path');
-const webpack = require('webpack');
+const path = require('path')
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const webpackTargetElectronRenderer = require('webpack-target-electron-renderer');
+const webpackTargetElectronRenderer = require('webpack-target-electron-renderer')
 
-var argv = require('minimist')(process.argv.slice(2));
-const isWeb = (argv && argv.target === 'web');
-const isProd = process.env.NODE_ENV === 'production';
-const output = (isWeb ? 'assets/platform/web' : 'assets/platform/electron');
+var argv = require('minimist')(process.argv.slice(2))
+const isWeb = (argv && argv.target === 'web')
+const isProd = process.env.NODE_ENV === 'production'
+const output = (isWeb ? 'assets/platform/web' : 'assets/platform/electron')
 const htmlTemplate = isWeb ? 'index.web.html' : 'index.electron.html'
 
 let options = {
@@ -21,12 +21,12 @@ let options = {
 
   context: path.resolve(__dirname, 'app'),
 
-  devtool: isProd ? false : 'inline-source-map',
+  devtool: isProd ? false : 'source-map',
 
   module: {
     rules: [
       {
-        test: /\.js?$/,
+        test: /\.js$/,
         loader: 'babel-loader',
         options: {
           presets: ['es2015','stage-0','react']
@@ -37,7 +37,7 @@ let options = {
         ]
       },
       {
-        test: /\.sass|\.scss?$/,
+        test: /\.scss$/,
         exclude: [
           /dist/
         ],
@@ -47,14 +47,11 @@ let options = {
   },
 
   plugins: [
-    new webpack.NamedModulesPlugin(),
-    new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'build', htmlTemplate)
-    })
+    new webpack.NamedModulesPlugin()
   ],
 
   resolve: {
-    extensions: ['.js', '.json', '.coffee', '.css', '.scss']
+    extensions: ['.js', '.coffee', '.scss']
   }
 }
 
@@ -67,6 +64,11 @@ if (isProd) {
       compress: {
         screw_ie8: true
       }
+    }),
+    new webpack.DefinePlugin({
+        'process.env': {
+            'NODE_ENV': JSON.stringify('production')
+        }
     })
   )
 }
@@ -87,6 +89,7 @@ if (!isProd) {
     publicPath: 'http://localhost:8080',
     historyApiFallback: true
   }
+  options.target = 'web'
 }
 
 module.exports = options

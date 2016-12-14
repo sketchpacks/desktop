@@ -22,25 +22,27 @@ let store = configureStore()
 
 const render = () => {
   ReactDOM.render(
-    <Provider store={store}>
-      <Router history={browserHistory}>
-        <Route path="/" component={App}>
-          <IndexRoute component={FrontPage} />
-          <Route path="browse" component={BrowsePlugins} />
-          <Route path="browse/popular" component={PopularPlugins} />
-          <Route path="browse/newest" component={NewestPlugins} />
+    <AppContainer>
+      <Provider store={store}>
+        <Router history={browserHistory}>
+          <Route path="/" component={App}>
+            <IndexRoute component={FrontPage} />
+            <Route path="browse" component={BrowsePlugins} />
+            <Route path="browse/popular" component={PopularPlugins} />
+            <Route path="browse/newest" component={NewestPlugins} />
 
-          <Route path="@:owner" component={UserProfile}>
-            <IndexRedirect to="recommends" />
-            <Route path="recommends" component={UserRecommends} />
-            <Route path="plugins" component={UserPlugins} />
+            <Route path="@:owner" component={UserProfile}>
+              <IndexRedirect to="recommends" />
+              <Route path="recommends" component={UserRecommends} />
+              <Route path="plugins" component={UserPlugins} />
+            </Route>
+
+            <Route path=":owner/:id" component={PluginDetails} />
+
           </Route>
-
-          <Route path=":owner/:id" component={PluginDetails} />
-
-        </Route>
-      </Router>
-    </Provider>,
+        </Router>
+      </Provider>
+    </AppContainer>,
 
     document.getElementById('root')
   )

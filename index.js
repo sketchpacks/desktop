@@ -1,26 +1,25 @@
 /* eslint strict: 0 */
 'use strict';
 
-const config = require('./app/config');
 
-const path = require('path');
+const path = require('path')
 const os = require('os')
 const ms = require('ms')
-const electron = require('electron');
-const app = electron.app;
-const dialog = electron.dialog;
-const autoUpdater = electron.autoUpdater;
-const log = require('electron-log');
-const menubar = require('menubar');
+const electron = require('electron')
+const app = electron.app
+const dialog = electron.dialog
+const autoUpdater = electron.autoUpdater
+const log = require('electron-log')
+const menubar = require('menubar')
 
 const opts = {
   dir: __dirname,
   icon: __dirname + '/app/IconTemplate.png',
   width: 640,
   height: 600,
-  index: process.env.NODE_ENV === 'production' ? `file://${__dirname}/app/dist/index.html` : 'http://localhost:8080',
   resizable: false
 }
+
 
 const menuBar = menubar(opts)
 
@@ -29,10 +28,11 @@ menuBar.on('ready', () => {
 })
 
 menuBar.on('after-show', () => {
-  if (process.env.NODE_ENV === 'development') {
+  // if (process.env.NODE_ENV === 'development') {
     // require('devtron').install()
-    menuBar.window.openDevTools({ mode: 'detach' })
-  }
+    // menuBar.window.openDevTools({ mode: 'detach' })
+  // }
+  menuBar.window.openDevTools({ mode: 'detach' })
 })
 
 menuBar.on('after-create-window', () => {

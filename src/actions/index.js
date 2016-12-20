@@ -41,6 +41,14 @@ export function logoutRequest () {
   }
 }
 
+export const PLUGINS_ERROR = 'PLUGINS_ERROR'
+
+export function pluginsError () {
+  return {
+    type: PLUGINS_ERROR
+  }
+}
+
 
 export const PLUGINS_REQUEST = 'PLUGINS_REQUEST'
 
@@ -79,6 +87,14 @@ export function pluginDetailsRequest () {
   }
 }
 
+export const PLUGIN_DETAILS_ERROR = 'PLUGIN_DETAILS_ERROR'
+
+export function pluginDetailsError () {
+  return {
+    type: PLUGIN_DETAILS_ERROR
+  }
+}
+
 
 export const PLUGIN_DETAILS_RECEIVED = 'PLUGIN_DETAILS_RECEIVED'
 
@@ -114,6 +130,14 @@ export const RECOMMENDS_REQUEST = 'RECOMMENDS_REQUEST'
 export function recommendsRequest () {
   return {
     type: RECOMMENDS_REQUEST
+  }
+}
+
+export const RECOMMENDS_ERROR = 'RECOMMENDS_ERROR'
+
+export function recommendsError () {
+  return {
+    type: RECOMMENDS_ERROR
   }
 }
 

@@ -8,10 +8,10 @@
   "scripts": {
     "postinstall": "install-app-deps",
     "client:electron": "NODE_ENV=development electron .",
-    "serve:electron": "npm run build && NODE_ENV=development webpack-dev-server",
+    "serve:electron": "NODE_ENV=development webpack-dev-server --config webpack.config.electron.dev.js",
     "serve:web": "NODE_ENV=development webpack-dev-server --target web",
     "build:web": "NODE_ENV=production webpack -p --target web",
-    "build": "NODE_ENV=production webpack -p --progress --profile --colors",
+    "build": "NODE_ENV=production webpack -p --progress --profile --colors --config webpack.config.electron.prod.js",
     "pack": "npm run build && build --dir",
     "pack:dev": "npm run build && build --dir",
     "dist": "npm run build && build"
@@ -34,11 +34,15 @@
   },
   "devDependencies": {
     "babel-core": "^6.20.0",
-    "babel-loader": "^6.2.0",
+    "babel-loader": "^6.2.10",
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-polyfill": "^6.20.0",
     "babel-preset-es2015": "^6.18.0",
+    "babel-preset-es2015-native-modules": "^6.9.4",
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
+    "babel-runtime": "^6.20.0",
     "css-loader": "^0.26.1",
     "electron-builder": "^10.6.1",
     "electron-packager": "^8.4.0",
@@ -50,7 +54,7 @@
     "react-hot-loader": "^3.0.0-beta.6",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
-    "webpack": "^2.1.0-beta.27",
+    "webpack": "^2.2.0-rc.1",
     "webpack-dev-server": "^2.1.0-beta.12",
     "webpack-target-electron-renderer": "^0.3.0"
   },

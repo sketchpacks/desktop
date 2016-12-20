@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import marky from 'marky-markdown'
 
 import {
   pluginDetailsRequest,
@@ -13,8 +12,6 @@ import {
 class PluginDetailsContainer extends Component {
   constructor (props) {
     super(props)
-
-    this.renderMarkdown = this.renderMarkdown.bind(this)
   }
 
   componentDidMount () {
@@ -40,16 +37,6 @@ class PluginDetailsContainer extends Component {
       })
   }
 
-  renderMarkdown () {
-    const opts = {
-      enableHeadingLinkIcons: false,
-      sanitize: true,
-      highlightSyntax: false
-    }
-
-    return {__html: marky(this.props.pluginDetails.readme, opts)}
-  }
-
   render () {
     const { description, name } = this.props.pluginDetails
 
@@ -72,7 +59,7 @@ class PluginDetailsContainer extends Component {
           <div className="container">
             <div className="columns">
               <div className="column">
-                  <div className="content" dangerouslySetInnerHTML={this.renderMarkdown()} />
+                insert README here
               </div>
             </div>
           </div>

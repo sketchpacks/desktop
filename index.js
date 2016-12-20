@@ -1,6 +1,7 @@
 /* eslint strict: 0 */
 'use strict';
 
+const config = require('./src/config')
 
 const path = require('path')
 const os = require('os')
@@ -14,12 +15,14 @@ const menubar = require('menubar')
 
 const opts = {
   dir: __dirname,
-  icon: __dirname + '/app/IconTemplate.png',
+  icon: __dirname + '/src/IconTemplate.png',
   width: 640,
   height: 600,
+  index: `file://${__dirname}/src/dist/index.html`,
   resizable: false
 }
 
+if (process.env.NODE_ENV === 'development') opts.index = 'http://localhost:8080/'
 
 const menuBar = menubar(opts)
 
@@ -42,7 +45,7 @@ menuBar.on('after-create-window', () => {
 
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') {
-    const updater = require('./app/main/updater')
+    const updater = require('./src/main/updater')
     updater.init()
   }
 })

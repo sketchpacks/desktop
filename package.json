@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "electron-log": "^1.2.2",
+    "express": "^4.14.0",
     "fs": "0.0.1-security",
     "is-electron-renderer": "^2.0.0",
     "jwt-simple": "^0.5.1",

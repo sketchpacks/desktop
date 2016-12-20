@@ -12,18 +12,17 @@ const output = (isWeb ? 'assets/platform/web' : 'assets/platform/electron')
 const htmlTemplate = isWeb ? 'index.web.html' : 'index.electron.html'
 
 let options = {
-  entry: ['babel-polyfill','./index.js'],
+  entry: './index.js',
 
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'app', 'dist'),
-    publicPath: './',
+    path: path.resolve(__dirname, 'src', 'dist'),
     libraryTarget: 'commonjs2'
   },
 
-  target: 'electron-renderer',
+  target: 'electron',
 
-  context: path.resolve(__dirname, 'app'),
+  context: path.resolve(__dirname, 'src'),
 
   devtool: false,
 
@@ -36,15 +35,22 @@ let options = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        include: ['./app/index'],
         use: [
-          'babel-loader'
+          {
+            loader: 'babel-loader',
+          }
+        ],
+        exclude: [
+          /(dist)/,
+          /(node_modules)/
         ]
       },
       {
         test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
-        exclude: /node_modules/
+        exclude: [
+          /(dist)/
+        ],
+        loaders: ['style-loader', 'css-loader', 'sass-loader']
       }
     ]
   },

@@ -44,7 +44,7 @@ menuBar.on('after-create-window', () => {
 
 
 app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV !== 'development') {
     const updater = require('./src/main/updater')
     updater.init()
   }

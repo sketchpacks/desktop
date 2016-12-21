@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "sketchpacks-dev",
+    "staging": "sketchpacks-dev",
+    "production": "sketchpacks"
+  }
+}

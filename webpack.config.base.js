@@ -55,41 +55,5 @@ let options = {
   }
 }
 
-if (isProd) {
-  options.entry = {
-    main: './index.js'
-  }
-  options.plugins.push(
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        screw_ie8: true
-      }
-    }),
-    new webpack.DefinePlugin({
-        'process.env': {
-            'NODE_ENV': JSON.stringify('production')
-        }
-    })
-  )
-}
-
-if (!isProd) {
-  options.plugins.push(new webpack.HotModuleReplacementPlugin())
-  options.entry = {
-    server: [
-      'react-hot-loader/patch',
-      'webpack-dev-server/client?http://localhost:8080',
-      'webpack/hot/only-dev-server'
-    ],
-    main: './index.js'
-  }
-  options.devServer = {
-    hot: true,
-    contentBase: path.resolve(__dirname, 'app', 'dist'),
-    publicPath: 'http://localhost:8080',
-    historyApiFallback: true
-  }
-  options.target = 'web'
-}
 
 module.exports = options

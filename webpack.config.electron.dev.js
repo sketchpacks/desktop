@@ -22,7 +22,7 @@ let options = {
 
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'src', 'dist')
+    path: path.resolve(__dirname, 'dist', 'web')
   },
 
   target: 'electron',
@@ -33,7 +33,7 @@ let options = {
 
   devServer: {
     hot: true,
-    contentBase: path.resolve(__dirname, 'src', 'dist'),
+    contentBase: path.resolve(__dirname, 'dist', 'web'),
     publicPath: 'http://localhost:8080/',
     historyApiFallback: true
   },

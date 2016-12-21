@@ -13,33 +13,49 @@ const output = (isWeb ? 'assets/platform/web' : 'assets/platform/electron')
 const htmlTemplate = isWeb ? 'index.web.html' : 'index.electron.html'
 
 let options = {
+  entry: [
+    'react-hot-loader/patch',
+    'webpack-dev-server/client?http://localhost:8080/',
+    'webpack/hot/only-dev-server',
+    './index.js'
+  ],
+
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'app', 'dist'),
-    publicPath: '/'
+    path: path.resolve(__dirname, 'src', 'dist')
   },
 
-  context: path.resolve(__dirname, 'app'),
+  target: 'web',
+
+  context: path.resolve(__dirname, 'src'),
 
   devtool: isProd ? false : 'source-map',
+
+  devServer: {
+    hot: true,
+    contentBase: path.resolve(__dirname, 'src', 'dist'),
+    publicPath: 'http://localhost:8080/',
+    historyApiFallback: true
+  },
 
   module: {
     rules: [
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        options: {
-          presets: ['es2015','stage-0','react']
-        },
+        test: /\.(js|jsx)$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          }
+        ],
         exclude: [
-          /node_modules/,
-          /dist/
+          /(dist)/,
+          /(node_modules)/
         ]
       },
       {
         test: /\.scss$/,
         exclude: [
-          /dist/
+          /(dist)/
         ],
         loaders: ['style-loader', 'css-loader', 'sass-loader']
       }
@@ -47,49 +63,16 @@ let options = {
   },
 
   plugins: [
-    new webpack.NamedModulesPlugin()
+    new webpack.NamedModulesPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new HtmlWebpackPlugin({
+      template: './index.web.html'
+    })
   ],
 
   resolve: {
-    extensions: ['.js', '.coffee', '.scss']
+    extensions: ['.js', '.scss']
   }
-}
-
-if (isProd) {
-  options.entry = {
-    main: './index.js'
-  }
-  options.plugins.push(
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        screw_ie8: true
-      }
-    }),
-    new webpack.DefinePlugin({
-        'process.env': {
-            'NODE_ENV': JSON.stringify('production')
-        }
-    })
-  )
-}
-
-if (!isProd) {
-  options.plugins.push(new webpack.HotModuleReplacementPlugin())
-  options.entry = {
-    server: [
-      'react-hot-loader/patch',
-      'webpack-dev-server/client?http://localhost:8080',
-      'webpack/hot/only-dev-server'
-    ],
-    main: './index.js'
-  }
-  options.devServer = {
-    hot: true,
-    contentBase: path.resolve(__dirname, 'app', 'dist'),
-    publicPath: 'http://localhost:8080',
-    historyApiFallback: true
-  }
-  options.target = 'web'
 }
 
 module.exports = options

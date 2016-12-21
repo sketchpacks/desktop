@@ -4,6 +4,9 @@ import _ from 'lodash'
 
 import { Link } from 'react-router'
 
+import Nameplate from '../Nameplate'
+import Button from '../Button'
+
 import './plugin_media.scss'
 
 class PluginMedia extends Component {
@@ -11,43 +14,84 @@ class PluginMedia extends Component {
     super(props)
 
     this.renderPreview = this.renderPreview.bind(this)
+    this.renderVersion = this.renderVersion.bind(this)
+    this.renderScore = this.renderScore.bind(this)
   }
 
   renderPreview () {
     const { thumbnail_url } = this.props.plugin
-    if (thumbnail_url === '') return
+
+    if (thumbnail_url === null)
+      return
+
+    if (thumbnail_url === undefined)
+      return
 
     return (
-      <figure className="media-right">
-        <p className="image is-64x64">
-          <img src={thumbnail_url} role="presentation" />
-        </p>
-      </figure>
+      <div className="o-media__right u-mar-left-large">
+        <img src={thumbnail_url} role="presentation" />
+      </div>
+    )
+  }
+
+  renderScore () {
+    const { score } = this.props.plugin
+
+    if (score === 0)
+      return
+
+    return (
+      <span>{score}/5.0</span>
+    )
+  }
+
+  renderVersion () {
+    const { version } = this.props.plugin
+
+    if (version === "0")
+      return
+
+    return (
+      <span>v{version}</span>
     )
   }
 
   render () {
-    const { name, description, owner } = this.props.plugin
+    const { name, description, owner, version, score } = this.props.plugin
 
     return (
-      <div className="box">
-        <article className="media">
-          <div className="media-content">
-            <div className="content">
-              <p>
-                <strong className="title"><Link to={`/${owner.handle}/${name}`}>{name}</Link></strong><br />
-                <Link to={`/@${owner.handle}`} className="subtitle">{owner.handle}</Link>
-              </p>
-
+        <article className="o-plugin">
+          <div className="o-media">
+            <div className="o-media__content">
+              <h5>
+                <Link to={`/${owner.handle}/${name}`}>
+                  {name}
+                </Link>
+              </h5>
               <p>
                 {description}
               </p>
             </div>
+
+            { this.renderPreview() }
           </div>
 
-          { this.renderPreview() }
+          <div className="o-plugin__footer">
+            <Nameplate
+              handle={owner.handle}
+              thumbnailUrl={owner.avatar_url}
+              name={owner.name}
+              height={24}
+              width={24}
+            />
+
+            { this.renderVersion() }
+
+            { this.renderScore() }
+
+            <Button actionVerb={'Install'}/>
+          </div>
         </article>
-      </div>
     )
   }
 }
@@ -59,17 +103,8 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { recommends } = state
-  const { id } = ownProps.plugin
-
-  const isRecommended = () => {
-    return _.includes(_.map(recommends.items, 'id'), id )
-  }
-
   return {
-    state,
-    recommends,
-    isRecommended: isRecommended()
+    state
   }
 }
 

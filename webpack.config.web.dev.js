@@ -5,7 +5,6 @@ const { SERVER_PORT } = require('./src/config')
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const webpackTargetElectronRenderer = require('webpack-target-electron-renderer')
 
 var argv = require('minimist')(process.argv.slice(2))
 const isWeb = (argv && argv.target === 'web')

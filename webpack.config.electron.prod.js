@@ -4,6 +4,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 var argv = require('minimist')(process.argv.slice(2))
 const isWeb = (argv && argv.target === 'web')
@@ -47,10 +48,13 @@ let options = {
       },
       {
         test: /\.scss$/,
+        loader: ExtractTextPlugin.extract({
+          fallbackLoader: 'style-loader',
+          loader: ['css-loader', 'sass-loader']
+        }),
         exclude: [
           /(dist)/
-        ],
-        loaders: ['style-loader', 'css-loader', 'sass-loader']
+        ]
       }
     ]
   },
@@ -59,7 +63,16 @@ let options = {
     new webpack.NamedModulesPlugin(),
     new HtmlWebpackPlugin({
       template: './index.electron.html'
-    })
+    }),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      }
+    }),
+    new ExtractTextPlugin("styles.css")
   ],
 
   resolve: {

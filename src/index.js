@@ -19,8 +19,6 @@ import UserPlugins from './views/UserPlugins'
 let store = configureStore()
 
 const render = () => {
-  console.log('RENDER')
-
   ReactDOM.render(
     <Provider store={store}>
       <Router history={browserHistory}>

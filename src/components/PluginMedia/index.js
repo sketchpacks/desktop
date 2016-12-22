@@ -1,3 +1,7 @@
+import {
+  __ELECTRON__
+} from '../../config'
+
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
@@ -64,9 +68,13 @@ class PluginMedia extends Component {
           <div className="o-media">
             <div className="o-media__content">
               <h5>
-                <Link to={`/${owner.handle}/${name}`}>
-                  {name}
-                </Link>
+                { __ELECTRON__ ? (
+                  <span>{name}</span>
+                ) : (
+                  <Link to={`/${owner.handle}/${name}`}>
+                    {name}
+                  </Link>
+                ) }
               </h5>
               <p>
                 {description}

@@ -41,17 +41,15 @@ menuBar.on('ready', () => {
 })
 
 menuBar.on('after-show', () => {
-  // if (process.env.NODE_ENV === 'development') {
+  // if (__DEVELOPMENT__ || __DEBUG__) {
     // require('devtron').install()
-    // menuBar.window.openDevTools({ mode: 'detach' })
+    menuBar.window.openDevTools({ mode: 'detach' })
   // }
-  menuBar.window.openDevTools({ mode: 'detach' })
 })
 
 menuBar.on('after-create-window', () => {
   menuBar.window.show()
 })
-
 
 app.on('ready', () => {
   if (__PRODUCTION__ && __ELECTRON__) {

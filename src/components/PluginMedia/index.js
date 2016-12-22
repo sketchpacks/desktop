@@ -1,5 +1,7 @@
 import {
-  __ELECTRON__
+  __ELECTRON__,
+  WEB_URL,
+  API_URL
 } from '../../config'
 
 import React, { Component } from 'react'
@@ -69,7 +71,9 @@ class PluginMedia extends Component {
             <div className="o-media__content">
               <h5>
                 { __ELECTRON__ ? (
-                  <span>{name}</span>
+                  <a href={`${WEB_URL}/${owner.handle}/${name}`}>
+                    {name}
+                  </a>
                 ) : (
                   <Link to={`/${owner.handle}/${name}`}>
                     {name}

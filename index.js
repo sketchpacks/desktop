@@ -3,7 +3,10 @@
 
 const {
   APP_VERSION,
-  SERVER_PORT
+  SERVER_PORT,
+  __PRODUCTION__,
+  __DEVELOPMENT__,
+  __ELECTRON__
 } = require('./src/config')
 
 const path = require('path')
@@ -15,13 +18,6 @@ const dialog = electron.dialog
 const autoUpdater = electron.autoUpdater
 const log = require('electron-log')
 const menubar = require('menubar')
-
-const __PRODUCTION__ = (process.env.NODE_ENV === 'production') || false
-
-if (__PRODUCTION__) {
-  const server = require('./src/server')
-}
-
 
 const opts = {
   dir: __dirname,
@@ -35,9 +31,10 @@ const opts = {
 const menuBar = menubar(opts)
 
 menuBar.on('ready', () => {
-  log.info(`Sketchpacks v${APP_VERSION} launched`)
+  log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
 
-  if (__PRODUCTION__) {
+  if (__PRODUCTION__ && __ELECTRON__) {
+    const server = require('./src/server')
     server.listen(SERVER_PORT)
     log.info("Server started on port " + SERVER_PORT)
   }
@@ -57,7 +54,7 @@ menuBar.on('after-create-window', () => {
 
 
 app.on('ready', () => {
-  if (process.env.NODE_ENV !== 'development') {
+  if (__PRODUCTION__ && __ELECTRON__) {
     const updater = require('./src/main/updater')
     updater.init()
   }

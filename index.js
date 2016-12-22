@@ -16,7 +16,7 @@ const autoUpdater = electron.autoUpdater
 const log = require('electron-log')
 const menubar = require('menubar')
 
-const __PRODUCTION__ = (process.env.NODE_ENV === 'production') || true
+const __PRODUCTION__ = (process.env.NODE_ENV === 'production') || false
 
 if (__PRODUCTION__) {
   const server = require('./src/server')

@@ -1,6 +1,7 @@
 /* eslint strict: 0 */
 'use strict';
 
+const { SERVER_PORT } = require('./src/config')
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -15,14 +16,15 @@ const htmlTemplate = isWeb ? 'index.web.html' : 'index.electron.html'
 let options = {
   entry: [
     'react-hot-loader/patch',
-    'webpack-dev-server/client?http://localhost:8080/',
+    `webpack-dev-server/client?http://localhost:${SERVER_PORT}/`,
     'webpack/hot/only-dev-server',
     './index.js'
   ],
 
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'dist', 'web')
+    path: path.resolve(__dirname, 'dist', 'web'),
+    publicPath: '/'
   },
 
   target: 'electron',
@@ -34,7 +36,7 @@ let options = {
   devServer: {
     hot: true,
     contentBase: path.resolve(__dirname, 'dist', 'web'),
-    publicPath: 'http://localhost:8080/',
+    publicPath: `http://localhost:${SERVER_PORT}/`,
     historyApiFallback: true
   },
 

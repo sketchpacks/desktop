@@ -1,7 +1,10 @@
 /* eslint strict: 0 */
 'use strict';
 
-const config = require('./src/config')
+const {
+  APP_VERSION,
+  SERVER_PORT
+} = require('./src/config')
 
 const path = require('path')
 const os = require('os')
@@ -13,25 +16,31 @@ const autoUpdater = electron.autoUpdater
 const log = require('electron-log')
 const menubar = require('menubar')
 
-const server = require('./src/server')
+const __PRODUCTION__ = (process.env.NODE_ENV === 'production') || true
 
-const port = process.env.PORT || 3000
+if (__PRODUCTION__) {
+  const server = require('./src/server')
+}
+
 
 const opts = {
   dir: __dirname,
   icon: __dirname + '/src/IconTemplate.png',
   width: 640,
   height: 600,
-  index: `http://localhost:${port}/`,
+  index: `http://localhost:${SERVER_PORT}/`,
   resizable: false
 }
 
 const menuBar = menubar(opts)
 
 menuBar.on('ready', () => {
-  log.info(`Sketchpacks v${config.APP_VERSION} launched`)
-  server.listen(port)
-  log.info("Server started on port " + port)
+  log.info(`Sketchpacks v${APP_VERSION} launched`)
+
+  if (__PRODUCTION__) {
+    server.listen(SERVER_PORT)
+    log.info("Server started on port " + SERVER_PORT)
+  }
 })
 
 menuBar.on('after-show', () => {

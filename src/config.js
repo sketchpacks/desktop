@@ -1,7 +1,5 @@
-const RELEASE_SERVER_URL = 'https://sketchpacks-releases.herokuapp.com'
-const APP_VERSION = require('../package.json').version
-
 module.exports = {
-  RELEASE_SERVER_URL: RELEASE_SERVER_URL,
-  APP_VERSION: APP_VERSION
+  RELEASE_SERVER_URL: 'https://sketchpacks-releases.herokuapp.com',
+  APP_VERSION: require('../package.json').version,
+  SERVER_PORT: process.env.PORT || 8080
 }

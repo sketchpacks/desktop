@@ -11,7 +11,7 @@ import _ from 'lodash'
 import { Link } from 'react-router'
 
 import Nameplate from '../Nameplate'
-import Button from '../Button'
+import InstallButton from '../InstallButton'
 
 import './plugin_media.scss'
 
@@ -63,7 +63,7 @@ class PluginMedia extends Component {
   }
 
   render () {
-    const { name, description, owner, version, score } = this.props.plugin
+    const { name, description, owner, version, score, handleCTAClick } = this.props.plugin
 
     return (
         <article className="o-plugin">
@@ -101,7 +101,7 @@ class PluginMedia extends Component {
 
             { this.renderScore() }
 
-            <Button actionVerb={'Install'}/>
+            <InstallButton plugin={this.props.plugin}/>
           </div>
         </article>
     )

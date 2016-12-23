@@ -2,26 +2,26 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, Route, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
 import { Provider } from 'react-redux'
-import configureStore from './store/configureStore'
+import configureStore from '../store/configureStore'
 import { ipcRenderer } from 'electron'
 
-import App from './containers/App'
+import App from '../containers/App'
 
-import FrontPage from './views/FrontPage'
-import BrowsePlugins from './views/BrowsePlugins'
-import PopularPlugins from './views/PopularPlugins'
-import NewestPlugins from './views/NewestPlugins'
-import PluginDetails from './views/PluginDetails'
+import FrontPage from '../views/FrontPage'
+import BrowsePlugins from '../views/BrowsePlugins'
+import PopularPlugins from '../views/PopularPlugins'
+import NewestPlugins from '../views/NewestPlugins'
+import PluginDetails from '../views/PluginDetails'
 
-import UserProfile from './views/UserProfile'
-import UserRecommends from './views/UserRecommends'
-import UserPlugins from './views/UserPlugins'
+import UserProfile from '../views/UserProfile'
+import UserRecommends from '../views/UserRecommends'
+import UserPlugins from '../views/UserPlugins'
 
 import {
   installPluginProgress,
   installPluginSuccess,
   installPluginError
-} from './actions/plugin_manager'
+} from '../actions/plugin_manager'
 
 let store = configureStore()
 

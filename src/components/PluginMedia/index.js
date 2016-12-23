@@ -101,7 +101,7 @@ class PluginMedia extends Component {
 
             { this.renderScore() }
 
-            <InstallButton plugin={this.props.plugin}/>
+            <InstallButton plugin={this.props.plugin} dispatch={this.props.dispatch}/>
           </div>
         </article>
     )

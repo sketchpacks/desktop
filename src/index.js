@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import { Router, Route, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
 import { Provider } from 'react-redux'
 import configureStore from './store/configureStore'
+import { ipcRenderer } from 'electron'
 
 import App from './containers/App'
 
@@ -15,6 +16,12 @@ import PluginDetails from './views/PluginDetails'
 import UserProfile from './views/UserProfile'
 import UserRecommends from './views/UserRecommends'
 import UserPlugins from './views/UserPlugins'
+
+import {
+  installPluginProgress,
+  installPluginSuccess,
+  installPluginError
+} from './actions/plugin_manager'
 
 let store = configureStore()
 
@@ -45,3 +52,15 @@ const render = () => {
 }
 
 render()
+
+// Receive download progress, dispatch installPluginProgress
+ipcRenderer.on('manager/INSTALL_PROGRESS', (evt,arg) => {
+  const { plugin, progress } = arg
+  const { bytesReceived, bytesTotal } = progress
+  store.dispatch(installPluginProgress(plugin,bytesReceived,bytesTotal))
+})
+
+// Download is complete, dispatch installPluginProgress
+ipcRenderer.on('manager/INSTALL_SUCCESS', (evt,arg) => {
+  store.dispatch(installPluginSuccess(arg))
+})

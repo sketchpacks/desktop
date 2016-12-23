@@ -16,8 +16,10 @@ const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
 const autoUpdater = electron.autoUpdater
+const ipcMain = electron.ipcMain
 const log = require('electron-log')
 const menubar = require('menubar')
+const pluginManager = require('./src/main/plugin_manager')
 
 const opts = {
   dir: __dirname,
@@ -56,4 +58,8 @@ app.on('ready', () => {
     const updater = require('./src/main/updater')
     updater.init()
   }
+})
+
+ipcMain.on('manager/INSTALL_REQUEST', (event, arg) => {
+  pluginManager.install(event, arg)
 })

@@ -72,7 +72,7 @@ let options = {
   ],
 
   resolve: {
-    extensions: ['.js', '.scss']
+    extensions: ['.js', '.scss', '.web.js']
   }
 }
 

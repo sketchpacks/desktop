@@ -76,7 +76,7 @@ let options = {
   ],
 
   resolve: {
-    extensions: ['.js', '.scss']
+    extensions: ['.js', '.scss', '.electron.js']
   }
 }
 

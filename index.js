@@ -16,10 +16,15 @@ const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
 const autoUpdater = electron.autoUpdater
-const ipcMain = electron.ipcMain
+const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
 const pluginManager = require('./src/main/plugin_manager')
+const catalogManager = require('./src/main/catalog_manager')
+const {
+  CATALOG_FETCH_DELAY,
+  CATALOG_FETCH_INTERVAL
+} = require('./src/config')
 
 const opts = {
   dir: __dirname,
@@ -31,6 +36,8 @@ const opts = {
 }
 
 const menuBar = menubar(opts)
+
+let mainWindow
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
@@ -51,6 +58,7 @@ menuBar.on('after-show', () => {
 
 menuBar.on('after-create-window', () => {
   menuBar.window.show()
+  mainWindow = menuBar.window
 })
 
 app.on('ready', () => {
@@ -58,8 +66,24 @@ app.on('ready', () => {
     const updater = require('./src/main/updater')
     updater.init()
   }
+
+  if (__ELECTRON__) {
+    setTimeout(updateCatalog, ms(CATALOG_FETCH_DELAY))
+    setInterval(updateCatalog, ms(CATALOG_FETCH_INTERVAL))
+  }
 })
+
+
+
 
 ipcMain.on('manager/INSTALL_REQUEST', (event, arg) => {
   pluginManager.install(event, arg)
 })
+
+function updateCatalog () {
+  catalogManager.fetch()
+
+  if (mainWindow) {
+    mainWindow.webContents.send('catalog/FETCH_REQUEST')
+  }
+}

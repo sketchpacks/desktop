@@ -62,3 +62,7 @@ ipcRenderer.on('manager/INSTALL_PROGRESS', (evt,arg) => {
 ipcRenderer.on('manager/INSTALL_SUCCESS', (evt,arg) => {
   store.dispatch(installPluginSuccess(arg))
 })
+
+ipcRenderer.on('catalog/FETCH_REQUEST', (evt,arg) => {
+  console.log('Fetching latest catalog')
+})

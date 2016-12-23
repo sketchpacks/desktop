@@ -11,5 +11,5 @@ module.exports = {
   API_URL: 'https://sketchpacks-api.herokuapp.com/',
 
   CATALOG_FETCH_DELAY: '10s',
-  CATALOG_FETCH_INTERVAL: '30s' 
+  CATALOG_FETCH_INTERVAL: '5s' 
 }

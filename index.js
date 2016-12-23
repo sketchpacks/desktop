@@ -37,7 +37,7 @@ const opts = {
 
 const menuBar = menubar(opts)
 
-let mainWindow
+let mainWindow, catalog
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
@@ -59,6 +59,8 @@ menuBar.on('after-show', () => {
 menuBar.on('after-create-window', () => {
   menuBar.window.show()
   mainWindow = menuBar.window
+
+  catalog.addSubscribers([mainWindow])
 })
 
 app.on('ready', () => {
@@ -68,22 +70,12 @@ app.on('ready', () => {
   }
 
   if (__ELECTRON__) {
-    setTimeout(updateCatalog, ms(CATALOG_FETCH_DELAY))
-    setInterval(updateCatalog, ms(CATALOG_FETCH_INTERVAL))
+    catalog = new catalogManager('test')
+    catalog.fetch()
+    catalog.enableAutoUpdate()
   }
 })
-
-
-
 
 ipcMain.on('manager/INSTALL_REQUEST', (event, arg) => {
   pluginManager.install(event, arg)
 })
-
-function updateCatalog () {
-  catalogManager.fetch()
-
-  if (mainWindow) {
-    mainWindow.webContents.send('catalog/FETCH_REQUEST')
-  }
-}

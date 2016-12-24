@@ -20,7 +20,8 @@ const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
 const pluginManager = require('./src/main/plugin_manager')
-const catalogManager = require('./src/main/catalog_manager')
+const CatalogManager = require('./src/main/catalog_manager')
+const Catalog = require('./src/lib/catalog')
 const {
   CATALOG_FETCH_DELAY,
   CATALOG_FETCH_INTERVAL
@@ -60,7 +61,7 @@ menuBar.on('after-create-window', () => {
   menuBar.window.show()
   mainWindow = menuBar.window
 
-  catalog.addSubscribers([mainWindow])
+  CatalogManager.addSubscribers(mainWindow)
 })
 
 app.on('ready', () => {
@@ -70,9 +71,8 @@ app.on('ready', () => {
   }
 
   if (__ELECTRON__) {
-    catalog = new catalogManager('test')
-    catalog.fetch()
-    catalog.enableAutoUpdate()
+    CatalogManager.fetch()
+    CatalogManager.enableAutoUpdate()
   }
 })
 

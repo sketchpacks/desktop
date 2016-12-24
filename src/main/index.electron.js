@@ -18,6 +18,10 @@ import UserRecommends from '../views/UserRecommends'
 import UserPlugins from '../views/UserPlugins'
 
 import {
+  pluginsReceived
+} from '../actions'
+
+import {
   installPluginProgress,
   installPluginSuccess,
   installPluginError
@@ -65,4 +69,8 @@ ipcRenderer.on('manager/INSTALL_SUCCESS', (evt,arg) => {
 
 ipcRenderer.on('catalog/FETCH_REQUEST', (evt,arg) => {
   console.log('Fetching latest catalog')
+})
+
+ipcRenderer.on('catalog/FETCH_RECEIVED', (evt,arg) => {
+  console.log('Latest catalog received')
 })

@@ -1,51 +1,53 @@
 const log = require('electron-log')
 const request = require('request')
+const promise = require('promise')
 const ms = require('ms')
+const Catalog = require('../lib/catalog')
 const {
   API_URL,
   CATALOG_FETCH_INTERVAL
 } = require('../config')
 
-let instance = null
+const subscribers = []
 
-module.exports = class CatalogManager {
-  constructor (store) {
-    if (!instance) {
-      instance = this
-    }
+const opts = {
+  method: 'GET',
+  baseUrl: API_URL,
+  uri: '/v1/plugins/catalog',
+  json: true
+}
 
-    instance.store = store
-    instance.subscribers = []
+const CatalogManager = {
+  addSubscribers: (window) => subscribers.push(window),
 
-    return instance
-  }
+  enableAutoUpdate: () => setInterval(CatalogManager.fetch, ms(CATALOG_FETCH_INTERVAL)),
 
-  addSubscribers (subscribers) {
-    instance.subscribers = instance.subscribers.concat(subscribers)
-  }
-
-  fetch () {
-    const opts = {
-      method: 'GET',
-      baseUrl: API_URL,
-      uri: '/v1/plugins/catalog',
-      json: true
-    }
-
-    log.info(`Fetching latest plugin catalog from ${API_URL}...`)
-
-    const req = request(opts, (error, response, body) => {
-      console.log(body)
-    })
-
-    if (instance.subscribers.length) {
-      for (const window of instance.subscribers) {
-        window.webContents.send('catalog/FETCH_REQUEST')
+  notifySubscribers: (channel, args) => {
+    if (subscribers.length) {
+      for (const window of subscribers) {
+        window.webContents.send(channel, args)
       }
     }
-  }
+  },
 
-  enableAutoUpdate () {
-    setInterval(instance.fetch, ms(CATALOG_FETCH_INTERVAL))
-  }
+  fetch: () =>
+    new Promise((resolve, reject) => {
+      log.info(`Fetching latest plugin catalog from ${API_URL}...`)
+
+      CatalogManager.notifySubscribers('catalog/FETCH_REQUEST',{})
+
+      request(opts, (error, response, body) => {
+        if (error) return reject(error)
+
+        CatalogManager.notifySubscribers('catalog/FETCH_RECEIVED',{})
+
+        return resolve(body)
+      })
+    }),
+
+  getSubscribers: () => subscribers
+
 }
+
+Object.freeze(CatalogManager)
+module.exports = CatalogManager

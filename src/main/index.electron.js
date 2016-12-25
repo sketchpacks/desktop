@@ -34,7 +34,7 @@ export const render = () => {
     <Provider store={store}>
       <Router history={browserHistory}>
         <Route path="/" component={App}>
-          <IndexRoute component={FrontPage} />
+          <IndexRoute component={BrowsePlugins} />
           <Route path="browse" component={BrowsePlugins} />
           <Route path="browse/popular" component={PopularPlugins} />
           <Route path="browse/newest" component={NewestPlugins} />

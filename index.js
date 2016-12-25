@@ -19,6 +19,7 @@ const autoUpdater = electron.autoUpdater
 const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
+const Database = require('nedb')
 const pluginManager = require('./src/main/plugin_manager')
 const CatalogManager = require('./src/main/catalog_manager')
 const Catalog = require('./src/lib/catalog')
@@ -38,7 +39,17 @@ const opts = {
 
 const menuBar = menubar(opts)
 
-let mainWindow, catalog
+const database = new Database({
+  filename: path.join(app.getPath('userData'), 'catalog.db'),
+  autoload: true
+})
+
+global.database = database
+global.catalog = Catalog
+
+Catalog.setDatabase(database)
+
+let mainWindow
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
@@ -71,7 +82,8 @@ app.on('ready', () => {
   }
 
   if (__ELECTRON__) {
-    CatalogManager.fetch()
+    setTimeout(CatalogManager.fetch, ms('1m'))
+
     CatalogManager.enableAutoUpdate()
   }
 })

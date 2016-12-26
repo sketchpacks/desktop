@@ -19,7 +19,7 @@ const Catalog = {
   getDatabase: () => database,
 
   upsert: (plugins) => {
-    const filteredPlugins = _.without(plugins, null, undefined)
+    const filteredPlugins = _.without(JSON.parse(plugins), null, undefined)
 
     new Promise((resolve, reject) => {
       let error

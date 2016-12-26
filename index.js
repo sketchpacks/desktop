@@ -82,7 +82,7 @@ app.on('ready', () => {
   }
 
   if (__ELECTRON__) {
-    setTimeout(updateCatalogOnStart, ms('10s'))
+    setTimeout(updateCatalogOnStart, ms('5s'))
 
     CatalogManager.enableAutoUpdate()
   }
@@ -94,9 +94,7 @@ ipcMain.on('manager/INSTALL_REQUEST', (event, arg) => {
 
 const updateCatalogOnStart = () => {
   CatalogManager.fetch()
-    .then((items) => {
-      const plugins = JSON.parse(items)
-      const cleanedPlugins = _.without(plugins, null, undefined)
-      Catalog.upsert(cleanedPlugins)
+    .then((plugins) => {
+      Catalog.upsert(plugins)
     })
 }

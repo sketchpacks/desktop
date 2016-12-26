@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import PluginList from '../../components/PluginList'
+import PluginList from 'components/PluginList'
 
 import {
   pluginsRequest,
   pluginsReceived
-} from '../../actions'
+} from 'actions'
 
 class FrontPageContainer extends Component {
   componentDidMount () {

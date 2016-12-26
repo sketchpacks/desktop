@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
-import { routerReducer as routing } from 'react-router-redux'
-import * as actions from '../actions'
+import { routerReducer } from 'react-router-redux'
+import * as actions from 'actions'
 
 import jwt from 'jwt-simple'
 
@@ -156,12 +156,33 @@ function pluginDetails (state, action) {
   }
 }
 
+function app (state, action) {
+  switch (action.type) {
+    case actions.LOCATION_CHANGE:
+      return {
+        ...state,
+        location: action.payload.pathname
+      }
+    default:
+      if (state === undefined) {
+        return {
+          ...state,
+          location: '/browse'
+        }
+      }
+      else {
+        return state
+      }
+  }
+}
+
 const rootReducer = combineReducers({
-  routing,
+  routing: routerReducer,
   auth,
   plugins,
   pluginDetails,
-  recommends
+  recommends,
+  app
 })
 
 export default rootReducer

@@ -1,8 +1,8 @@
 import React from 'react'
 
-const Button = ({ actionVerb }) => (
+const Button = ({ actionVerb, onClick }) => (
   <div>
-    <button className="button">{actionVerb}</button>
+    <button className="button" onClick={onClick}>{actionVerb}</button>
   </div>
 )
 

@@ -1,11 +1,17 @@
+import {
+  __ELECTRON__,
+  WEB_URL,
+  API_URL
+} from 'config'
+
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 
 import { Link } from 'react-router'
 
-import Nameplate from '../Nameplate'
-import Button from '../Button'
+import Nameplate from 'components/Nameplate'
+import InstallButton from 'components/InstallButton'
 
 import './plugin_media.scss'
 
@@ -57,16 +63,22 @@ class PluginMedia extends Component {
   }
 
   render () {
-    const { name, description, owner, version, score } = this.props.plugin
+    const { name, description, owner, version, score, handleCTAClick } = this.props.plugin
 
     return (
         <article className="o-plugin">
           <div className="o-media">
             <div className="o-media__content">
               <h5>
-                <Link to={`/${owner.handle}/${name}`}>
-                  {name}
-                </Link>
+                { __ELECTRON__ ? (
+                  <a href={`${WEB_URL}/${owner.handle}/${name}`}>
+                    {name}
+                  </a>
+                ) : (
+                  <Link to={`/${owner.handle}/${name}`}>
+                    {name}
+                  </Link>
+                ) }
               </h5>
               <p>
                 {description}
@@ -89,7 +101,7 @@ class PluginMedia extends Component {
 
             { this.renderScore() }
 
-            <Button actionVerb={'Install'}/>
+            <InstallButton plugin={this.props.plugin} dispatch={this.props.dispatch}/>
           </div>
         </article>
     )

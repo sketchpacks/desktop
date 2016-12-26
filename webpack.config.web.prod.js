@@ -70,7 +70,8 @@ let options = {
   ],
 
   resolve: {
-    extensions: ['.js', '.scss']
+    extensions: ['.js', '.scss', '.web.js'],
+    modules: [path.resolve(__dirname, "src"), "node_modules"]
   }
 }
 

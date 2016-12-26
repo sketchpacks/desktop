@@ -5,9 +5,9 @@ import { connect } from 'react-redux'
 import {
   loginSuccess,
   logoutRequest
-} from '../../actions'
+} from 'actions'
 
-import '../../css/milligram.scss'
+import 'css/milligram.scss'
 
 class App extends Component {
   constructor (props) {

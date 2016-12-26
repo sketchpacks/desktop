@@ -6,7 +6,7 @@ import {
   pluginDetailsReceived,
   pluginReadmeRequest,
   pluginReadmeReceived
-} from '../../actions'
+} from 'actions'
 
 
 class PluginDetailsContainer extends Component {

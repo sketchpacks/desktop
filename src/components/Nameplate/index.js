@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Link } from 'react-router'
 
-import Avatar from '../Avatar'
+import Avatar from 'components/Avatar'
 
 const Nameplate = ({ handle, thumbnailUrl, name }) => (
   <div>

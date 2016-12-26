@@ -1,3 +1,5 @@
+export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE'
+
 export const LOGIN_REQUEST = 'LOGIN_REQUEST'
 
 export function loginRequest () {

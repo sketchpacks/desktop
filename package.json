@@ -3,7 +3,7 @@
   "productName": "Sketchpacks",
   "companyName": "Sketchpacks",
   "description": "Discover and manage Sketch Plugins from the menu bar",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "main": "index.js",
   "scripts": {
     "postinstall": "install-app-deps",
@@ -71,10 +71,13 @@
     "menubar": "^5.1.0",
     "minimist": "^1.2.0",
     "ms": "^0.7.2",
+    "nedb": "^1.8.0",
+    "nedb-party": "^0.1.1",
     "node-notifier": "^4.6.1",
     "node-sass": "^4.0.0",
     "os": "^0.1.1",
     "parse-link-header": "^0.4.1",
+    "promise": "^7.1.1",
     "qs": "^6.3.0",
     "react": "^15.4.1",
     "react-addons-create-fragment": "^15.4.1",
@@ -86,6 +89,8 @@
     "redux": "^3.6.0",
     "redux-logger": "^2.7.4",
     "redux-thunk": "^2.1.0",
+    "request": "^2.79.0",
+    "reselect": "^2.5.4",
     "segmentize": "^0.4.1",
     "whatwg-fetch": "^2.0.1"
   }

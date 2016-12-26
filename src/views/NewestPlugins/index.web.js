@@ -4,15 +4,15 @@ import { browserHistory } from 'react-router'
 
 import qs from 'qs'
 
-import PluginList from '../../components/PluginList'
+import PluginList from 'components/PluginList'
 import linkHeader from 'parse-link-header'
-import Pagination from '../../components/Pagination'
+import Pagination from 'components/Pagination'
 
 import {
   pluginsRequest,
   pluginsReceived,
   pluginsPaginate
-} from '../../actions'
+} from 'actions'
 
 class NewestPluginsContainer extends Component {
   componentDidMount () {
@@ -28,7 +28,7 @@ class NewestPluginsContainer extends Component {
       sort: 'created_at:desc'
     })
 
-    dispatch(pluginsRequest())    
+    dispatch(pluginsRequest())
 
     fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins?${queryScope}`)
       .then(response => {

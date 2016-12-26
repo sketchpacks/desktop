@@ -1,6 +1,6 @@
 import React from 'react'
 
-import PluginMedia from '../PluginMedia'
+import PluginMedia from 'components/PluginMedia'
 
 const PluginList = ({ plugins }) => {
   return (

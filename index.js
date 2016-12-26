@@ -20,7 +20,7 @@ const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
 const Database = require('nedb')
-const pluginManager = require('./src/main/plugin_manager')
+const PluginManager = require('./src/main/plugin_manager')
 const CatalogManager = require('./src/main/catalog_manager')
 const Catalog = require('./src/lib/catalog')
 const {
@@ -89,7 +89,7 @@ app.on('ready', () => {
 })
 
 ipcMain.on('manager/INSTALL_REQUEST', (event, arg) => {
-  pluginManager.install(event, arg)
+  PluginManager.install(event, arg)
 })
 
 const updateCatalogOnStart = () => {

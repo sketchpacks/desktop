@@ -31,11 +31,25 @@ import {
 import {
   installPluginProgress,
   installPluginSuccess,
-  installPluginError
+  installPluginError,
+  INSTALL_PLUGIN_REQUEST,
+  INSTALL_PLUGIN_SUCCESS,
+  INSTALL_PLUGIN_ERROR,
+
+  uninstallPluginProgress,
+  uninstallPluginSuccess,
+  uninstallPluginError,
+  UNINSTALL_PLUGIN_REQUEST,
+  UNINSTALL_PLUGIN_SUCCESS,
+  UNINSTALL_PLUGIN_ERROR
 } from 'actions/plugin_manager'
 
 let store = configureStore()
 const history = syncHistoryWithStore(browserHistory, store)
+
+const refreshStateFromCatalog = () =>
+  Catalog.getAllPlugins()
+    .then((plugins) => store.dispatch( pluginsReceived(plugins) ))
 
 export const render = () => {
   ReactDOM.render(
@@ -61,28 +75,22 @@ export const render = () => {
     document.getElementById('root')
   )
 
-  Catalog.getAllPlugins()
-    .then(plugins => store.dispatch(pluginsReceived(plugins)))
+  refreshStateFromCatalog()
 }
 
-// Receive download progress, dispatch installPluginProgress
-ipcRenderer.on('manager/INSTALL_PROGRESS', (evt,arg) => {
-  const { plugin, progress } = arg
-  const { bytesReceived, bytesTotal } = progress
-  store.dispatch(installPluginProgress(plugin,bytesReceived,bytesTotal))
+// Download is complete, dispatch installPluginProgress
+ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,arg) => {
+  refreshStateFromCatalog()
 })
 
-// Download is complete, dispatch installPluginProgress
-ipcRenderer.on('manager/INSTALL_SUCCESS', (evt,arg) => {
-  store.dispatch(installPluginSuccess(arg))
+ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,arg) => {
+  refreshStateFromCatalog()
 })
 
 ipcRenderer.on('catalog/FETCH_REQUEST', (evt,arg) => {
+  // UI reflects progress of updating the catalog from GET /plugins/catalog
 })
 
 ipcRenderer.on('catalog/FETCH_RECEIVED', (evt,arg) => {
-  Catalog.getAllPlugins()
-    .then((plugins) => {
-      store.dispatch(pluginsReceived(plugins))
-    })
+  refreshStateFromCatalog()
 })

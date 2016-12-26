@@ -49,6 +49,40 @@ const Catalog = {
       if (error) return reject(err)
       return resolve(filteredPlugins)
     })
+  },
+
+  pluginInstalled: ({ id, install_path, version}) => {
+    const newProps = {
+      installed: true,
+      install_path: install_path,
+      installed_version: version
+    }
+
+    return new Promise((resolve, reject) => {
+      database.update({ id: id },
+        { $set: newProps },
+        { returnUpdatedDocs: true }, (err, num, plugin) => {
+          if (err) return reject(err)
+          return resolve(plugin)
+        })
+    })
+  },
+
+  pluginRemoved: ({ id }) => {
+    const newProps = {
+      installed: false,
+      install_path: null,
+      installed_version: null
+    }
+
+    return new Promise((resolve, reject) => {
+      database.update({ id: id },
+        { $set: newProps },
+        { returnUpdatedDocs: true }, (err, num, plugin) => {
+          if (err) return reject(err)
+          return resolve(plugin)
+        })
+    })
   }
 }
 

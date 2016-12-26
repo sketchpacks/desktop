@@ -1,19 +1,19 @@
-import { ipcRenderer, remote } from 'electron'
+const { ipcRenderer, remote } = require('electron')
+const ms = require('ms')
 
-import ms from 'ms'
 
-export const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
+const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
 
-export function installPluginRequest (plugin) {
+function installPluginRequest (plugin) {
   return (dispatch, getState) => {
-    ipcRenderer.send('manager/INSTALL_REQUEST', plugin)
+    ipcRenderer.send(INSTALL_PLUGIN_REQUEST, plugin)
   }
 }
 
 
-export const INSTALL_PLUGIN_PROGRESS = 'manager/INSTALL_PROGRESS'
+const INSTALL_PLUGIN_PROGRESS = 'manager/INSTALL_PROGRESS'
 
-export function installPluginProgress (plugin, bytesReceived, bytesTotal) {
+function installPluginProgress (plugin, bytesReceived, bytesTotal) {
   return {
     type: INSTALL_PLUGIN_PROGRESS,
     plugin,
@@ -26,9 +26,9 @@ export function installPluginProgress (plugin, bytesReceived, bytesTotal) {
 }
 
 
-export const INSTALL_PLUGIN_SUCCESS = 'manager/INSTALL_SUCCESS'
+const INSTALL_PLUGIN_SUCCESS = 'manager/INSTALL_SUCCESS'
 
-export function installPluginSuccess (plugin) {
+function installPluginSuccess (plugin) {
   return {
     type: INSTALL_PLUGIN_SUCCESS,
     plugin
@@ -36,12 +36,62 @@ export function installPluginSuccess (plugin) {
 }
 
 
-export const INSTALL_PLUGIN_ERROR = 'manager/INSTALL_ERROR'
+const INSTALL_PLUGIN_ERROR = 'manager/INSTALL_ERROR'
 
-export function installPluginError (error, plugin) {
+function installPluginError (error, plugin) {
   return {
     type: INSTALL_PLUGIN_ERROR,
     error: error,
     plugin
   }
+}
+
+
+const UNINSTALL_PLUGIN_REQUEST = 'manager/UNINSTALL_REQUEST'
+
+function uninstallPluginRequest (plugin) {
+  return (dispatch, getState) => {
+    ipcRenderer.send(UNINSTALL_PLUGIN_REQUEST, plugin)
+  }
+}
+
+const UNINSTALL_PLUGIN_SUCCESS = 'manager/UNINSTALL_SUCCESS'
+
+function uninstallPluginSuccess (plugin) {
+  return {
+    type: UNINSTALL_PLUGIN_SUCCESS,
+    plugin
+  }
+}
+
+
+const UNINSTALL_PLUGIN_ERROR = 'manager/UNINSTALL_ERROR'
+
+function uninstallPluginError (error, plugin) {
+  return {
+    type: INSTALL_PLUGIN_ERROR,
+    error: error,
+    plugin
+  }
+}
+
+
+module.exports = {
+  installPluginRequest,
+  installPluginProgress,
+  installPluginSuccess,
+  installPluginError,
+
+  uninstallPluginRequest,
+  uninstallPluginSuccess,
+  uninstallPluginError,
+
+  INSTALL_PLUGIN_REQUEST,
+  INSTALL_PLUGIN_PROGRESS,
+  INSTALL_PLUGIN_SUCCESS,
+  INSTALL_PLUGIN_ERROR,
+
+  UNINSTALL_PLUGIN_REQUEST,
+  UNINSTALL_PLUGIN_SUCCESS,
+  UNINSTALL_PLUGIN_ERROR
 }

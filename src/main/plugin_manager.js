@@ -1,49 +1,103 @@
 const { app } = require('electron')
 const request = require('request')
+const Promise = require('promise')
+
 const fs = require('fs')
 const path = require('path')
+const exec = require('child_process').exec
+const _ = require('lodash')
+const IsThere = require("is-there")
+const contentDisposition = require('content-disposition')
+const AdmZip = require('adm-zip')
+
+const {
+  HOME_PATH,
+  PLUGIN_PATHS
+} = require('../config')
+
+const TEMP_DIR_PATH = app.getPath('temp')
+const DOWNLOAD_PATH = app.getPath('downloads')
+
+const getInstallPath = () => {
+  const installPath = _.find(PLUGIN_PATHS, (installPath) => {
+    return IsThere(path.join(HOME_PATH,installPath))
+  })
+
+  return path.join(HOME_PATH,installPath).replace(/ /g, '\\ ')
+}
+
+const getSavePath = ((filename) => {
+  return path.join(TEMP_DIR_PATH, filename)
+})
 
 const install = (event, plugin) => {
-  let bytesReceived = 0
-  let bytesTotal = 0
+  const { id, name, download_url, version } = plugin
 
-  const DOWNLOAD_PATH = app.getPath('downloads')
-
-  const req = request({
+  const opts = {
     method: 'GET',
-    uri: plugin.download_url
-  })
+    uri: download_url
+  }
 
-  let out = fs.createWriteStream(path.join(DOWNLOAD_PATH,`sketch-plugin-${plugin.id}.zip`))
+  return new Promise ((resolve, reject) => {
+    request(opts)
+      .on('response', (response) => {
+        const disposition = response.headers['content-disposition']
+        const filename = contentDisposition.parse(disposition)['parameters']['filename']
+        const savePath = getSavePath(filename)
+        const archiveFileStream = fs.createWriteStream(savePath)
+        const installPath = getInstallPath()
 
-  req.pipe(out)
+        let extractionPath
 
-  req.on('response', (data) => {
-    bytesTotal = parseInt(data.headers['content-length'])
-  })
+        archiveFileStream.on('finish', () => {
+          exec(`unzip -o -a ${savePath} -d ${installPath}`, (error, stdout, stderr) => {
+            if (error) {
+              console.error(`exec error: ${error}`)
+              reject(error)
+              return
+            }
+            console.log(`stdout: ${stdout}`)
+            console.log(`stderr: ${stderr}`)
+          })
 
-  req.on('data', (chunk) => {
-    bytesReceived += chunk.length
+          extractionPath = new AdmZip(savePath).getEntries()[0].entryName
 
-    if (bytesTotal !== 0) {
-      event.sender.send('manager/INSTALL_PROGRESS', {
-        plugin: plugin,
-        progress: {
-          bytesReceived: bytesReceived,
-          bytesTotal: bytesTotal
-        }
+          resolve({
+            id: id,
+            name: name,
+            download_url: download_url,
+            filename: filename,
+            install_path: path.join(getInstallPath(), extractionPath),
+            version: version
+          })
+        })
+
+        response.pipe(archiveFileStream)
       })
-    }
-
-  })
-
-  req.on('end', (chunk) => {
-    event.sender.send('manager/INSTALL_SUCCESS', plugin)
   })
 }
 
 const uninstall = (event, plugin) => {
-  event.sender.send('manager/UNINSTALL_SUCCESS', plugin)
+  const { id, name, install_path } = plugin
+
+  return new Promise((resolve, reject) => {
+    exec(`rm -rf ${install_path}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`)
+        reject(error)
+        return
+      }
+      console.log(`stdout: ${stdout}`)
+      console.log(`stderr: ${stderr}`)
+    })
+
+    resolve({
+      id: id,
+      name: name,
+      install_path: null,
+      installed_version: null
+    })
+  })
 }
 
 const update = (event, plugin) => {

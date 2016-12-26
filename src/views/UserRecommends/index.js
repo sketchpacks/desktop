@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import PluginList from '../../components/PluginList'
+import PluginList from 'components/PluginList'
 
 import {
   recommendsRequest,
   recommendsReceived
-} from '../../actions'
+} from 'actions'
 
 class UserRecommendsContainer extends Component {
   componentDidMount () {

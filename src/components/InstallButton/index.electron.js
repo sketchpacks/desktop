@@ -1,7 +1,7 @@
 import React from 'react'
-import Button from '../Button'
-import InstallButton from '../InstallButton'
-import { installPluginRequest } from '../../actions/plugin_manager'
+import Button from 'components/Button'
+import InstallButton from 'components/InstallButton'
+import { installPluginRequest } from 'actions/plugin_manager'
 
 const Connect = ComposedComponent =>
   class extends React.Component {

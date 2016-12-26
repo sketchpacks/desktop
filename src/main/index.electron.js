@@ -60,6 +60,9 @@ export const render = () => {
 
     document.getElementById('root')
   )
+
+  Catalog.getAllPlugins()
+    .then(plugins => store.dispatch(pluginsReceived(plugins)))
 }
 
 // Receive download progress, dispatch installPluginProgress

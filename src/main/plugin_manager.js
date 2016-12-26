@@ -1,5 +1,6 @@
 const { app } = require('electron')
 const request = require('request')
+const Promise = require('promise')
 
 const fs = require('fs')
 const path = require('path')
@@ -29,42 +30,74 @@ const getSavePath = ((filename) => {
   return path.join(TEMP_DIR_PATH, filename)
 })
 
-const downloadAndExtract = (plugin) => {
-  const { download_url } = plugin
+const install = (event, plugin) => {
+  const { id, name, download_url, version } = plugin
 
   const opts = {
     method: 'GET',
     uri: download_url
   }
 
-  request(opts)
-    .on('response', (response) => {
-      const disposition = response.headers['content-disposition']
-      const filename = contentDisposition.parse(disposition)['parameters']['filename']
-      const savePath = getSavePath(filename)
-      const archiveFileStream = fs.createWriteStream(savePath)
+  return new Promise ((resolve, reject) => {
+    request(opts)
+      .on('response', (response) => {
+        const disposition = response.headers['content-disposition']
+        const filename = contentDisposition.parse(disposition)['parameters']['filename']
+        const savePath = getSavePath(filename)
+        const archiveFileStream = fs.createWriteStream(savePath)
+        const installPath = getInstallPath()
 
-      archiveFileStream.on('finish', () => {
-        exec(`unzip -o -a ${savePath} -d ${getInstallPath()}`, (error, stdout, stderr) => {
-          if (error) {
-            console.error(`exec error: ${error}`)
-            return
-          }
-          console.log(`stdout: ${stdout}`)
-          console.log(`stderr: ${stderr}`)
+        let extractionPath
+
+        archiveFileStream.on('finish', () => {
+          exec(`unzip -o -a ${savePath} -d ${installPath}`, (error, stdout, stderr) => {
+            if (error) {
+              console.error(`exec error: ${error}`)
+              reject(error)
+              return
+            }
+            console.log(`stdout: ${stdout}`)
+            console.log(`stderr: ${stderr}`)
+          })
+
+          extractionPath = new AdmZip(savePath).getEntries()[0].entryName
+
+          resolve({
+            id: id,
+            name: name,
+            download_url: download_url,
+            filename: filename,
+            install_path: path.join(getInstallPath(), extractionPath),
+            version: version
+          })
         })
+
+        response.pipe(archiveFileStream)
       })
-
-      response.pipe(archiveFileStream)
-    })
-}
-
-const install = (event, plugin) => {
-  downloadAndExtract(plugin)
+  })
 }
 
 const uninstall = (event, plugin) => {
-  event.sender.send('manager/UNINSTALL_SUCCESS', plugin)
+  const { id, name, install_path } = plugin
+
+  return new Promise((resolve, reject) => {
+    exec(`rm -rf ${install_path}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`)
+        reject(error)
+        return
+      }
+      console.log(`stdout: ${stdout}`)
+      console.log(`stderr: ${stderr}`)
+    })
+
+    resolve({
+      id: id,
+      name: name,
+      install_path: null,
+      installed_version: null
+    })
+  })
 }
 
 const update = (event, plugin) => {

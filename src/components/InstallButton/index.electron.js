@@ -1,7 +1,10 @@
 import React from 'react'
 import Button from 'components/Button'
 import InstallButton from 'components/InstallButton'
-import { installPluginRequest } from 'actions/plugin_manager'
+import {
+  installPluginRequest,
+  uninstallPluginRequest
+} from 'actions/plugin_manager'
 
 const Connect = ComposedComponent =>
   class extends React.Component {
@@ -11,15 +14,28 @@ const Connect = ComposedComponent =>
       this.handleClick = this.handleClick.bind(this)
 
       this.state = {
-        activity: 'idle'
+        activity: props.plugin.installed ? 'installed' : 'idle'
       }
     }
 
     handleClick () {
-      const { dispatch } = this.props
-      dispatch(installPluginRequest(this.props.plugin))
+      const { dispatch, plugin } = this.props
+
+      if (!plugin.installed) {
+        dispatch(installPluginRequest(this.props.plugin))
+        this.setState({ activity: 'installing' })
+      }
+
+      if (plugin.installed) {
+        dispatch(uninstallPluginRequest(this.props.plugin))
+        this.setState({ activity: 'removing' })
+      }
+    }
+
+    componentWillReceiveProps (nextProps) {
+      const { plugin } = nextProps
       this.setState({
-        activity: 'downloading'
+        activity: plugin.installed ? 'installed' : 'idle'
       })
     }
 
@@ -27,10 +43,12 @@ const Connect = ComposedComponent =>
       switch(this.state.activity) {
         case 'idle':
           return 'Install'
-        case 'downloading':
-          return 'Downloading...'
+        case 'installing':
+          return 'Installing'
         case 'installed':
           return 'Remove'
+        case 'removing':
+          return 'Uninstalling'
         default:
           return 'Install'
       }

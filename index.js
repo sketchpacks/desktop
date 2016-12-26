@@ -28,6 +28,15 @@ const {
   CATALOG_FETCH_INTERVAL
 } = require('./src/config')
 
+const {
+  INSTALL_PLUGIN_REQUEST,
+  INSTALL_PLUGIN_SUCCESS,
+  INSTALL_PLUGIN_ERROR,
+  UNINSTALL_PLUGIN_REQUEST,
+  UNINSTALL_PLUGIN_SUCCESS,
+  UNINSTALL_PLUGIN_ERROR
+} = require('./src/actions/plugin_manager')
+
 const opts = {
   dir: __dirname,
   icon: __dirname + '/src/IconTemplate.png',
@@ -88,8 +97,28 @@ app.on('ready', () => {
   }
 })
 
-ipcMain.on('manager/INSTALL_REQUEST', (event, arg) => {
+ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.install(event, arg)
+    .then((plugin) => {
+      Catalog.pluginInstalled({
+        id: plugin.id,
+        install_path: plugin.install_path,
+        version: plugin.version
+      }).then((plugin) => {
+        event.sender.send(INSTALL_PLUGIN_SUCCESS, plugin)
+      })
+    })
+})
+
+ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
+  PluginManager.uninstall(event, arg)
+    .then((plugin) => {
+      Catalog.pluginRemoved({
+        id: plugin.id
+      }).then((plugin) => {
+        event.sender.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
+      })
+    })
 })
 
 const updateCatalogOnStart = () => {

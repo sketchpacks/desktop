@@ -67,6 +67,10 @@ let options = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true,
+      debug: false
+    }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
@@ -76,7 +80,8 @@ let options = {
   ],
 
   resolve: {
-    extensions: ['.js', '.scss', '.electron.js']
+    extensions: ['.js', '.scss', '.electron.js'],
+    modules: [path.resolve(__dirname, "src"), "node_modules"]
   }
 }
 

@@ -1,6 +1,6 @@
 import React from 'react'
-import Button from '../Button'
-import InstallButton from '../InstallButton'
+import Button from 'components/Button'
+import InstallButton from 'components/InstallButton'
 
 const Connect = ComposedComponent =>
   class extends React.Component {

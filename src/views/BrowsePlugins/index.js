@@ -4,15 +4,15 @@ import { browserHistory } from 'react-router'
 
 import qs from 'qs'
 
-import PluginList from '../../components/PluginList'
+import PluginList from 'components/PluginList'
 import linkHeader from 'parse-link-header'
-import Pagination from '../../components/Pagination'
+import Pagination from 'components/Pagination'
 
 import {
   pluginsRequest,
   pluginsReceived,
   pluginsPaginate
-} from '../../actions'
+} from 'actions'
 
 class BrowsePluginsContainer extends Component {
   componentDidMount () {

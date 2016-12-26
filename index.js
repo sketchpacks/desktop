@@ -43,11 +43,11 @@ const database = new Database({
   filename: path.join(app.getPath('userData'), 'catalog.db'),
   autoload: true
 })
+Catalog.setDatabase(database)
 
 global.database = database
-global.catalog = Catalog
-
-Catalog.setDatabase(database)
+global.Catalog = Catalog
+global.CatalogManager = CatalogManager
 
 let mainWindow
 
@@ -82,7 +82,7 @@ app.on('ready', () => {
   }
 
   if (__ELECTRON__) {
-    setTimeout(CatalogManager.fetch, ms('1m'))
+    setTimeout(updateCatalogOnStart, ms('10s'))
 
     CatalogManager.enableAutoUpdate()
   }
@@ -91,3 +91,12 @@ app.on('ready', () => {
 ipcMain.on('manager/INSTALL_REQUEST', (event, arg) => {
   pluginManager.install(event, arg)
 })
+
+const updateCatalogOnStart = () => {
+  CatalogManager.fetch()
+    .then((items) => {
+      const plugins = JSON.parse(items)
+      const cleanedPlugins = _.without(plugins, null, undefined)
+      Catalog.upsert(cleanedPlugins)
+    })
+}

@@ -2,7 +2,7 @@ import {
   __ELECTRON__,
   WEB_URL,
   API_URL
-} from '../../config'
+} from 'config'
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -10,8 +10,8 @@ import _ from 'lodash'
 
 import { Link } from 'react-router'
 
-import Nameplate from '../Nameplate'
-import InstallButton from '../InstallButton'
+import Nameplate from 'components/Nameplate'
+import InstallButton from 'components/InstallButton'
 
 import './plugin_media.scss'
 

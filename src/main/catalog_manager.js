@@ -13,8 +13,7 @@ const subscribers = []
 const opts = {
   method: 'GET',
   baseUrl: API_URL,
-  uri: '/v1/plugins/catalog',
-  json: true
+  uri: '/v1/plugins/catalog'
 }
 
 const CatalogManager = {
@@ -34,19 +33,16 @@ const CatalogManager = {
     new Promise((resolve, reject) => {
       log.info(`Fetching latest plugin catalog from ${API_URL}...`)
 
-      CatalogManager.notifySubscribers('catalog/FETCH_REQUEST',{})
-
       request(opts, (error, response, body) => {
         if (error) return reject(error)
 
-        CatalogManager.notifySubscribers('catalog/FETCH_RECEIVED',{})
-
+        CatalogManager.notifySubscribers('catalog/FETCH_RECEIVED')
+        
         return resolve(body)
       })
     }),
 
   getSubscribers: () => subscribers
-
 }
 
 Object.freeze(CatalogManager)

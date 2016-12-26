@@ -1,41 +1,48 @@
+import { remote } from 'electron'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, Route, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
+import { syncHistoryWithStore } from 'react-router-redux'
 import { Provider } from 'react-redux'
-import configureStore from '../store/configureStore'
+import configureStore from 'store/configureStore'
 import { ipcRenderer } from 'electron'
 
-import App from '../containers/App'
+import _ from 'lodash'
 
-import FrontPage from '../views/FrontPage'
-import BrowsePlugins from '../views/BrowsePlugins'
-import PopularPlugins from '../views/PopularPlugins'
-import NewestPlugins from '../views/NewestPlugins'
-import PluginDetails from '../views/PluginDetails'
+import App from 'containers/App'
 
-import UserProfile from '../views/UserProfile'
-import UserRecommends from '../views/UserRecommends'
-import UserPlugins from '../views/UserPlugins'
+import FrontPage from 'views/FrontPage'
+import BrowsePlugins from 'views/BrowsePlugins'
+import PopularPlugins from 'views/PopularPlugins'
+import NewestPlugins from 'views/NewestPlugins'
+import PluginDetails from 'views/PluginDetails'
+
+import UserProfile from 'views/UserProfile'
+import UserRecommends from 'views/UserRecommends'
+import UserPlugins from 'views/UserPlugins'
+
+const CatalogManager = remote.getGlobal('CatalogManager')
+const Catalog = remote.getGlobal('Catalog')
 
 import {
   pluginsReceived
-} from '../actions'
+} from 'actions'
 
 import {
   installPluginProgress,
   installPluginSuccess,
   installPluginError
-} from '../actions/plugin_manager'
+} from 'actions/plugin_manager'
 
 let store = configureStore()
+const history = syncHistoryWithStore(browserHistory, store)
 
 export const render = () => {
   ReactDOM.render(
     <Provider store={store}>
-      <Router history={browserHistory}>
+      <Router history={history}>
         <Route path="/" component={App}>
-          <IndexRoute component={BrowsePlugins} />
-          <Route path="browse" component={BrowsePlugins} />
+          <IndexRoute component={NewestPlugins} />
           <Route path="browse/popular" component={PopularPlugins} />
           <Route path="browse/newest" component={NewestPlugins} />
 
@@ -68,9 +75,11 @@ ipcRenderer.on('manager/INSTALL_SUCCESS', (evt,arg) => {
 })
 
 ipcRenderer.on('catalog/FETCH_REQUEST', (evt,arg) => {
-  console.log('Fetching latest catalog')
 })
 
 ipcRenderer.on('catalog/FETCH_RECEIVED', (evt,arg) => {
-  console.log('Latest catalog received')
+  Catalog.getAllPlugins()
+    .then((plugins) => {
+      store.dispatch(pluginsReceived(plugins))
+    })
 })

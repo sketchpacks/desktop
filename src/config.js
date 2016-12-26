@@ -11,5 +11,15 @@ module.exports = {
   API_URL: 'https://sketchpacks-api.herokuapp.com/',
 
   CATALOG_FETCH_DELAY: '10s',
-  CATALOG_FETCH_INTERVAL: process.env.NODE_ENV === 'development' ? '5m' : '30m'
+  CATALOG_FETCH_INTERVAL: process.env.NODE_ENV === 'development' ? '5m' : '30m',
+
+  HOME_PATH: process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE,
+  PLUGIN_PATHS: [
+    "/Library/Application Support/com.bohemiancoding.sketch3/Plugins/", // Sketch 3
+    "/Library/Containers/com.bohemiancoding.sketch3/Data/Library/Application Support/com.bohemiancoding.sketch3/Plugins/", // Sketch 3 (MAS)
+    "/Library/Containers/com.bohemiancoding.sketch3.beta/Data/Library/Application Support/com.bohemiancoding.sketch3/Plugins/", // Sketch 3 Beta
+    "/Library/Containers/com.bohemiancoding.sketch/Data/Library/Application Support/sketch/Plugins/", // Sketch 2 (MAS)
+    "/Library/Application Support/sketch/Plugins/", // Sketch 2
+    "/Downloads/" // Fallback
+  ]
 }

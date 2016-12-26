@@ -61,10 +61,13 @@
     "webpack-target-electron-renderer": "^0.3.0"
   },
   "dependencies": {
+    "adm-zip": "^0.4.7",
+    "content-disposition": "^0.5.2",
     "electron-log": "^1.2.2",
     "express": "^4.14.0",
     "fs": "0.0.1-security",
     "is-electron-renderer": "^2.0.0",
+    "is-there": "^4.3.6",
     "jwt-simple": "^0.5.1",
     "lodash": "^4.17.2",
     "marky-markdown": "^9.0.1",

@@ -73,6 +73,7 @@
     "marky-markdown": "^9.0.1",
     "menubar": "^5.1.0",
     "minimist": "^1.2.0",
+    "moment": "^2.17.1",
     "ms": "^0.7.2",
     "nedb": "^1.8.0",
     "nedb-party": "^0.1.1",

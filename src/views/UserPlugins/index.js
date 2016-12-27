@@ -3,36 +3,15 @@ import { connect } from 'react-redux'
 
 import PluginList from 'components/PluginList'
 
-import {
-  pluginsRequest,
-  pluginsReceived
-} from 'actions'
-
-class UserRecommendsContainer extends Component {
-  componentDidMount () {
-    console.log(this.props)
-    const { dispatch } = this.props
-    const { owner } = this.props.params
-
-    dispatch(pluginsRequest())
-
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}/plugins`)
-      .then(response => {
-        return response.json()
-      })
-      .then(json => {
-        dispatch(pluginsReceived(json))
-      })
-  }
-
+class UserPluginsContainer extends Component {
   render () {
-    const { plugins, recommends } = this.props
+    const { plugins, authorDetails } = this.props
 
     return (
       <div className="container">
-        <h1>Plugins by Adam Kirkwood</h1>
+        <h1>Published Plugins</h1>
 
-        <PluginList plugins={plugins.items} recommends={recommends} />
+        <PluginList plugins={plugins.items} authorDetails={authorDetails} />
       </div>
     )
   }
@@ -45,12 +24,12 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins, recommends } = state
+  const { plugins, authorDetails } = state
 
   return {
     plugins,
-    recommends
+    authorDetails
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)( UserRecommendsContainer )
+export default connect(mapStateToProps, mapDispatchToProps)( UserPluginsContainer )

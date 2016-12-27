@@ -61,7 +61,7 @@ export const render = () => {
           <Route path="browse/newest" component={NewestPlugins} />
 
           <Route path="@:owner" component={UserProfile}>
-            <IndexRedirect to="recommends" />
+            <IndexRedirect to="plugins" />
             <Route path="recommends" component={UserRecommends} />
             <Route path="plugins" component={UserPlugins} />
           </Route>

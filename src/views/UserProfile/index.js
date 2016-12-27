@@ -2,9 +2,38 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
+import {
+  pluginsRequest,
+  pluginsReceived,
+  authorProfileRequest,
+  authorProfileReceived
+} from 'actions'
+
 class UserProfileContainer extends Component {
-  render () {
+  componentDidMount () {
+    const { dispatch } = this.props
     const { owner } = this.props.params
+    const AUTHOR_PROFILE_URL = `https://sketchpacks-api.herokuapp.com/v1/users/${owner}`
+    const opts = {
+      method: 'GET',
+      uri: AUTHOR_PROFILE_URL
+    }
+
+    // Get author details
+    dispatch(authorProfileRequest())
+    dispatch(pluginsRequest())
+    fetch(AUTHOR_PROFILE_URL)
+      .then((response) => {
+        return response.json()
+      })
+      .then(json => {
+        dispatch(authorProfileReceived(json))
+        dispatch(pluginsReceived(json.plugins))
+      })
+  }
+
+  render () {
+    const { authorDetails } = this.props
 
     return (
       <div className="container">
@@ -14,16 +43,16 @@ class UserProfileContainer extends Component {
               <img src="http://placehold.it/256x256" role="presentation" />
             </figure>
             <div className="content">
-              <p className="title is-3">Adam Kirkwood</p>
-              <p className="subtitle is-5">@adamkirkwood</p>
+              <p className="title is-3">{authorDetails.name}</p>
+              <p className="subtitle is-5">@{authorDetails.handle}</p>
             </div>
           </div>
 
           <div className="column">
             <div className="tabs is-medium">
               <ul>
-                <li><Link to={`/@${owner}/recommends`}>Recommends</Link></li>
-                <li><Link to={`/@${owner}/plugins`}>Plugins</Link></li>
+                <li><Link to={`/@${authorDetails.handle}/plugins`}>Plugins</Link></li>
+                <li><Link to={`/@${authorDetails.handle}/recommends`}>Recommends</Link></li>
               </ul>
             </div>
 
@@ -44,9 +73,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins } = state
+  const { plugins, authorDetails } = state
 
   return {
+    authorDetails,
     plugins
   }
 }

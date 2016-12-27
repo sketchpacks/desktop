@@ -14,7 +14,7 @@ export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
 export function loginSuccess (jwt) {
   return {
     type: LOGIN_SUCCESS,
-    token: jwt,
+    token: jwt
   }
 }
 
@@ -150,5 +150,23 @@ export function recommendsReceived (payload) {
   return {
     type: RECOMMENDS_RECEIVED,
     payload: payload
+  }
+}
+
+
+export const AUTHOR_PROFILE_REQUEST = 'author/PROFILE_REQUEST'
+
+export function authorProfileRequest () {
+  return {
+    type: AUTHOR_PROFILE_REQUEST
+  }
+}
+
+export const AUTHOR_PROFILE_RECEIVED = 'author/PROFILE_RECEIVED'
+
+export function authorProfileReceived (payload) {
+  return {
+    type: AUTHOR_PROFILE_RECEIVED,
+    payload
   }
 }

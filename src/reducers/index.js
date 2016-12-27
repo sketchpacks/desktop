@@ -176,13 +176,40 @@ function app (state, action) {
   }
 }
 
+function authorDetails (state, action) {
+  switch (action.type) {
+    case actions.AUTHOR_PROFILE_RECEIVED:
+      return {
+        ...state,
+        name: action.payload.name,
+        handle: action.payload.handle,
+        email: action.payload.email,
+        avatar_url: action.payload.avatar_url
+      }
+    default:
+      if (state === undefined) {
+        return {
+          ...state,
+          name: null,
+          handle: null,
+          email: null,
+          avatar_url: null,
+        }
+      }
+      else {
+        return state
+      }
+  }
+}
+
 const rootReducer = combineReducers({
   routing: routerReducer,
   auth,
   plugins,
   pluginDetails,
   recommends,
-  app
+  app,
+  authorDetails
 })
 
 export default rootReducer

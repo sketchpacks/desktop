@@ -29,9 +29,9 @@ export const render = () => {
           <Route path="browse/newest" component={NewestPlugins} />
 
           <Route path="@:owner" component={UserProfile}>
-            <IndexRedirect to="recommends" />
-            <Route path="recommends" component={UserRecommends} />
+            <IndexRedirect to="plugins" />
             <Route path="plugins" component={UserPlugins} />
+            <Route path="recommends" component={UserRecommends} />
           </Route>
 
           <Route path=":owner/:id" component={PluginDetails} />

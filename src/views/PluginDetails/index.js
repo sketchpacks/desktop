@@ -12,21 +12,28 @@ import {
 class PluginDetailsContainer extends Component {
   constructor (props) {
     super(props)
+
+    this.getReadme = this.getReadme.bind(this)
   }
 
-  componentDidMount () {
+  getReadme () {
     const { dispatch } = this.props
-    const { owner, id } = this.props.params
-
+    const { id } = this.props.pluginDetails
     dispatch(pluginReadmeRequest())
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}/plugins/${id}/readme`)
+    fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins/${id}/readme`)
       .then(response => {
         return response.text()
       })
       .then(markdown => {
         dispatch(pluginReadmeReceived(markdown))
       })
+  }
 
+  componentDidMount () {
+    const { dispatch } = this.props
+    const { owner, id } = this.props.params
+
+    const self = this
     dispatch(pluginDetailsRequest())
     fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}/plugins/${id}`)
       .then(response => {
@@ -34,11 +41,12 @@ class PluginDetailsContainer extends Component {
       })
       .then(plugin => {
         dispatch(pluginDetailsReceived(plugin))
+        self.getReadme()
       })
   }
 
   render () {
-    const { description, name } = this.props.pluginDetails
+    const { description, name, readme } = this.props.pluginDetails
 
     return (
       <div>
@@ -59,7 +67,7 @@ class PluginDetailsContainer extends Component {
           <div className="container">
             <div className="columns">
               <div className="column">
-                insert README here
+                { readme }
               </div>
             </div>
           </div>

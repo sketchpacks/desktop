@@ -60,7 +60,7 @@ class PluginMedia extends Component {
       return
 
     return (
-      <span>{score}/5.0</span>
+      <span>{parseFloat(score).toFixed(1)}/5.0</span>
     )
   }
 

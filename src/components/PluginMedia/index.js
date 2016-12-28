@@ -25,20 +25,30 @@ class PluginMedia extends Component {
     this.renderVersion = this.renderVersion.bind(this)
     this.renderScore = this.renderScore.bind(this)
     this.renderUpdateTimestamp = this.renderUpdateTimestamp.bind(this)
+
+    this.state = {
+      hidePreview: false
+    }
   }
 
   renderPreview () {
+    if (this.state.hidePreview) return
+
     const { thumbnail_url } = this.props.plugin
 
-    if (thumbnail_url === null)
+    if (thumbnail_url === null) {
+      this.setState({ hidePreview: true })
       return
+    }
 
-    if (thumbnail_url === undefined)
+    if (thumbnail_url === undefined) {
+      this.setState({ hidePreview: true })
       return
+    }
 
     return (
       <div className="o-media__right u-mar-left-large">
-        <img src={thumbnail_url} role="presentation" />
+        <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
       </div>
     )
   }

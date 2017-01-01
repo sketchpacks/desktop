@@ -2,7 +2,10 @@ import React, { Component } from 'react'
 import { Link } from 'react-router'
 import { connect } from 'react-redux'
 
+import 'normalize.css'
 import 'css/milligram.scss'
+
+import './app.scss'
 
 class App extends Component {
   constructor (props) {
@@ -16,26 +19,27 @@ class App extends Component {
   render () {
 
     return (
-      <div>
-        <nav className="nav">
-          <div className="container">
 
-            <div className="nav-left">
-              <a className="nav-item is-brand" href="#">
-                <strong>Sketchpacks</strong>
-              </a>
-            </div>
-
-            <div className="nav-right nav-menu">
-              <strong>Browse</strong>
-              <Link to="/browse/popular" className="nav-item">Popular</Link>
-              <Link to="/browse/newest" className="nav-item">Newest</Link>
-            </div>
+      <div className="app">
+        <div className="sidebar">
+          <div className="sidebar__section">
+            <div><strong className="sidebar__subheading">Browse</strong></div>
+            <div><Link to="/browse/popular" className="sidebar__item">Popular</Link></div>
+            <div><Link to="/browse/newest" className="sidebar__item">Newest</Link></div>
           </div>
-        </nav>
 
-        {this.props.children}
+          <div className="sidebar__section">
+            <div><strong className="sidebar__subheading">Library</strong></div>
+            <div><Link to="/browse/popular" className="sidebar__item">Installed</Link></div>
+            <div><Link to="/browse/newest" className="sidebar__item">Updates</Link></div>
+          </div>
+        </div>
+
+        <div className="viewport">
+          { this.props.children }
+        </div>
       </div>
+
     )
   }
 }

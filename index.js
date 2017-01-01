@@ -40,8 +40,8 @@ const {
 const opts = {
   dir: __dirname,
   icon: __dirname + '/src/IconTemplate.png',
-  width: 640,
-  height: 600,
+  width: 720,
+  height: 540,
   index: `http://localhost:${SERVER_PORT}/`,
   resizable: false
 }

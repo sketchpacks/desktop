@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router'
 import { connect } from 'react-redux'
 
 import 'normalize.css'
 import 'css/milligram.scss'
 
 import './app.scss'
+
+import SideBarMenu from 'components/electron/SideBarMenu'
 
 class App extends Component {
   constructor (props) {
@@ -21,19 +22,7 @@ class App extends Component {
     return (
 
       <div className="app">
-        <div className="sidebar">
-          <div className="sidebar__section">
-            <div><strong className="sidebar__subheading">Browse</strong></div>
-            <div><Link to="/browse/popular" className="sidebar__item">Popular</Link></div>
-            <div><Link to="/browse/newest" className="sidebar__item">Newest</Link></div>
-          </div>
-
-          <div className="sidebar__section">
-            <div><strong className="sidebar__subheading">Library</strong></div>
-            <div><Link to="/browse/popular" className="sidebar__item">Installed</Link></div>
-            <div><Link to="/browse/newest" className="sidebar__item">Updates</Link></div>
-          </div>
-        </div>
+        <SideBarMenu />
 
         <div className="viewport">
           { this.props.children }

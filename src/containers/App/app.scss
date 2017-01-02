@@ -1,39 +1,7 @@
-$sidebar-width: 250px;
-
 .app {
   display: flex;
   flex-direction: row;
   overflow: auto;
-}
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  max-height: 100vh;
-  width: $sidebar-width;
-  max-width: $sidebar-width;
-  border-right: 1px solid #D7DBDD;
-  background-color: #FCFDFD;
-  padding: 20px 20px;
-}
-
-.sidebar__section {
-  margin-bottom: 32px;
-}
-
-.sidebar__item {
-  cursor: pointer;
-  padding: 5px 0px;
-  color: #16A2D7;
-}
-
-.sidebar__subheading {
-  font-size: 1.2rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1rem;
-  margin-bottom: 1rem;
-  font-weight: bold;
 }
 
 .viewport {

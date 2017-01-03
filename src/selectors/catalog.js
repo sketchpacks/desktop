@@ -14,7 +14,7 @@ export const getPluginList = createSelector(
       case '/browse/newest':
         return _.orderBy(plugins, ['updated_at'], ['desc'])
       case '/browse/popular':
-        return _.orderBy(plugins, ['score'], ['asc'])
+        return _.orderBy(plugins, ['score'], ['desc'])
       default:
         return _.orderBy(plugins, ['updated_at'], ['desc'])
     }

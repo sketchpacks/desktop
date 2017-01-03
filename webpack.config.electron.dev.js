@@ -60,6 +60,13 @@ let options = {
           /(dist)/
         ],
         loaders: ['style-loader', 'css-loader', 'sass-loader']
+      },
+      {
+        test: /\.css$/,
+        exclude: [
+          /(dist)/
+        ],
+        loaders: ['style-loader', 'css-loader']
       }
     ]
   },
@@ -73,7 +80,7 @@ let options = {
   ],
 
   resolve: {
-    extensions: ['.js', '.scss', '.electron.js'],
+    extensions: ['.js', '.scss', '.css', '.electron.js'],
     modules: [path.resolve(__dirname, "src"), "node_modules"]
   }
 }

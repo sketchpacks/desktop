@@ -1,8 +1,14 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router'
 import { connect } from 'react-redux'
 
+import 'normalize.css'
 import 'css/milligram.scss'
+
+import './app.scss'
+
+import SideBarMenu from 'components/electron/SideBarMenu'
+import SearchBar from 'components/electron/SearchBar'
+
 
 class App extends Component {
   constructor (props) {
@@ -16,26 +22,21 @@ class App extends Component {
   render () {
 
     return (
-      <div>
-        <nav className="nav">
-          <div className="container">
 
-            <div className="nav-left">
-              <a className="nav-item is-brand" href="#">
-                <strong>Sketchpacks</strong>
-              </a>
-            </div>
+      <div className="app">
+        <header className="app__header">
+          <SearchBar {...this.props} />
+        </header>
 
-            <div className="nav-right nav-menu">
-              <strong>Browse</strong>
-              <Link to="/browse/popular" className="nav-item">Popular</Link>
-              <Link to="/browse/newest" className="nav-item">Newest</Link>
-            </div>
+        <div className="app__body">
+          <SideBarMenu />
+
+          <div className="app__viewport">
+            { this.props.children }
           </div>
-        </nav>
-
-        {this.props.children}
+        </div>
       </div>
+
     )
   }
 }

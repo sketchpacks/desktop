@@ -1,32 +1,40 @@
+import {remote} from 'electron'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
-import { getPluginList } from 'selectors/catalog'
+import {
+  pluginsRequest,
+  pluginsReceived,
+} from 'actions'
+
 import PluginList from 'components/PluginList'
 
+const Catalog = remote.getGlobal('Catalog')
+
 class PopularPluginsContainer extends Component {
+  componentDidMount () {
+    const { dispatch } = this.props
+
+    dispatch(pluginsRequest())
+    Catalog.getPopularPlugins()
+      .then(plugins => dispatch(pluginsReceived(plugins)))
+  }
+
   render () {
     const { plugins } = this.props
 
     return (
       <div>
-        <section className="hero is-primary">
-          <div className="hero-body">
-            <div className="container">
-              <h1 className="title">
-                Popular plugins
-              </h1>
-            </div>
-          </div>
-        </section>
-
         <div className="container">
           <div className="columns">
-            { (plugins === undefined)
-                ? <div>No plugins</div>
-                : <PluginList plugins={plugins} /> }
+            <h3 className="title">
+              Popular plugins
+            </h3>
 
+            { (plugins === undefined)
+              ? <div>No plugins</div>
+              : <PluginList plugins={plugins.items} /> }
           </div>
         </div>
       </div>
@@ -45,7 +53,7 @@ function mapStateToProps(state, ownProps) {
 
   return {
     state,
-    plugins: getPluginList(state, ownProps)
+    plugins
   }
 }
 

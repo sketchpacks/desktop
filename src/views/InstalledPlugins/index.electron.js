@@ -12,12 +12,12 @@ import PluginList from 'components/PluginList'
 
 const Catalog = remote.getGlobal('Catalog')
 
-class NewestPluginsContainer extends Component {
+class InstalledPluginsContainer extends Component {
   componentDidMount () {
     const { dispatch } = this.props
 
     dispatch(pluginsRequest())
-    Catalog.getNewestPlugins()
+    Catalog.getInstalledPlugins()
       .then(plugins => dispatch(pluginsReceived(plugins)))
   }
 
@@ -29,7 +29,7 @@ class NewestPluginsContainer extends Component {
         <div className="container">
           <div className="columns">
             <h3 className="title">
-              Newest plugins
+              Installed plugins
             </h3>
 
             { (plugins === undefined)
@@ -57,4 +57,4 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)( NewestPluginsContainer )
+export default connect(mapStateToProps, mapDispatchToProps)( InstalledPluginsContainer )

@@ -12,7 +12,7 @@ class SearchBar extends Component {
   handleEnterKey (e) {
     if (e.key !== 'Enter') return
 
-    if (e.target.value.length <= 3) return
+    if (e.target.value.length <= 2) return
 
     const {dispatch} = this.props
     const keyword = e.target.value

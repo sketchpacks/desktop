@@ -1,6 +1,6 @@
-$sidebar-width: 160px;
+$sidebar-width: 200px;
 
-.sidebar {
+.app__sidebar {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -12,11 +12,11 @@ $sidebar-width: 160px;
   padding: 10px 0;
 }
 
-.sidebar__section {
+.app__sidebar-section {
   margin-bottom: 32px;
 }
 
-.sidebar__item {
+.app__sidebar-item {
   cursor: pointer;
   padding: 0 16px;
   color: #CFD4E0;
@@ -34,7 +34,7 @@ $sidebar-width: 160px;
   }
 }
 
-.sidebar__subheading {
+.app__sidebar-subheading {
   font-size: 1.1rem;
   text-transform: uppercase;
   letter-spacing: 0.1rem;

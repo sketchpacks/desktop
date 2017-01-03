@@ -16,6 +16,7 @@ import BrowsePlugins from 'views/BrowsePlugins'
 import PopularPlugins from 'views/PopularPlugins'
 import NewestPlugins from 'views/NewestPlugins'
 import PluginDetails from 'views/PluginDetails'
+import SearchResults from 'views/SearchResults'
 
 import UserProfile from 'views/UserProfile'
 import UserRecommends from 'views/UserRecommends'
@@ -59,6 +60,8 @@ export const render = () => {
           <IndexRoute component={NewestPlugins} />
           <Route path="browse/popular" component={PopularPlugins} />
           <Route path="browse/newest" component={NewestPlugins} />
+
+          <Route path="search" component={SearchResults} />
 
           <Route path="@:owner" component={UserProfile}>
             <IndexRedirect to="plugins" />

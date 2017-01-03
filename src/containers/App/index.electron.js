@@ -7,6 +7,8 @@ import 'css/milligram.scss'
 import './app.scss'
 
 import SideBarMenu from 'components/electron/SideBarMenu'
+import SearchBar from 'components/electron/SearchBar'
+
 
 class App extends Component {
   constructor (props) {
@@ -22,10 +24,16 @@ class App extends Component {
     return (
 
       <div className="app">
-        <SideBarMenu />
+        <header className="app__header">
+          <SearchBar {...this.props} />
+        </header>
 
-        <div className="viewport">
-          { this.props.children }
+        <div className="app__body">
+          <SideBarMenu />
+
+          <div className="app__viewport">
+            { this.props.children }
+          </div>
         </div>
       </div>
 

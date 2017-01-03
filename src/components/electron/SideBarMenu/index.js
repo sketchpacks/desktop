@@ -4,25 +4,21 @@ import { Link } from 'react-router'
 import './sidebar.scss'
 
 const SideBarMenu = ({ handle, width, height }) => (
-  <div>
+  <aside className="app__sidebar">
+    <nav>
+      <div className="app__sidebar-section">
+        <div><strong className="app__sidebar-subheading">Browse</strong></div>
+        <div><Link to="/browse/popular" className="app__sidebar-item" activeClassName="app__sidebar-item--active">Popular</Link></div>
+        <div><Link to="/browse/newest" className="app__sidebar-item" activeClassName="app__sidebar-item--active">Newest</Link></div>
+      </div>
 
-    <aside className="sidebar">
-      <nav>
-        <div className="sidebar__section">
-          <div><strong className="sidebar__subheading">Browse</strong></div>
-          <div><Link to="/browse/popular" className="sidebar__item" activeClassName="sidebar__item--active">Popular</Link></div>
-          <div><Link to="/browse/newest" className="sidebar__item" activeClassName="sidebar__item--active">Newest</Link></div>
-        </div>
-
-        <div className="sidebar__section">
-          <div><strong className="sidebar__subheading">Library</strong></div>
-          <div><Link to="/browse/popular" className="sidebar__item" activeClassName="sidebar__item--active">Installed</Link></div>
-          <div><Link to="/browse/newest" className="sidebar__item" activeClassName="sidebar__item--active">Updates</Link></div>
-        </div>
-      </nav>
-    </aside>
-
-  </div>
+      <div className="app__sidebar-section">
+        <div><strong className="app__sidebar-subheading">Library</strong></div>
+        <div><Link to="/browse/popular" className="app__sidebar-item" activeClassName="sidebar-item--active">Installed</Link></div>
+        <div><Link to="/browse/newest" className="app__sidebar-item" activeClassName="sidebar-item--active">Updates</Link></div>
+      </div>
+    </nav>
+  </aside>
 )
 
 export default SideBarMenu

@@ -43,7 +43,9 @@ const opts = {
   width: 720,
   height: 540,
   index: `http://localhost:${SERVER_PORT}/`,
-  resizable: false
+  resizable: false,
+  alwaysOnTop: true,
+  showOnAllWorkspaces: true
 }
 
 const menuBar = menubar(opts)

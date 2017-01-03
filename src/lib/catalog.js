@@ -5,10 +5,38 @@ const _ = require('lodash')
 let database
 
 const Catalog = {
-  getAllPlugins: () => new Promise((resolve, reject) => {
+  getPopularPlugins: () => new Promise((resolve, reject) => {
     if (database === undefined) return new Error("Set a database to query")
 
-    database.find({}, (err, plugins) => {
+    database.find({}).sort({ score: -1 }).exec((err, plugins) => {
+      if (err) return reject(err)
+      return resolve(plugins)
+    })
+  }),
+
+  getNewestPlugins: () => new Promise((resolve, reject) => {
+    if (database === undefined) return new Error("Set a database to query")
+
+    database.find({}).sort({ updated_at: -1 }).exec((err, plugins) => {
+      if (err) return reject(err)
+      return resolve(plugins)
+    })
+  }),
+
+  getInstalledPlugins: () => new Promise((resolve, reject) => {
+    if (database === undefined) return new Error("Set a database to query")
+
+    database.find({ installed: true }).sort({ name: 1 }).exec((err, plugins) => {
+      if (err) return reject(err)
+      return resolve(plugins)
+    })
+  }),
+
+  getUpdatedPlugins: () => new Promise((resolve, reject) => {
+    if (database === undefined) return new Error("Set a database to query")
+
+    database.find({ $where: () => { return ( Object.version !== Object.installed_version) } })
+      .sort({ updated_at: -1 }).exec((err, plugins) => {
       if (err) return reject(err)
       return resolve(plugins)
     })

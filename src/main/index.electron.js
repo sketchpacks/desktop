@@ -11,10 +11,11 @@ import _ from 'lodash'
 
 import App from 'containers/App'
 
-import FrontPage from 'views/FrontPage'
-import BrowsePlugins from 'views/BrowsePlugins'
 import PopularPlugins from 'views/PopularPlugins'
 import NewestPlugins from 'views/NewestPlugins'
+import InstalledPlugins from 'views/InstalledPlugins'
+import UpdatedPlugins from 'views/UpdatedPlugins'
+
 import PluginDetails from 'views/PluginDetails'
 import SearchResults from 'views/SearchResults'
 
@@ -49,7 +50,7 @@ let store = configureStore()
 const history = syncHistoryWithStore(browserHistory, store)
 
 const refreshStateFromCatalog = () =>
-  Catalog.getAllPlugins()
+  Catalog.getPopularPlugins()
     .then((plugins) => store.dispatch( pluginsReceived(plugins) ))
 
 export const render = () => {
@@ -57,11 +58,15 @@ export const render = () => {
     <Provider store={store}>
       <Router history={history}>
         <Route path="/" component={App}>
-          <IndexRoute component={NewestPlugins} />
+          <IndexRoute component={PopularPlugins} />
           <Route path="browse/popular" component={PopularPlugins} />
           <Route path="browse/newest" component={NewestPlugins} />
 
           <Route path="search" component={SearchResults} />
+
+          <Route path="library/installed" component={InstalledPlugins} />
+          <Route path="library/updates" component={UpdatedPlugins} />
+
 
           <Route path="@:owner" component={UserProfile}>
             <IndexRedirect to="plugins" />

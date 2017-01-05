@@ -18,16 +18,6 @@ let options = {
     renderer: './renderer/renderer.js'
   },
 
-  entry: {
-    main: [
-      'react-hot-loader/patch',
-      `webpack-dev-server/client?http://localhost:${SERVER_PORT}/`,
-      'webpack/hot/only-dev-server',
-      './index.js',
-    ],
-    renderer: './renderer/renderer.js'
-  },
-
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'src', 'dist'),

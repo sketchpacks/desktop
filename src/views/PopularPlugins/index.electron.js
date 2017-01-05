@@ -1,4 +1,3 @@
-import {remote} from 'electron'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
@@ -9,8 +8,6 @@ import {
 } from 'actions'
 
 import PluginList from 'components/PluginList'
-
-const Catalog = remote.getGlobal('Catalog')
 
 class PopularPluginsContainer extends Component {
   componentDidMount () {

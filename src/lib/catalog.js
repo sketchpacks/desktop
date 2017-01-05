@@ -1,4 +1,3 @@
-const config = require('../config')
 const Promise = require('promise')
 const _ = require('lodash')
 const semver = require('semver')
@@ -42,6 +41,10 @@ const Catalog = {
 
       let remoteVersion = plugin.version
       let localVersion = plugin.installed_version
+
+      // FIXME: API should return valid SemVer by default
+      if (remoteVersion === "0") remoteVersion = "0.0.0"
+      if (localVersion === "0") remoteVersion = "0.0.0"
 
       return plugin.installed && semver.lt(localVersion,remoteVersion)
     }

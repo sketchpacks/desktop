@@ -13,7 +13,20 @@ const output = (isWeb ? 'assets/platform/web' : 'assets/platform/electron')
 const htmlTemplate = isWeb ? 'index.web.html' : 'index.electron.html'
 
 let options = {
-  entry: './index.js',
+  entry: {
+    main: './index.js',
+    renderer: './renderer/renderer.js'
+  },
+
+  entry: {
+    main: [
+      'react-hot-loader/patch',
+      `webpack-dev-server/client?http://localhost:${SERVER_PORT}/`,
+      'webpack/hot/only-dev-server',
+      './index.js',
+    ],
+    renderer: './renderer/renderer.js'
+  },
 
   output: {
     filename: '[name].js',
@@ -51,6 +64,16 @@ let options = {
         loader: ExtractTextPlugin.extract({
           fallbackLoader: 'style-loader',
           loader: ['css-loader', 'sass-loader']
+        }),
+        exclude: [
+          /(dist)/
+        ]
+      },
+      {
+        test: /\.css$/,
+        loader: ExtractTextPlugin.extract({
+          fallbackLoader: 'style-loader',
+          loader: ['css-loader']
         }),
         exclude: [
           /(dist)/

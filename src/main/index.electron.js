@@ -24,7 +24,6 @@ import UserRecommends from 'views/UserRecommends'
 import UserPlugins from 'views/UserPlugins'
 
 const CatalogManager = remote.getGlobal('CatalogManager')
-const Catalog = remote.getGlobal('Catalog')
 
 import {
   pluginsReceived

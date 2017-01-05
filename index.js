@@ -45,7 +45,8 @@ const opts = {
   index: `http://localhost:${SERVER_PORT}/`,
   resizable: false,
   alwaysOnTop: true,
-  showOnAllWorkspaces: true
+  showOnAllWorkspaces: true,
+  preloadWindow: true
 }
 
 const menuBar = menubar(opts)
@@ -80,7 +81,7 @@ menuBar.on('after-show', () => {
 })
 
 menuBar.on('after-create-window', () => {
-  menuBar.window.show()
+  menuBar.window.hide()
   mainWindow = menuBar.window
 
   CatalogManager.addSubscribers(mainWindow)

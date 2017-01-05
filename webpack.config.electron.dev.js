@@ -14,12 +14,15 @@ const output = (isWeb ? 'assets/platform/web' : 'assets/platform/electron')
 const htmlTemplate = isWeb ? 'index.web.html' : 'index.electron.html'
 
 let options = {
-  entry: [
-    'react-hot-loader/patch',
-    `webpack-dev-server/client?http://localhost:${SERVER_PORT}/`,
-    'webpack/hot/only-dev-server',
-    './index.js'
-  ],
+  entry: {
+    main: [
+      'react-hot-loader/patch',
+      `webpack-dev-server/client?http://localhost:${SERVER_PORT}/`,
+      'webpack/hot/only-dev-server',
+      './index.js',
+    ],
+    renderer: './renderer/renderer.js'
+  },
 
   output: {
     filename: '[name].js',

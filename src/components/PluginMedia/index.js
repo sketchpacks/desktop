@@ -56,6 +56,10 @@ class PluginMedia extends Component {
   }
 
   renderScore () {
+    const {location} = this.props.state.app
+
+    if (location === '/library/updates') return
+
     const { score } = this.props.plugin
 
     if (score === 0)
@@ -81,13 +85,17 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
-    const { version } = this.props.plugin
+    const { version, installed_version } = this.props.plugin
+    const {location} = this.props.state.app
 
     if (version === "0")
       return
 
     return (
-      <span>v{version}</span>
+      <span>v{location === '/library/updates'
+                ? version
+                : installed_version}
+      </span>
     )
   }
 

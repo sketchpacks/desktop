@@ -29,7 +29,7 @@ class InstalledPluginsContainer extends Component {
         <div className="container">
           <div className="columns">
             <h3 className="title">
-              Installed plugins
+              Your plugins
             </h3>
 
             { (plugins === undefined)

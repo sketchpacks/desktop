@@ -55,6 +55,16 @@ let options = {
         exclude: [
           /(dist)/
         ]
+      },
+      {
+        test: /\.css$/,
+        loader: ExtractTextPlugin.extract({
+          fallbackLoader: 'style-loader',
+          loader: ['css-loader']
+        }),
+        exclude: [
+          /(dist)/
+        ]
       }
     ]
   },

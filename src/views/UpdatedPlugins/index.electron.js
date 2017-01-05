@@ -29,7 +29,7 @@ class UpdatedPluginsContainer extends Component {
         <div className="container">
           <div className="columns">
             <h3 className="title">
-              Updates
+              Pending updates
             </h3>
 
             { (plugins === undefined)

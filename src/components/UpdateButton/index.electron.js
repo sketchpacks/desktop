@@ -13,43 +13,35 @@ const Connect = ComposedComponent =>
       this.handleClick = this.handleClick.bind(this)
 
       this.state = {
-        activity: props.plugin.installed ? 'installed' : 'idle'
+        activity: 'update'
       }
     }
 
     handleClick () {
       const { dispatch, plugin } = this.props
 
-      if (!plugin.installed) {
-        dispatch(installPluginRequest(this.props.plugin))
-        this.setState({ activity: 'installing' })
-      }
-
-      if (plugin.installed) {
-        dispatch(uninstallPluginRequest(this.props.plugin))
-        this.setState({ activity: 'removing' })
-      }
+      dispatch(installPluginRequest(this.props.plugin))
+      this.setState({
+        activity: 'updating'
+      })
     }
 
     componentWillReceiveProps (nextProps) {
       const { plugin } = nextProps
+
       this.setState({
-        activity: plugin.installed ? 'installed' : 'idle'
+        activity: 'idle'
       })
     }
 
     renderButtonText () {
       switch(this.state.activity) {
         case 'idle':
-          return 'Install'
-        case 'installing':
-          return 'Installing'
-        case 'installed':
-          return 'Remove'
-        case 'removing':
-          return 'Uninstalling'
+          return 'Update'
+        case 'updating':
+          return 'Updating'
         default:
-          return 'Install'
+          return 'Update'
       }
     }
 

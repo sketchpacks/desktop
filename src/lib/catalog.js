@@ -1,6 +1,7 @@
 const config = require('../config')
 const Promise = require('promise')
 const _ = require('lodash')
+const semver = require('semver')
 
 let database
 
@@ -35,7 +36,17 @@ const Catalog = {
   getUpdatedPlugins: () => new Promise((resolve, reject) => {
     if (database === undefined) return new Error("Set a database to query")
 
-    database.find({ $where: () => { return ( Object.version !== Object.installed_version) } })
+    function updateAvailable (plugin) {
+      if (plugin.installed === undefined) return false
+      if (!plugin.installed) return false
+
+      let remoteVersion = plugin.version
+      let localVersion = plugin.installed_version
+
+      return plugin.installed && semver.lt(localVersion,remoteVersion)
+    }
+
+    database.find({ $where: function () { return updateAvailable(this) } })
       .sort({ updated_at: -1 }).exec((err, plugins) => {
       if (err) return reject(err)
       return resolve(plugins)

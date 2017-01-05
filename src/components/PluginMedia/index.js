@@ -12,6 +12,7 @@ import { Link } from 'react-router'
 
 import Nameplate from 'components/Nameplate'
 import InstallButton from 'components/InstallButton'
+import UpdateButton from 'components/UpdateButton'
 
 import moment from 'moment'
 
@@ -25,6 +26,7 @@ class PluginMedia extends Component {
     this.renderVersion = this.renderVersion.bind(this)
     this.renderScore = this.renderScore.bind(this)
     this.renderUpdateTimestamp = this.renderUpdateTimestamp.bind(this)
+    this.renderButton = this.renderButton.bind(this)
 
     this.state = {
       hidePreview: false
@@ -89,6 +91,14 @@ class PluginMedia extends Component {
     )
   }
 
+  renderButton () {
+    const {location} = this.props.state.app
+
+    return (location === '/library/updates'
+      ? <UpdateButton plugin={this.props.plugin} dispatch={this.props.dispatch} />
+      : <InstallButton plugin={this.props.plugin} dispatch={this.props.dispatch} />)
+  }
+
   render () {
     const { name, description, owner, version, score, handleCTAClick } = this.props.plugin
 
@@ -130,7 +140,7 @@ class PluginMedia extends Component {
 
             { this.renderScore() }
 
-            <InstallButton plugin={this.props.plugin} dispatch={this.props.dispatch}/>
+            { this.renderButton() }
           </div>
         </article>
     )

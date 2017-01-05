@@ -1,4 +1,3 @@
-const config = require('../config')
 const Promise = require('promise')
 const _ = require('lodash')
 const semver = require('semver')

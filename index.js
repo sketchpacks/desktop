@@ -20,8 +20,8 @@ const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
 const Database = require('nedb')
+
 const PluginManager = require('./src/main/plugin_manager')
-const CatalogManager = require('./src/main/catalog_manager')
 const Catalog = require('./src/lib/catalog')
 const {
   CATALOG_FETCH_DELAY,
@@ -51,16 +51,6 @@ const opts = {
 
 const menuBar = menubar(opts)
 
-const database = new Database({
-  filename: path.join(app.getPath('userData'), 'catalog.db'),
-  autoload: true
-})
-Catalog.setDatabase(database)
-
-global.database = database
-global.Catalog = Catalog
-global.CatalogManager = CatalogManager
-
 let mainWindow
 
 menuBar.on('ready', () => {
@@ -83,20 +73,12 @@ menuBar.on('after-show', () => {
 menuBar.on('after-create-window', () => {
   menuBar.window.hide()
   mainWindow = menuBar.window
-
-  CatalogManager.addSubscribers(mainWindow)
 })
 
 app.on('ready', () => {
   if (__PRODUCTION__ && __ELECTRON__) {
     const updater = require('./src/main/updater')
     updater.init()
-  }
-
-  if (__ELECTRON__) {
-    setTimeout(updateCatalogOnStart, ms('5s'))
-
-    CatalogManager.enableAutoUpdate()
   }
 })
 
@@ -123,10 +105,3 @@ ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
       })
     })
 })
-
-const updateCatalogOnStart = () => {
-  CatalogManager.fetch()
-    .then((plugins) => {
-      Catalog.upsert(plugins)
-    })
-}

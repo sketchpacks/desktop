@@ -85,23 +85,15 @@ app.on('ready', () => {
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.install(event, arg)
     .then((plugin) => {
-      Catalog.pluginInstalled({
-        id: plugin.id,
-        install_path: plugin.install_path,
-        version: plugin.version
-      }).then((plugin) => {
-        event.sender.send(INSTALL_PLUGIN_SUCCESS, plugin)
-      })
+      event.sender.send(INSTALL_PLUGIN_SUCCESS, plugin)
     })
 })
+
+
 
 ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.uninstall(event, arg)
     .then((plugin) => {
-      Catalog.pluginRemoved({
-        id: plugin.id
-      }).then((plugin) => {
-        event.sender.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
-      })
+      event.sender.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
     })
 })

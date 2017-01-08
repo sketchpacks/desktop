@@ -159,7 +159,7 @@ const Catalog = {
     })
   },
 
-  pluginInstalled: ({ id, install_path, version}) => {
+  pluginInstalled: ({ id, install_path, version }) => {
     const newProps = {
       installed: true,
       install_path: install_path,

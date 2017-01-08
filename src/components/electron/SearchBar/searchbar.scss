@@ -4,4 +4,9 @@
   outline: none;
   background: transparent;
   border: 1px solid #ffffff;
+  color: #ffffff
+
+  ::placeholder {
+    color: rgba(0,0,0,0.6)
+  }
 }

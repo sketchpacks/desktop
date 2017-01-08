@@ -11,21 +11,19 @@ class SearchResultsContainer extends Component {
 
     return (
       <div>
-        <section className="hero is-primary">
-          <div className="hero-body">
-            <div className="container">
-              <h1 className="title">
+        <div className="container">
+          <div className="row">
+            <div className="column">
+              <h3 className="title">
                 Showing { plugins.items.length } results for { q }
-              </h1>
+              </h3>
             </div>
           </div>
-        </section>
-
-        <div className="container">
-          <div className="columns">
-            <PluginList plugins={plugins.items} />
-          </div>
         </div>
+
+        { (plugins.isLoading)
+          ? <div>Searching all plugins...</div>
+          : <PluginList plugins={plugins.items} /> }
       </div>
     )
   }

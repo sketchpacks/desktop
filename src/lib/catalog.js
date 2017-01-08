@@ -38,8 +38,6 @@ const Catalog = {
 
   autoUpdatePlugins: () => {
     Catalog.getUpdatedPlugins().then((plugins) => {
-      console.log(plugins)
-
       _(plugins).forEach((plugin) => {
         ipcRenderer.send('manager/INSTALL_REQUEST', plugin)
       })

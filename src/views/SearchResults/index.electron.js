@@ -2,34 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
-import qs from 'qs'
-
 import PluginList from 'components/PluginList'
-import linkHeader from 'parse-link-header'
-
-import {
-  pluginsRequest,
-  pluginsReceived,
-  pluginsPaginate
-} from 'actions'
 
 class SearchResultsContainer extends Component {
-  componentDidMount () {
-    const {dispatch} = this.props
-    const {q} = this.props.location.query
-    const apiQuery = qs.stringify({text: q, sort: 'updated_at:desc'})
-
-    dispatch(pluginsRequest())
-
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins?${apiQuery}`)
-      .then(response => {
-        return response.json()
-      })
-      .then(json => {
-        dispatch(pluginsReceived(json))
-      })
-  }
-
   render () {
     const { plugins } = this.props
     const { q } = this.props.location.query

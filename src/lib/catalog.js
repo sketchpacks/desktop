@@ -97,6 +97,16 @@ const Catalog = {
     })
   }),
 
+  search: (keyword) => {
+    const regx = new RegExp(keyword)
+    return new Promise((resolve, reject) => {
+      database.find({ $or: [{owner: regx}, {author: regx}, {name: regx}, {description: regx}] }, (err, plugins) => {
+        if (err) return reject(err)
+        return resolve(plugins)
+      })
+    })
+  },
+
   update: () => {
     const opts = {
       method: 'GET',

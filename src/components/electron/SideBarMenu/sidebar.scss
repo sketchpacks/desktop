@@ -1,8 +1,10 @@
-$sidebar-width: 200px;
+$sidebar-width: 140px;
 
 .app__sidebar {
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+  flex-basis: $sidebar-width;
   height: 100vh;
   max-height: 100vh;
   width: $sidebar-width;

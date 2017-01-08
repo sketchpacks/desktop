@@ -82,3 +82,21 @@ setTimeout(() => {
   Catalog.setStore(store)
   Catalog.enableAutoUpdate()
 }, 10000)
+
+
+
+ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
+  Catalog.pluginInstalled(plugin)
+    .then((plugin) => {
+      Catalog.getPopularPlugins()
+        .then((plugins) => store.dispatch(pluginsReceived(plugins)))
+    })
+})
+
+ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
+  Catalog.pluginRemoved(plugin)
+    .then((plugin) => {
+      Catalog.getInstalledPlugins()
+        .then((plugins) => store.dispatch(pluginsReceived(plugins)))
+    })
+})

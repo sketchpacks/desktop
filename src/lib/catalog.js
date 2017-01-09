@@ -1,10 +1,51 @@
-const Promise = require('promise')
 const _ = require('lodash')
+const Promise = require('promise')
+const request = require('request')
+const ms = require('ms')
 const semver = require('semver')
+const log = require('electron-log')
+const {ipcRenderer} = require('electron')
+
+
+const {
+  API_URL,
+  CATALOG_FETCH_INTERVAL
+} = require('../config')
 
 let database
+let store
+let updateInterval
 
 const Catalog = {
+  setDatabase: (db) => database = db,
+  getDatabase: () => database,
+
+  setStore: (rdx) => store = rdx,
+  getStore: () => store,
+
+  enableAutoUpdate: () => {
+    console.log('Enabling catalog auto updating...')
+    Catalog.update()
+      .then((plugins) => {
+        Catalog.upsert(plugins)
+          .then((plugins) => {
+            store.dispatch(pluginsReceived(plugins))
+            Catalog.autoUpdatePlugins()
+          })
+      })
+    updateInterval = setInterval(Catalog.update, ms(CATALOG_FETCH_INTERVAL))
+  },
+
+  autoUpdatePlugins: () => {
+    Catalog.getUpdatedPlugins().then((plugins) => {
+      _(plugins).forEach((plugin) => {
+        ipcRenderer.send('manager/INSTALL_REQUEST', plugin)
+      })
+    })
+  },
+
+  disableAutoUpdate: () => clearInterval(updateInterval),
+
   getPopularPlugins: () => new Promise((resolve, reject) => {
     if (database === undefined) return new Error("Set a database to query")
 
@@ -56,15 +97,38 @@ const Catalog = {
     })
   }),
 
-  setDatabase: (db) => database = db,
+  search: (keyword) => {
+    const regx = new RegExp(keyword)
+    return new Promise((resolve, reject) => {
+      database.find({ $or: [{owner: regx}, {author: regx}, {name: regx}, {description: regx}] }, (err, plugins) => {
+        if (err) return reject(err)
+        return resolve(plugins)
+      })
+    })
+  },
 
-  getDatabase: () => database,
+  update: () => {
+    const opts = {
+      method: 'GET',
+      baseUrl: API_URL,
+      uri: '/v1/plugins/catalog'
+    }
+
+    return new Promise((resolve, reject) => {
+      console.log(`Fetching latest plugin catalog from ${API_URL}...`)
+
+      request(opts, (error, response, body) => {
+        if (error) return reject(error)
+        return resolve(body)
+      })
+    })
+  },
 
   upsert: (plugins) => {
-    const filteredPlugins = _.without(JSON.parse(plugins), null, undefined)
-
     new Promise((resolve, reject) => {
       let error
+
+      const filteredPlugins = _.without(JSON.parse(plugins), null, undefined)
       const updatedPlugins = []
 
       _(filteredPlugins).forEach((plugin) => {
@@ -89,11 +153,13 @@ const Catalog = {
       })
 
       if (error) return reject(err)
+
+      Catalog.autoUpdatePlugins()
       return resolve(filteredPlugins)
     })
   },
 
-  pluginInstalled: ({ id, install_path, version}) => {
+  pluginInstalled: ({ id, install_path, version }) => {
     const newProps = {
       installed: true,
       install_path: install_path,

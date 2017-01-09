@@ -2,6 +2,13 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 
+import './searchbar.scss'
+
+import {
+  pluginsRequest,
+  pluginsReceived
+} from 'actions'
+
 class SearchBar extends Component {
   constructor (props) {
     super(props)
@@ -17,6 +24,11 @@ class SearchBar extends Component {
     const {dispatch} = this.props
     const keyword = e.target.value
 
+    dispatch(pluginsRequest())
+
+    Catalog.search(keyword)
+      .then(plugins => dispatch(pluginsReceived(plugins)))
+
     this.props.router.push(`/search?q=${keyword}`)
   }
 
@@ -27,6 +39,7 @@ class SearchBar extends Component {
         placeholder="Search all plugins"
         className="searchBar"
         onKeyUp={this.handleEnterKey}
+        className="searchBar"
       />
     )
   }

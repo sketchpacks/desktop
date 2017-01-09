@@ -23,8 +23,6 @@ import UserProfile from 'views/UserProfile'
 import UserRecommends from 'views/UserRecommends'
 import UserPlugins from 'views/UserPlugins'
 
-const CatalogManager = remote.getGlobal('CatalogManager')
-
 import {
   pluginsReceived
 } from 'actions'
@@ -47,10 +45,6 @@ import {
 
 let store = configureStore()
 const history = syncHistoryWithStore(browserHistory, store)
-
-const refreshStateFromCatalog = () =>
-  Catalog.getPopularPlugins()
-    .then((plugins) => store.dispatch( pluginsReceived(plugins) ))
 
 export const render = () => {
   ReactDOM.render(
@@ -82,22 +76,27 @@ export const render = () => {
     document.getElementById('root')
   )
 
-  refreshStateFromCatalog()
 }
 
-// Download is complete, dispatch installPluginProgress
-ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,arg) => {
-  refreshStateFromCatalog()
+setTimeout(() => {
+  Catalog.setStore(store)
+  Catalog.enableAutoUpdate()
+}, 10000)
+
+
+
+ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
+  Catalog.pluginInstalled(plugin)
+    .then((plugin) => {
+      Catalog.getPopularPlugins()
+        .then((plugins) => store.dispatch(pluginsReceived(plugins)))
+    })
 })
 
-ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,arg) => {
-  refreshStateFromCatalog()
-})
-
-ipcRenderer.on('catalog/FETCH_REQUEST', (evt,arg) => {
-  // UI reflects progress of updating the catalog from GET /plugins/catalog
-})
-
-ipcRenderer.on('catalog/FETCH_RECEIVED', (evt,arg) => {
-  refreshStateFromCatalog()
+ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
+  Catalog.pluginRemoved(plugin)
+    .then((plugin) => {
+      Catalog.getInstalledPlugins()
+        .then((plugins) => store.dispatch(pluginsReceived(plugins)))
+    })
 })

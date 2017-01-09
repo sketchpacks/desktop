@@ -18,22 +18,32 @@ class NewestPluginsContainer extends Component {
       .then(plugins => dispatch(pluginsReceived(plugins)))
   }
 
+  renderList () {
+    const { plugins } = this.props
+
+    if (plugins.isLoading) return (<div>Loading plugins...</div>)
+
+    if (plugins.items.length === 0) return (<div>No plugins found</div>)
+
+    return (<PluginList plugins={plugins.items} />)
+  }
+
   render () {
     const { plugins } = this.props
 
     return (
       <div>
         <div className="container">
-          <div className="columns">
-            <h3 className="title">
-              Newest plugins
-            </h3>
-
-            { (plugins === undefined)
-              ? <div>No plugins</div>
-              : <PluginList plugins={plugins.items} /> }
+          <div className="row">
+            <div className="column">
+              <h3 className="title">
+                Newest plugins
+              </h3>
+            </div>
           </div>
         </div>
+
+        { this.renderList() }
       </div>
     )
   }

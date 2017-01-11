@@ -202,6 +202,37 @@ function authorDetails (state, action) {
   }
 }
 
+const initialSearchState = {
+  keyword: '',
+  items: []
+}
+
+function search (state = initialSearchState, action) {
+  switch (action.type) {
+    case actions.SEARCH:
+      return {
+        ...state,
+        keyword: action.payload
+      }
+    case actions.SEARCH_RESULTS_RECEIVED:
+      return {
+        ...state,
+        items: action.payload
+      }
+    default:
+      if (typeof state === undefined) {
+        return {
+          ...state,
+          keyword: '',
+          items: []
+        }
+      }
+      else {
+        return state
+      }
+  }
+}
+
 const rootReducer = combineReducers({
   routing: routerReducer,
   auth,
@@ -209,7 +240,8 @@ const rootReducer = combineReducers({
   pluginDetails,
   recommends,
   app,
-  authorDetails
+  authorDetails,
+  search
 })
 
 export default rootReducer

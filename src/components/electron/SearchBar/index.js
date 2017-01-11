@@ -5,8 +5,8 @@ import { push } from 'react-router-redux'
 import './searchbar.scss'
 
 import {
-  pluginsRequest,
-  pluginsReceived
+  search,
+  searchResultsReceived
 } from 'actions'
 
 class SearchBar extends Component {
@@ -24,10 +24,9 @@ class SearchBar extends Component {
     const {dispatch} = this.props
     const keyword = e.target.value
 
-    dispatch(pluginsRequest())
-
+    dispatch(search(keyword))
     Catalog.search(keyword)
-      .then(plugins => dispatch(pluginsReceived(plugins)))
+      .then(plugins => dispatch(searchResultsReceived(plugins)))
 
     this.props.router.push(`/search?q=${keyword}`)
   }

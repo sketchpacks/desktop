@@ -2,30 +2,19 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
-import {
-  pluginsRequest,
-  pluginsReceived,
-} from 'actions'
+import { getNewestPlugins } from 'selectors'
 
 import PluginList from 'components/PluginList'
 
 class NewestPluginsContainer extends Component {
-  componentDidMount () {
-    const { dispatch } = this.props
-
-    dispatch(pluginsRequest())
-    Catalog.getNewestPlugins()
-      .then(plugins => dispatch(pluginsReceived(plugins)))
-  }
-
   renderList () {
     const { plugins } = this.props
 
     if (plugins.isLoading) return (<div>Loading plugins...</div>)
 
-    if (plugins.items.length === 0) return (<div>No plugins found</div>)
+    if (plugins.length === 0) return (<div>No plugins found</div>)
 
-    return (<PluginList plugins={plugins.items} />)
+    return (<PluginList plugins={plugins} />)
   }
 
   render () {
@@ -60,7 +49,7 @@ function mapStateToProps(state, ownProps) {
 
   return {
     state,
-    plugins
+    plugins: getNewestPlugins(state)
   }
 }
 

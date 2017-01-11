@@ -9,14 +9,9 @@ import './app.scss'
 import SideBarMenu from 'components/electron/SideBarMenu'
 import SearchBar from 'components/electron/SearchBar'
 
-
 class App extends Component {
   constructor (props) {
     super(props)
-  }
-
-  componentDidMount () {
-    const { dispatch } = this.props
   }
 
   render () {
@@ -48,10 +43,8 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins } = state
-
   return {
-    plugins
+    state
   }
 }
 

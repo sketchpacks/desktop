@@ -3,13 +3,7 @@ import React from 'react'
 import PluginMedia from 'components/PluginMedia'
 
 const PluginList = ({ plugins, authorDetails }) => {
-  if (plugins.length === 0) return (
-    <div className="row">
-      <div className="column">
-        <strong>No plugins found</strong>
-      </div>
-    </div>
-  )
+  if (plugins.length === 0) return (<em>No plugins found</em>)
 
   return (
     <div className="container">
@@ -18,9 +12,9 @@ const PluginList = ({ plugins, authorDetails }) => {
         if (!('owner' in plugin)) plugin['owner'] = authorDetails
 
         return (
-          <div className="row">
+          <div className="row" key={plugin.id}>
             <div className="column">
-              <PluginMedia plugin={plugin} key={plugin.id} />
+              <PluginMedia plugin={plugin} />
             </div>
           </div>
         )

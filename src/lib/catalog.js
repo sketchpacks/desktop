@@ -46,6 +46,15 @@ const Catalog = {
 
   disableAutoUpdate: () => clearInterval(updateInterval),
 
+  getAllPlugins: () => new Promise((resolve, reject) => {
+  if (database === undefined) return new Error("Set a database to query")
+
+  database.find({}).exec((err, plugins) => {
+    if (err) return reject(err)
+    return resolve(plugins)
+  })
+}),
+
   getPopularPlugins: () => new Promise((resolve, reject) => {
     if (database === undefined) return new Error("Set a database to query")
 

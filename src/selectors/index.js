@@ -51,3 +51,9 @@ export const getUpdatedPlugins = createSelector(
     return _.filter(plugins, (p => hasNewVersion(p)))
   }
 )
+
+export const getUpdatesCount = createSelector(
+  [ getUpdatedPlugins ], (plugins) => {
+    return plugins.length
+  }
+)

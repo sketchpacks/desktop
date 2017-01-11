@@ -9,17 +9,15 @@ import './app.scss'
 import SideBarMenu from 'components/electron/SideBarMenu'
 import SearchBar from 'components/electron/SearchBar'
 
+import {getUpdatesCount} from 'selectors'
 
 class App extends Component {
   constructor (props) {
     super(props)
   }
 
-  componentDidMount () {
-    const { dispatch } = this.props
-  }
-
   render () {
+    const {availableUpdates} = this.props
 
     return (
 
@@ -29,7 +27,7 @@ class App extends Component {
         </header>
 
         <div className="app__body">
-          <SideBarMenu />
+          <SideBarMenu updatesCount={availableUpdates} />
 
           <div className="app__viewport">
             { this.props.children }
@@ -48,10 +46,9 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins } = state
-
   return {
-    plugins
+    state,
+    availableUpdates: getUpdatesCount(state)
   }
 }
 

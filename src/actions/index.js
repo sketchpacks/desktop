@@ -170,3 +170,22 @@ export function authorProfileReceived (payload) {
     payload
   }
 }
+
+
+export const SEARCH = 'plugins/SEARCH'
+
+export function search (payload) {
+  return {
+    type: SEARCH,
+    payload
+  }
+}
+
+export const SEARCH_RESULTS_RECEIVED = 'plugins/SEARCH_RESULTS_RECEIVED'
+
+export function searchResultsReceived (payload) {
+  return {
+    type: SEARCH_RESULTS_RECEIVED,
+    payload: payload
+  }
+}

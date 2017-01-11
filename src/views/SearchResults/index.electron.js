@@ -6,8 +6,7 @@ import PluginList from 'components/PluginList'
 
 class SearchResultsContainer extends Component {
   render () {
-    const { plugins } = this.props
-    const { q } = this.props.location.query
+    const { plugins, keyword } = this.props
 
     return (
       <div>
@@ -15,7 +14,7 @@ class SearchResultsContainer extends Component {
           <div className="row">
             <div className="column">
               <h3 className="title">
-                Showing { plugins.items.length } results for { q }
+                Showing { plugins.length } results for { keyword }
               </h3>
             </div>
           </div>
@@ -23,7 +22,7 @@ class SearchResultsContainer extends Component {
 
         { (plugins.isLoading)
           ? <div>Searching all plugins...</div>
-          : <PluginList plugins={plugins.items} /> }
+        : <PluginList plugins={plugins} /> }
       </div>
     )
   }
@@ -36,10 +35,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins } = state
-
+  const { keyword, items } = state.search
   return {
-    plugins
+    keyword,
+    plugins: items,
   }
 }
 

@@ -6,6 +6,7 @@ import { syncHistoryWithStore } from 'react-router-redux'
 import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
 import { ipcRenderer } from 'electron'
+import Promsie from 'promise'
 
 import _ from 'lodash'
 
@@ -24,7 +25,8 @@ import UserRecommends from 'views/UserRecommends'
 import UserPlugins from 'views/UserPlugins'
 
 import {
-  pluginsReceived
+  pluginsRequest,
+  pluginsReceived,
 } from 'actions'
 
 import {
@@ -72,23 +74,29 @@ export const render = () => {
         </Route>
       </Router>
     </Provider>,
-
     document.getElementById('root')
   )
-
 }
 
-setTimeout(() => {
-  Catalog.setStore(store)
-  Catalog.enableAutoUpdate()
-}, 10000)
+const catalogCheck = () => {
+  if (window.Catalog === undefined) {
+    setTimeout(catalogCheck, 100)
+  }
+  else {
+    Catalog.setStore(store)
+    Catalog.enableAutoUpdate()
 
-
+    store.dispatch(pluginsRequest())
+    Catalog.getAllPlugins()
+      .then(plugins => store.dispatch(pluginsReceived(plugins)))
+  }
+}
+catalogCheck()
 
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
-      Catalog.getPopularPlugins()
+      Catalog.getAllPlugins()
         .then((plugins) => store.dispatch(pluginsReceived(plugins)))
     })
 })
@@ -96,7 +104,7 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginRemoved(plugin)
     .then((plugin) => {
-      Catalog.getInstalledPlugins()
+      Catalog.getAllPlugins()
         .then((plugins) => store.dispatch(pluginsReceived(plugins)))
     })
 })

@@ -9,6 +9,7 @@ const {
   __ELECTRON__
 } = require('./src/config')
 
+const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const ms = require('ms')
@@ -46,7 +47,9 @@ const opts = {
   resizable: false,
   alwaysOnTop: true,
   showOnAllWorkspaces: true,
-  preloadWindow: true
+  preloadWindow: true,
+  tooltip: `Sketchpacks for macOS v${pkg.version}`,
+  backgroundColor: '#f8f9fa',
 }
 
 const menuBar = menubar(opts)

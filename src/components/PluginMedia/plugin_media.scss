@@ -1,6 +1,27 @@
 .o-plugin {
-  margin-bottom: 6rem;
+  margin-bottom: 2.4rem;
   width: 100%;
+  background-color: #fff;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 2.4rem;
+  border-radius: 0.5rem;
+  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  &:hover {
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    transform: scale(1.02, 1.02);
+  }
+
+  &__name {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.02rem;
+  }
+
+  &__logline {
+    color: #7E838A;
+  }
 }
 
 .o-plugin__footer {

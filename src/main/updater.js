@@ -8,7 +8,7 @@ const config = require('../config')
 
 let updateFeed = `${config.RELEASE_SERVER_URL}/update?version=${config.APP_VERSION}&platform=${os.platform()}`
 
-const promptRestart = false
+let promptRestart = false
 
 autoUpdater.setFeedURL(updateFeed)
 
@@ -40,6 +40,7 @@ function init () {
   })
 
   autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateURL) => {
+    promptRestart = true
     handleClientUpdate(releaseNotes, releaseName, releaseDate, updateURL)
     log.info('Update downloaded')
   })
@@ -52,12 +53,12 @@ function init () {
 function handleClientUpdate (releaseNotes, releaseName, releaseDate, updateURL) {
   const opts = {
     type: 'info',
-    title: 'Sketchpacks',
-    message: 'A new version has been downloaded. Please restart the application to apply the updates.',
-    detail: releaseName + "\n\n" + releaseNotes,
-    buttons: ['Restart', 'Later'],
+    title: 'A new version of Sketchpacks is available',
+    message: 'A new version of Sketchpacks is available',
+    detail: `Sketchpacks for macOS v${releaseName} is now available — you have v${config.APP_VERSION}. Would you like to install this update now?`,
+    buttons: ['Install now', 'Later'],
     defaultId: 0,
-    cancelId: 1
+    cancelId: 1,
   }
 
   dialog.showMessageBox(opts, ((response) => {
@@ -66,9 +67,7 @@ function handleClientUpdate (releaseNotes, releaseName, releaseDate, updateURL) 
       autoUpdater.quitAndInstall()
     }
 
-    if (response === 1) {
-      promptRestart = false
-    }
+    promptRestart = false
   }))
 }
 

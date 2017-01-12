@@ -103,10 +103,11 @@ class PluginMedia extends Component {
 
   renderButton () {
     const {location} = this.props.state.app
+    const {plugin,dispatch} = this.props
 
     return (location === '/library/updates'
-      ? <UpdateButton plugin={this.props.plugin} dispatch={this.props.dispatch} />
-      : <InstallButton plugin={this.props.plugin} dispatch={this.props.dispatch} />)
+      ? <UpdateButton plugin={plugin} dispatch={dispatch} />
+      : <InstallButton plugin={plugin} dispatch={dispatch} />)
   }
 
   render () {

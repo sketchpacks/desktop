@@ -1,4 +1,17 @@
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .app {
+  // Disable text selection
+  -webkit-user-select: none;
+  animation: fadein 0.5s;
+
   display: flex;
   flex-direction: column;
   overflow: hidden;

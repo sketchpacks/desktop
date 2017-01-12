@@ -25,7 +25,7 @@ class InstalledPluginsContainer extends Component {
         <div className="container">
           <div className="row">
             <div className="column">
-              <h3 className="title">
+              <h3 className="page-title">
                 Your plugins
               </h3>
             </div>

@@ -1,4 +1,17 @@
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .app {
+  // Disable text selection
+  -webkit-user-select: none;
+  animation: fadein 0.5s;
+
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -11,6 +24,7 @@
   }
 
   &__viewport {
+    background-color: #f8f9fa;
     height: 486px;
     max-height: 486px;
     overflow-y: scroll;
@@ -35,4 +49,8 @@
   padding: 0.6rem 1rem;
   width: 20.0rem;
   margin-bottom: 0px;
+}
+
+.page-title {
+  font-size: 2.4rem;
 }

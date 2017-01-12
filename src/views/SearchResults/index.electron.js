@@ -13,7 +13,7 @@ class SearchResultsContainer extends Component {
         <div className="container">
           <div className="row">
             <div className="column">
-              <h3 className="title">
+              <h3 className="page-title">
                 Showing { plugins.length } results for { keyword }
               </h3>
             </div>

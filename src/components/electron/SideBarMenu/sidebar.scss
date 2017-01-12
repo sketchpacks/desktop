@@ -20,11 +20,11 @@ $sidebar-width: 140px;
 
 .app__sidebar-item {
   cursor: pointer;
-  padding: 0 16px;
+  padding: 0.4rem 1.6rem;
   color: #CFD4E0;
   font-size: 1.4rem;
   border-left: 4px solid transparent;
-  margin: 5px 0;
+  margin: 0.5rem 0;
 
   &:hover {
     color: #ffffff;

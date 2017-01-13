@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
 import PluginList from 'components/PluginList'
+import {getSearchResults} from 'selectors'
 
 class SearchResultsContainer extends Component {
   render () {
@@ -35,10 +36,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { keyword, items } = state.search
+  const { keyword } = state.search
   return {
     keyword,
-    plugins: items,
+    plugins: getSearchResults(state),
   }
 }
 

@@ -2,8 +2,10 @@ import semver from 'semver'
 import { createSelector } from 'reselect'
 const _ = require('lodash')
 
+
 const getList = (state) => state.app.location
 const getPlugins = (state) => state.plugins.items
+const getSearchResultIds = (state) => state.search.items
 
 export const getAllPlugins = createSelector(
   [ getPlugins ], (plugins) => {
@@ -55,5 +57,17 @@ export const getUpdatedPlugins = createSelector(
 export const getUpdatesCount = createSelector(
   [ getUpdatedPlugins ], (plugins) => {
     return plugins.length
+  }
+)
+
+export const getSearchResults = createSelector(
+  [ getAllPlugins, getSearchResultIds ],
+  (plugins, ids) => {
+    let results = []
+    _.forEach(ids, (id) => {
+      results.push(_.find(plugins, ['id', id]))
+    })
+
+    return results
   }
 )

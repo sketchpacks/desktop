@@ -109,9 +109,10 @@ const Catalog = {
   search: (keyword) => {
     const regx = new RegExp(keyword)
     return new Promise((resolve, reject) => {
-      database.find({ $or: [{owner: regx}, {author: regx}, {name: regx}, {description: regx}] }, (err, plugins) => {
+      database.find({ $or: [{owner: regx}, {author: regx}, {name: regx}, {description: regx}] },
+        { id: 1 }, (err, plugins) => {
         if (err) return reject(err)
-        return resolve(plugins)
+        return resolve(_.map(plugins, (p) => p.id ))
       })
     })
   },

@@ -52,23 +52,13 @@ class UserProfileContainer extends Component {
                 </div>
               </div>
             </div>
-
-            <div className="row">
-              <div className="column">
-                <ul>
-                  <li><Link to={`/@${authorDetails.handle}/plugins`}>Published</Link></li>
-                </ul>
-              </div>
-            </div>
           </div>
         </div>
 
         <div className="container">
           <div className="row">
             <div className="column">
-              <div className="content">
-                {this.props.children}
-              </div>
+              {this.props.children}
             </div>
           </div>
         </div>

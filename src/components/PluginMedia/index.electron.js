@@ -86,7 +86,6 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
-    return 
     const { version, installed_version } = this.props.plugin
     const {location} = this.props.state.app
 
@@ -111,7 +110,7 @@ class PluginMedia extends Component {
   }
 
   render () {
-    const { name, description, owner, version, score, handleCTAClick } = this.props.plugin
+    const { name, description, owner, version, score, handleCTAClick, title } = this.props.plugin
 
     return (
         <article className="o-plugin">
@@ -120,11 +119,11 @@ class PluginMedia extends Component {
               <h3 className="o-plugin__name">
                 { __ELECTRON__ ? (
                   <a href={`${WEB_URL}/${owner.handle}/${name}`}>
-                    {name}
+                    {title || name}
                   </a>
                 ) : (
                   <Link to={`/${owner.handle}/${name}`}>
-                    {name}
+                    {title || name}
                   </Link>
                 ) }
               </h3>

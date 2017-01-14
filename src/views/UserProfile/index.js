@@ -9,6 +9,8 @@ import {
   authorProfileReceived
 } from 'actions'
 
+import './style.scss'
+
 class UserProfileContainer extends Component {
   componentDidMount () {
     const { dispatch } = this.props
@@ -36,28 +38,37 @@ class UserProfileContainer extends Component {
     const { authorDetails } = this.props
 
     return (
-      <div className="container">
-        <div className="columns">
-          <div className="column is-one-quarter">
-            <figure className="image is-square">
-              <img src="http://placehold.it/256x256" role="presentation" />
-            </figure>
-            <div className="content">
-              <p className="title is-3">{authorDetails.name}</p>
-              <p className="subtitle is-5">@{authorDetails.handle}</p>
+      <div>
+        <div className="profileHeader">
+          <div className="container">
+            <div className="row">
+              <div className="column is-one-quarter">
+                <figure className="image is-square">
+                  <img src="http://placehold.it/256x256" role="presentation" />
+                </figure>
+                <div className="content">
+                  <p className="title is-3">{authorDetails.name}</p>
+                  <p className="subtitle is-5">@{authorDetails.handle}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="column">
+                <ul>
+                  <li><Link to={`/@${authorDetails.handle}/plugins`}>Published</Link></li>
+                </ul>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="column">
-            <div className="tabs is-medium">
-              <ul>
-                <li><Link to={`/@${authorDetails.handle}/plugins`}>Plugins</Link></li>
-                <li><Link to={`/@${authorDetails.handle}/recommends`}>Recommends</Link></li>
-              </ul>
-            </div>
-
-            <div className="content">
-              {this.props.children}
+        <div className="container">
+          <div className="row">
+            <div className="column">
+              <div className="content">
+                {this.props.children}
+              </div>
             </div>
           </div>
         </div>

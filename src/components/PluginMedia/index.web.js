@@ -58,8 +58,6 @@ class PluginMedia extends Component {
     return
     const {location} = this.props.state.app
 
-    if (location === '/library/updates') return
-
     const { score } = this.props.plugin
 
     if (score === 0)
@@ -85,18 +83,12 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
-    const { version, installed_version } = this.props.plugin
-    const {location} = this.props.state.app
+    const { version } = this.props.plugin
 
     if (version === "0")
       return
 
-    return (
-      <span>v{location === '/library/updates'
-                ? version
-                : installed_version}
-      </span>
-    )
+    return (<span>v{version}</span>)
   }
 
   renderButton () {
@@ -107,7 +99,9 @@ class PluginMedia extends Component {
   }
 
   render () {
-    const { name, description, owner, version, score, handleCTAClick } = this.props.plugin
+    const { name, description, owner, version, score, handleCTAClick, title } = this.props.plugin
+    const title_or_name = title || name
+
 
     return (
         <article className="o-plugin">
@@ -116,11 +110,11 @@ class PluginMedia extends Component {
               <h3 className="o-plugin__name">
                 { __ELECTRON__ ? (
                   <a href={`${WEB_URL}/${owner.handle}/${name}`}>
-                    {name}
+                    {title_or_name}
                   </a>
                 ) : (
                   <Link to={`/${owner.handle}/${name}`}>
-                    {name}
+                    {title_or_name}
                   </Link>
                 ) }
               </h3>

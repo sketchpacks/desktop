@@ -1,11 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import Nameplate from 'components/Nameplate'
+
 import {
   pluginDetailsRequest,
   pluginDetailsReceived,
   pluginReadmeRequest,
-  pluginReadmeReceived
+  pluginReadmeReceived,
+  authorProfileRequest,
+  authorProfileReceived
 } from 'actions'
 
 
@@ -34,6 +38,17 @@ class PluginDetailsContainer extends Component {
     const { owner, id } = this.props.params
 
     const self = this
+
+    dispatch(authorProfileRequest())
+    fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}`)
+      .then(response => {
+        return response.json()
+      })
+      .then(user => {
+        dispatch(authorProfileReceived(user))
+      })
+
+
     dispatch(pluginDetailsRequest())
     fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}/plugins/${id}`)
       .then(response => {
@@ -47,6 +62,11 @@ class PluginDetailsContainer extends Component {
 
   render () {
     const { description, name, readme } = this.props.pluginDetails
+    const owner = {
+      handle: this.props.authorDetails.handle,
+      avatar_url: this.props.authorDetails.avatar_url,
+      name: this.props.authorDetails.name,
+    }
 
     return (
       <div>
@@ -65,9 +85,19 @@ class PluginDetailsContainer extends Component {
 
         <section className="section">
           <div className="container">
-            <div className="columns">
+            <div className="row">
               <div className="column">
                 { readme }
+              </div>
+
+              <div className="column column-25">
+                <Nameplate
+                  handle={owner.handle}
+                  thumbnailUrl={owner.avatar_url}
+                  name={owner.name}
+                  height={24}
+                  width={24}
+                />
               </div>
             </div>
           </div>
@@ -85,10 +115,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { pluginDetails } = state
+  const { pluginDetails, authorDetails } = state
   return {
     pluginDetails,
-    state
+    authorDetails
   }
 }
 

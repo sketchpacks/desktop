@@ -111,6 +111,7 @@ class PluginMedia extends Component {
 
   render () {
     const { name, description, owner, version, score, handleCTAClick, title } = this.props.plugin
+    const title_or_name = title || name
 
     return (
         <article className="o-plugin">
@@ -119,11 +120,11 @@ class PluginMedia extends Component {
               <h3 className="o-plugin__name">
                 { __ELECTRON__ ? (
                   <a href={`${WEB_URL}/${owner.handle}/${name}`}>
-                    {title || name}
+                    {title_or_name}
                   </a>
                 ) : (
                   <Link to={`/${owner.handle}/${name}`}>
-                    {title || name}
+                    {title_or_name}
                   </Link>
                 ) }
               </h3>

@@ -29,8 +29,8 @@ class FrontPageContainer extends Component {
     return (
       <div>
         <section className="hero is-primary is-large">
-          <div className="hero-body">
-            <div className="container">
+          <div className="container">
+            <div className="row">
               <h1 className="title">
                 Get Sketchpacks for macOS
               </h1>
@@ -39,24 +39,20 @@ class FrontPageContainer extends Component {
         </section>
 
         <div className="container">
-          <div className="columns">
-
+          <div className="row">
             <div className="column">
-              <div className="content">
-                <h3>Popular Plugins</h3>
+              <h3>Popular Plugins</h3>
 
-                <PluginList plugins={plugins.items} />
-              </div>
+              <PluginList plugins={plugins.items} />
             </div>
+          </div>
 
+          <div className="row">
             <div className="column">
-              <div className="content">
-                <h3>Newest Plugins</h3>
+              <h3>Popular Plugins</h3>
 
-                <PluginList plugins={plugins.items} />
-              </div>
+              <PluginList plugins={plugins.items} />
             </div>
-
           </div>
         </div>
       </div>

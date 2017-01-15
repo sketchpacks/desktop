@@ -39,7 +39,7 @@ class UserProfileContainer extends Component {
 
     return (
       <div>
-        <div className="profileHeader">
+        <div className="hero">
           <div className="container">
             <div className="row">
               <div className="column is-one-quarter">

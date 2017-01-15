@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import Nameplate from 'components/Nameplate'
+import ReadmeDocument from 'components/ReadmeDocument'
 
 import {
   pluginDetailsRequest,
@@ -61,7 +62,8 @@ class PluginDetailsContainer extends Component {
   }
 
   render () {
-    const { description, name, readme } = this.props.pluginDetails
+    const { description, name, readme, title } = this.props.pluginDetails
+    const title_or_name = title || name
     const owner = {
       handle: this.props.authorDetails.handle,
       avatar_url: this.props.authorDetails.avatar_url,
@@ -71,15 +73,22 @@ class PluginDetailsContainer extends Component {
     return (
       <div>
         <section className="hero is-primary">
-          <div className="hero-body">
-            <div className="container">
-              <h1 className="title">
-                {name}
-              </h1>
-              <h2 className="subtitle">
-                {description}
-              </h2>
-            </div>
+          <div className="container">
+            <Nameplate
+              handle={owner.handle}
+              thumbnailUrl={owner.avatar_url}
+              name={owner.name}
+              height={24}
+              width={24}
+            />
+
+            <h1 className="title">
+              {title_or_name}
+            </h1>
+
+            <p className="subtitle">
+              {description}
+            </p>
           </div>
         </section>
 
@@ -87,17 +96,7 @@ class PluginDetailsContainer extends Component {
           <div className="container">
             <div className="row">
               <div className="column">
-                { readme }
-              </div>
-
-              <div className="column column-25">
-                <Nameplate
-                  handle={owner.handle}
-                  thumbnailUrl={owner.avatar_url}
-                  name={owner.name}
-                  height={24}
-                  width={24}
-                />
+                <ReadmeDocument markdown={readme} />
               </div>
             </div>
           </div>

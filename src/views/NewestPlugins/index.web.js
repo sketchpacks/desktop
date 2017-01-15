@@ -63,17 +63,17 @@ class NewestPluginsContainer extends Component {
 
         <div className="container">
           <div className="columns">
-            <div className="column">
-              <Pagination plugins={plugins}
-                currentPage={this.props.location.query.page}
-                onSelect={(page) => this.handlePagination(page)} />
-            </div>
+            <PluginList plugins={plugins.items} />
           </div>
         </div>
 
         <div className="container">
           <div className="columns">
-            <PluginList plugins={plugins.items} />
+            <div className="column">
+              <Pagination plugins={plugins}
+                currentPage={this.props.location.query.page}
+                onSelect={(page) => this.handlePagination(page)} />
+            </div>
           </div>
         </div>
       </div>

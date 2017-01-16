@@ -3,6 +3,8 @@ import React from 'react'
 import segmentize from 'segmentize'
 import Paginator from 'react-pagify'
 
+import './style.scss'
+
 const Pagination = ({ plugins, currentPage, onSelect }) => {
   const ellipsis = '...'
   const labels = {

@@ -9,7 +9,7 @@ const Pagination = ({ plugins, currentPage, onSelect }) => {
   const ellipsis = '...'
   const labels = {
     'next': 'Next',
-    'previous': 'Previous'
+    'previous': 'Prev'
   }
   const pages = parseInt(plugins.lastPage, 10)
   const page = parseInt(currentPage, 10)

@@ -13,6 +13,7 @@ import { Link } from 'react-router'
 import Nameplate from 'components/Nameplate'
 import InstallButton from 'components/InstallButton'
 import UpdateButton from 'components/UpdateButton'
+import PluginMetric from 'components/PluginMetric'
 
 import moment from 'moment'
 
@@ -89,24 +90,37 @@ class PluginMedia extends Component {
     const { version, installed_version } = this.props.plugin
     const {location} = this.props.state.app
 
-    if (version === "0")
-      return
+    if (typeof version === undefined) return
+    if (version === "0") return
+    if (version === "") return
+    if (version === null) return
 
-    return (
-      <span>v{location === '/library/updates'
-                ? version
-                : installed_version}
-      </span>
-    )
+    return (location === '/library/updates')
+      ? <PluginMetric icon={'versions'} shape={'path'} value={version} tooltip={'Latest version'} />
+      : <PluginMetric icon={'versions'} shape={'path'} value={installed_version} tooltip={'Installed version'} />
   }
 
   renderButton () {
     const {location} = this.props.state.app
     const {plugin,dispatch} = this.props
 
-    return (location === '/library/updates'
+    return (location === '/library/updates')
       ? <UpdateButton plugin={plugin} dispatch={dispatch} />
-      : <InstallButton plugin={plugin} dispatch={dispatch} />)
+      : <InstallButton plugin={plugin} dispatch={dispatch} />
+  }
+
+  renderAutoupdates () {
+    const { version } = this.props.plugin
+
+    if (version === "0") return
+    if (typeof version === null) return
+
+    return <PluginMetric
+      icon={'autoupdates'}
+      value={'Auto-updates'}
+      shape={'polygon'}
+      tooltip={'Automatic plugin updates'}
+    />
   }
 
   render () {
@@ -146,6 +160,8 @@ class PluginMedia extends Component {
             />
 
             { this.renderVersion() }
+
+            { this.renderAutoupdates() }
 
             { this.renderUpdateTimestamp() }
 

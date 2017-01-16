@@ -41,7 +41,7 @@ class FrontPageContainer extends Component {
         <div className="container">
           <div className="row">
             <div className="column">
-              <h3>Popular Plugins</h3>
+              <h4>Popular Plugins</h4>
 
               <PluginList plugins={plugins.items} />
             </div>
@@ -49,7 +49,7 @@ class FrontPageContainer extends Component {
 
           <div className="row">
             <div className="column">
-              <h3>Popular Plugins</h3>
+              <h4>Newest Plugins</h4>
 
               <PluginList plugins={plugins.items} />
             </div>

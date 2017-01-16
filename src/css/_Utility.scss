@@ -42,3 +42,9 @@
 .u-mar-left-large {
   margin-left: getSize("large");
 }
+
+.spaced-between {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}

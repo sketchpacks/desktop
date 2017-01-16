@@ -63,13 +63,15 @@ class NewestPluginsContainer extends Component {
         </section>
 
         <div className="container">
-          <div className="columns">
-            <PluginList plugins={plugins.items} />
+          <div className="row">
+            <div className="column">
+              <PluginList plugins={plugins.items} />
+            </div>
           </div>
         </div>
 
         <div className="container">
-          <div className="columns">
+          <div className="row">
             <div className="column">
               <Pagination plugins={plugins}
                 currentPage={this.props.location.query.page}

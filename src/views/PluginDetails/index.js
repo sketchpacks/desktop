@@ -3,6 +3,9 @@ import { connect } from 'react-redux'
 
 import Nameplate from 'components/Nameplate'
 import ReadmeDocument from 'components/ReadmeDocument'
+import InstallButton from 'components/InstallButton'
+import Icon from 'components/Icon'
+import PluginMetric from 'components/PluginMetric'
 
 import {
   pluginDetailsRequest,
@@ -62,7 +65,18 @@ class PluginDetailsContainer extends Component {
   }
 
   render () {
-    const { description, name, readme, title } = this.props.pluginDetails
+    const {
+      description,
+      name,
+      readme,
+      title,
+      version,
+      compatible_version,
+      stargazers_count,
+      watchers_count,
+      score
+    } = this.props.pluginDetails
+
     const title_or_name = title || name
     const owner = {
       handle: this.props.authorDetails.handle,
@@ -74,25 +88,67 @@ class PluginDetailsContainer extends Component {
       <div>
         <section className="hero is-primary">
           <div className="container">
-            <Nameplate
-              handle={owner.handle}
-              thumbnailUrl={owner.avatar_url}
-              name={owner.name}
-              height={24}
-              width={24}
-            />
 
-            <h1 className="title">
-              {title_or_name}
-            </h1>
+            <div className="row">
+              <div className="column">
+                <Nameplate
+                  handle={owner.handle}
+                  thumbnailUrl={owner.avatar_url}
+                  name={owner.name}
+                  height={24}
+                  width={24}
+                />
 
-            <p className="subtitle">
-              {description}
-            </p>
+                <h1 className="title">
+                  {title_or_name}
+                </h1>
+
+                <p className="subtitle">
+                  {description}
+                </p>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="column">
+
+                <div className="o-shelf o-shelf--outlined">
+
+                  { version && (version !== "0") && <PluginMetric
+                      icon={'versions'}
+                      value={version}
+                      tooltip={'Latest version'}
+                      /> }
+
+                  { compatible_version && (compatible_version !== "0") && <PluginMetric
+                    icon={'compatible_version'}
+                    value={compatible_version}
+                    tooltip={'Compatible Sketch.app version'}
+                  /> }
+
+                  { stargazers_count && (parseInt(stargazers_count) > 30) && <PluginMetric
+                    icon={'stargazers'}
+                    value={stargazers_count}
+                    shape={'polygon'}
+                    tooltip={'Stargazers on Github'}
+                  /> }
+
+                  { version && (version !== "0") && <PluginMetric
+                    icon={'autoupdates'}
+                    value={'Auto-updates'}
+                    shape={'polygon'}
+                    tooltip={'Automatic plugin updates'}
+                  /> }
+
+                  <InstallButton plugin={this.props.pluginDetails} dispatch={this.props.dispatch} />
+                </div>
+
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="section">
+        <section className="section ">
           <div className="container">
             <div className="row">
               <div className="column">

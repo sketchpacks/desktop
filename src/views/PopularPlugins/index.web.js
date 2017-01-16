@@ -25,7 +25,8 @@ class PopularPluginsContainer extends Component {
 
     const queryScope = qs.stringify({
       page: page,
-      sort: 'score:desc'
+      sort: 'score:desc',
+      per_page: 10,
     })
 
     dispatch(pluginsRequest())

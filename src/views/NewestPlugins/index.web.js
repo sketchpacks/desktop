@@ -25,7 +25,8 @@ class NewestPluginsContainer extends Component {
 
     const queryScope = qs.stringify({
       page: page,
-      sort: 'created_at:desc'
+      sort: 'created_at:desc',
+      per_page: 10,
     })
 
     dispatch(pluginsRequest())

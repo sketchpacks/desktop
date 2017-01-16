@@ -12,6 +12,7 @@ import { Link } from 'react-router'
 
 import Nameplate from 'components/Nameplate'
 import InstallButton from 'components/InstallButton'
+import PluginMetric from 'components/PluginMetric'
 
 import moment from 'moment'
 
@@ -85,10 +86,9 @@ class PluginMedia extends Component {
   renderVersion () {
     const { version } = this.props.plugin
 
-    if (version === "0")
-      return
+    if (version === "0") return
 
-    return (<span>v{version}</span>)
+    return <PluginMetric icon={'versions'} shape={'path'} value={version} tooltip={'Latest version'} />
   }
 
   renderButton () {
@@ -96,6 +96,19 @@ class PluginMedia extends Component {
     const {plugin,dispatch} = this.props
 
     return <InstallButton plugin={plugin} dispatch={dispatch} />
+  }
+
+  renderAutoupdates () {
+    const { version } = this.props.plugin
+
+    if (version === "0") return
+
+    return <PluginMetric
+      icon={'autoupdates'}
+      value={'Auto-updates'}
+      shape={'polygon'}
+      tooltip={'Automatic plugin updates'}
+    />
   }
 
   render () {
@@ -136,6 +149,8 @@ class PluginMedia extends Component {
             />
 
             { this.renderVersion() }
+
+            { this.renderAutoupdates() }
 
             { this.renderUpdateTimestamp() }
 

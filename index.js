@@ -17,6 +17,7 @@ const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
 const autoUpdater = electron.autoUpdater
+const protocol = electron.protocol
 const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
@@ -82,7 +83,16 @@ app.on('ready', () => {
   if (__PRODUCTION__ && __ELECTRON__) {
     const updater = require('./src/main/updater')
     updater.init()
+
   }
+
+  protocol.registerHttpProtocol('sketchpacks', (request, callback) => {
+    const uri = url.parse(request.url)
+
+    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, uri)
+  }, (error) => {
+    if (error) console.error('Failed to register protocol', error)
+  })
 })
 
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
@@ -91,8 +101,6 @@ ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
       event.sender.send(INSTALL_PLUGIN_SUCCESS, plugin)
     })
 })
-
-
 
 ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.uninstall(event, arg)

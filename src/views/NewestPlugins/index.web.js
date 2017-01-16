@@ -25,7 +25,8 @@ class NewestPluginsContainer extends Component {
 
     const queryScope = qs.stringify({
       page: page,
-      sort: 'created_at:desc'
+      sort: 'created_at:desc',
+      per_page: 10,
     })
 
     dispatch(pluginsRequest())
@@ -62,18 +63,20 @@ class NewestPluginsContainer extends Component {
         </section>
 
         <div className="container">
-          <div className="columns">
+          <div className="row">
             <div className="column">
-              <Pagination plugins={plugins}
-                currentPage={this.props.location.query.page}
-                onSelect={(page) => this.handlePagination(page)} />
+              <PluginList plugins={plugins.items} />
             </div>
           </div>
         </div>
 
         <div className="container">
-          <div className="columns">
-            <PluginList plugins={plugins.items} />
+          <div className="row">
+            <div className="column">
+              <Pagination plugins={plugins}
+                currentPage={this.props.location.query.page}
+                onSelect={(page) => this.handlePagination(page)} />
+            </div>
           </div>
         </div>
       </div>

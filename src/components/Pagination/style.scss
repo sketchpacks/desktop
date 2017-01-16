@@ -1,0 +1,16 @@
+.pagination {
+  ul {
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  li {
+    margin-bottom: 0px;
+  }
+
+  .button {
+    padding: 0 1.2rem;
+  }
+}

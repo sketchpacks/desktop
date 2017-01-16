@@ -7,7 +7,9 @@ import {
   logoutRequest
 } from 'actions'
 
+import 'normalize.css'
 import 'css/milligram.scss'
+import './registry.scss'
 
 class App extends Component {
   constructor (props) {
@@ -35,12 +37,12 @@ class App extends Component {
     const { auth } = this.props
 
     return (
-      <div>
+      <div className="registry">
         <nav className="nav">
           <div className="container">
 
             <div className="nav-left">
-              <a className="nav-item is-brand" href="#">
+              <a className="nav-item is-brand" href="/">
                 <strong>Sketchpacks</strong>
               </a>
             </div>
@@ -52,22 +54,9 @@ class App extends Component {
             </span>
 
             <div className="nav-right nav-menu">
-              <Link to="/" className="nav-item">Home</Link>
               <Link to="/browse" className="nav-item">Browse</Link>
               <Link to="/browse/popular" className="nav-item">Popular</Link>
               <Link to="/browse/newest" className="nav-item">Newest</Link>
-
-              {(auth.token === undefined) &&
-                <a href="https://sketchpacks-api.herokuapp.com/v1/auth/web" className="nav-item">Login</a>
-              }
-
-              {(auth.token !== undefined) &&
-                <span onClick={() => this.handleLogout()} className="nav-item">Logout</span>
-              }
-
-              {(auth.token !== undefined) &&
-                <Link to={`/@${auth.handle}`} className="nav-item">@{auth.handle}</Link>
-              }
             </div>
           </div>
         </nav>
@@ -85,10 +74,9 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { auth, plugins } = state
+  const { plugins } = state
 
   return {
-    auth,
     plugins
   }
 }

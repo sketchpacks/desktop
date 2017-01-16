@@ -12,7 +12,7 @@ import { Link } from 'react-router'
 
 import Nameplate from 'components/Nameplate'
 import InstallButton from 'components/InstallButton'
-import UpdateButton from 'components/UpdateButton'
+import PluginMetric from 'components/PluginMetric'
 
 import moment from 'moment'
 
@@ -59,8 +59,6 @@ class PluginMedia extends Component {
     return
     const {location} = this.props.state.app
 
-    if (location === '/library/updates') return
-
     const { score } = this.props.plugin
 
     if (score === 0)
@@ -86,32 +84,37 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
-    return 
-    const { version, installed_version } = this.props.plugin
-    const {location} = this.props.state.app
+    const { version } = this.props.plugin
 
-    if (version === "0")
-      return
+    if (version === "0") return
 
-    return (
-      <span>v{location === '/library/updates'
-                ? version
-                : installed_version}
-      </span>
-    )
+    return <PluginMetric icon={'versions'} shape={'path'} value={version} tooltip={'Latest version'} />
   }
 
   renderButton () {
     const {location} = this.props.state.app
     const {plugin,dispatch} = this.props
 
-    return (location === '/library/updates'
-      ? <UpdateButton plugin={plugin} dispatch={dispatch} />
-      : <InstallButton plugin={plugin} dispatch={dispatch} />)
+    return <InstallButton plugin={plugin} dispatch={dispatch} />
+  }
+
+  renderAutoupdates () {
+    const { version } = this.props.plugin
+
+    if (version === "0") return
+
+    return <PluginMetric
+      icon={'autoupdates'}
+      value={'Auto-updates'}
+      shape={'polygon'}
+      tooltip={'Automatic plugin updates'}
+    />
   }
 
   render () {
-    const { name, description, owner, version, score, handleCTAClick } = this.props.plugin
+    const { name, description, owner, version, score, handleCTAClick, title } = this.props.plugin
+    const title_or_name = title || name
+
 
     return (
         <article className="o-plugin">
@@ -120,11 +123,11 @@ class PluginMedia extends Component {
               <h3 className="o-plugin__name">
                 { __ELECTRON__ ? (
                   <a href={`${WEB_URL}/${owner.handle}/${name}`}>
-                    {name}
+                    {title_or_name}
                   </a>
                 ) : (
                   <Link to={`/${owner.handle}/${name}`}>
-                    {name}
+                    {title_or_name}
                   </Link>
                 ) }
               </h3>
@@ -146,6 +149,8 @@ class PluginMedia extends Component {
             />
 
             { this.renderVersion() }
+
+            { this.renderAutoupdates() }
 
             { this.renderUpdateTimestamp() }
 

@@ -1,0 +1,16 @@
+$height: 24vh;
+
+.hero {
+  background-color: #ffffff;
+  min-height: $height;
+
+  .container {
+    min-height: $height;
+    padding-top: 4vh;
+    padding-bottom: 4vh;
+  }
+
+  .tabnav {
+    margin-bottom: -4vh;
+  }
+}

@@ -25,7 +25,8 @@ class PopularPluginsContainer extends Component {
 
     const queryScope = qs.stringify({
       page: page,
-      sort: 'score:desc'
+      sort: 'score:desc',
+      per_page: 10,
     })
 
     dispatch(pluginsRequest())
@@ -52,28 +53,32 @@ class PopularPluginsContainer extends Component {
     return (
       <div>
         <section className="hero is-primary">
-          <div className="hero-body">
-            <div className="container">
-              <h1 className="title">
-                Popular plugins
-              </h1>
+          <div className="container">
+            <div className="row">
+              <div className="column">
+                <h4 className="title">
+                  Popular plugins
+                </h4>
+              </div>
             </div>
           </div>
         </section>
 
         <div className="container">
-          <div className="columns">
+          <div className="row">
             <div className="column">
-              <Pagination plugins={plugins}
-                currentPage={this.props.location.query.page}
-                onSelect={(page) => this.handlePagination(page)} />
+              <PluginList plugins={plugins.items} />
             </div>
           </div>
         </div>
 
         <div className="container">
-          <div className="columns">
-            <PluginList plugins={plugins.items} />
+          <div className="row">
+            <div className="column">
+              <Pagination plugins={plugins}
+                currentPage={this.props.location.query.page}
+                onSelect={(page) => this.handlePagination(page)} />
+            </div>
           </div>
         </div>
       </div>

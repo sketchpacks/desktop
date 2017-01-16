@@ -3,11 +3,13 @@ import React from 'react'
 import segmentize from 'segmentize'
 import Paginator from 'react-pagify'
 
+import './style.scss'
+
 const Pagination = ({ plugins, currentPage, onSelect }) => {
   const ellipsis = '...'
   const labels = {
     'next': 'Next',
-    'previous': 'Previous'
+    'previous': 'Prev'
   }
   const pages = parseInt(plugins.lastPage, 10)
   const page = parseInt(currentPage, 10)

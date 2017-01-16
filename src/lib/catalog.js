@@ -30,8 +30,8 @@ const Catalog = {
         Catalog.upsert(plugins)
           .then((plugins) => {
             store.dispatch(pluginsReceived(plugins))
-            Catalog.autoUpdatePlugins()
           })
+        Catalog.autoUpdatePlugins()
       })
     updateInterval = setInterval(Catalog.update, ms(CATALOG_FETCH_INTERVAL))
   },
@@ -109,7 +109,7 @@ const Catalog = {
   search: (keyword) => {
     const regx = new RegExp(keyword)
     return new Promise((resolve, reject) => {
-      database.find({ $or: [{owner: regx}, {author: regx}, {name: regx}, {description: regx}] },
+      database.find({ $or: [{name: regx}, {title: regx}, {description: regx}] },
         { id: 1 }, (err, plugins) => {
         if (err) return reject(err)
         return resolve(_.map(plugins, (p) => p.id ))
@@ -155,7 +155,8 @@ const Catalog = {
             version: plugin.version,
             update_url: plugin.update_url,
             published_at: plugin.created_at,
-            updated_at: plugin.updated_at
+            updated_at: plugin.updated_at,
+            title: plugin.title,
           } }, { upsert: true }, (err, num) => {
           if (err) error = err
           updatedPlugins.push(plugin)

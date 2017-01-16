@@ -1,11 +1,19 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import Nameplate from 'components/Nameplate'
+import ReadmeDocument from 'components/ReadmeDocument'
+import InstallButton from 'components/InstallButton'
+import Icon from 'components/Icon'
+import PluginMetric from 'components/PluginMetric'
+
 import {
   pluginDetailsRequest,
   pluginDetailsReceived,
   pluginReadmeRequest,
-  pluginReadmeReceived
+  pluginReadmeReceived,
+  authorProfileRequest,
+  authorProfileReceived
 } from 'actions'
 
 
@@ -34,6 +42,17 @@ class PluginDetailsContainer extends Component {
     const { owner, id } = this.props.params
 
     const self = this
+
+    dispatch(authorProfileRequest())
+    fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}`)
+      .then(response => {
+        return response.json()
+      })
+      .then(user => {
+        dispatch(authorProfileReceived(user))
+      })
+
+
     dispatch(pluginDetailsRequest())
     fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}/plugins/${id}`)
       .then(response => {
@@ -46,28 +65,94 @@ class PluginDetailsContainer extends Component {
   }
 
   render () {
-    const { description, name, readme } = this.props.pluginDetails
+    const {
+      description,
+      name,
+      readme,
+      title,
+      version,
+      compatible_version,
+      stargazers_count,
+      watchers_count,
+      score
+    } = this.props.pluginDetails
+
+    const title_or_name = title || name
+    const owner = {
+      handle: this.props.authorDetails.handle,
+      avatar_url: this.props.authorDetails.avatar_url,
+      name: this.props.authorDetails.name,
+    }
 
     return (
       <div>
         <section className="hero is-primary">
-          <div className="hero-body">
-            <div className="container">
-              <h1 className="title">
-                {name}
-              </h1>
-              <h2 className="subtitle">
-                {description}
-              </h2>
+          <div className="container">
+
+            <div className="row">
+              <div className="column">
+                <Nameplate
+                  handle={owner.handle}
+                  thumbnailUrl={owner.avatar_url}
+                  name={owner.name}
+                  height={24}
+                  width={24}
+                />
+
+                <h1 className="title">
+                  {title_or_name}
+                </h1>
+
+                <p className="subtitle">
+                  {description}
+                </p>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="column">
+
+                <div className="o-shelf o-shelf--outlined">
+
+                  { version && (version !== "0") && <PluginMetric
+                      icon={'versions'}
+                      value={version}
+                      tooltip={'Latest version'}
+                      /> }
+
+                  { compatible_version && (compatible_version !== "0") && <PluginMetric
+                    icon={'compatible_version'}
+                    value={compatible_version}
+                    tooltip={'Compatible Sketch.app version'}
+                  /> }
+
+                  { stargazers_count && (parseInt(stargazers_count) > 30) && <PluginMetric
+                    icon={'stargazers'}
+                    value={stargazers_count}
+                    shape={'polygon'}
+                    tooltip={'Stargazers on Github'}
+                  /> }
+
+                  { version && (version !== "0") && <PluginMetric
+                    icon={'autoupdates'}
+                    value={'Auto-updates'}
+                    shape={'polygon'}
+                    tooltip={'Automatic plugin updates'}
+                  /> }
+
+                  <InstallButton plugin={this.props.pluginDetails} dispatch={this.props.dispatch} />
+                </div>
+
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="section">
+        <section className="section ">
           <div className="container">
-            <div className="columns">
+            <div className="row">
               <div className="column">
-                { readme }
+                <ReadmeDocument markdown={readme} />
               </div>
             </div>
           </div>
@@ -85,10 +170,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { pluginDetails } = state
+  const { pluginDetails, authorDetails } = state
   return {
     pluginDetails,
-    state
+    authorDetails
   }
 }
 

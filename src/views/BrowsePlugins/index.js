@@ -52,14 +52,18 @@ class BrowsePluginsContainer extends Component {
     return (
       <div>
         <section className="hero is-primary">
-          <div className="hero-body">
-            <div className="container">
-              <h1 className="title">
-                Browse all plugins
-              </h1>
-            </div>
+          <div className="container">
+            <h1 className="title">
+              Browse all plugins
+            </h1>
           </div>
         </section>
+
+        <div className="container">
+          <div className="columns">
+            <PluginList plugins={plugins.items} />
+          </div>
+        </div>
 
         <div className="container">
           <div className="columns">
@@ -68,12 +72,6 @@ class BrowsePluginsContainer extends Component {
                 currentPage={this.props.location.query.page}
                 onSelect={(page) => this.handlePagination(page)} />
             </div>
-          </div>
-        </div>
-
-        <div className="container">
-          <div className="columns">
-            <PluginList plugins={plugins.items} />
           </div>
         </div>
       </div>

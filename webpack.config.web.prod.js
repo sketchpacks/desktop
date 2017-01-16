@@ -49,6 +49,13 @@ let options = {
         exclude: [
           /(dist)/
         ]
+      },
+      {
+        test: /\.css$/,
+        exclude: [
+          /(dist)/
+        ],
+        loaders: ['style-loader', 'css-loader']
       }
     ]
   },

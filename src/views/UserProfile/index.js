@@ -9,6 +9,10 @@ import {
   authorProfileReceived
 } from 'actions'
 
+import Nameplate from 'components/Nameplate'
+
+import './style.scss'
+
 class UserProfileContainer extends Component {
   componentDidMount () {
     const { dispatch } = this.props
@@ -36,31 +40,36 @@ class UserProfileContainer extends Component {
     const { authorDetails } = this.props
 
     return (
-      <div className="container">
-        <div className="columns">
-          <div className="column is-one-quarter">
-            <figure className="image is-square">
-              <img src="http://placehold.it/256x256" role="presentation" />
-            </figure>
-            <div className="content">
-              <p className="title is-3">{authorDetails.name}</p>
-              <p className="subtitle is-5">@{authorDetails.handle}</p>
-            </div>
-          </div>
+      <div>
+        <div className="hero">
+          <div className="container spaced-between">
+            <div className="row">
+              <div className="column">
+                <Nameplate
+                  handle={authorDetails.handle}
+                  thumbnailUrl={authorDetails.avatar_url}
+                  name={authorDetails.name}
+                  height={24}
+                  width={24}
+                />
 
-          <div className="column">
-            <div className="tabs is-medium">
-              <ul>
-                <li><Link to={`/@${authorDetails.handle}/plugins`}>Plugins</Link></li>
-                <li><Link to={`/@${authorDetails.handle}/recommends`}>Recommends</Link></li>
-              </ul>
+                <h2>{authorDetails.name || authorDetails.handle}</h2>
+              </div>
             </div>
 
-            <div className="content">
-              {this.props.children}
+            <div className="row">
+              <div className="column">
+                <div className="tabnav">
+                  <nav className="tabnav-tabs">
+                    <Link to={`/@${authorDetails.handle}/plugins`} className="tabnav-tab" activeClassName="selected">Published</Link>
+                  </nav>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {this.props.children}
       </div>
     )
   }

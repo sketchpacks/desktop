@@ -9,9 +9,13 @@ class UserPluginsContainer extends Component {
 
     return (
       <div className="container">
-        <h1>Published Plugins</h1>
+        <div className="row">
+          <div className="column">
+            <h4>Published Plugins</h4>
 
-        <PluginList plugins={plugins.items} authorDetails={authorDetails} />
+            <PluginList plugins={plugins.items} authorDetails={authorDetails} />
+          </div>
+        </div>
       </div>
     )
   }

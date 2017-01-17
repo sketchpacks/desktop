@@ -27,6 +27,7 @@ class PluginMedia extends Component {
     this.renderScore = this.renderScore.bind(this)
     this.renderUpdateTimestamp = this.renderUpdateTimestamp.bind(this)
     this.renderButton = this.renderButton.bind(this)
+    this.renderStargazerCount = this.renderStargazerCount.bind(this)
 
     this.state = {
       hidePreview: false
@@ -83,6 +84,14 @@ class PluginMedia extends Component {
     )
   }
 
+  renderStargazerCount () {
+    const { stargazers_count } = this.props.plugin
+
+    if (stargazers_count === "0") return
+
+    return <PluginMetric icon={'stargazers'} shape={'polygon'} value={stargazers_count} tooltip={'Stargazers on Github'} />
+  }
+
   renderVersion () {
     const { version } = this.props.plugin
 
@@ -105,7 +114,7 @@ class PluginMedia extends Component {
 
     return <PluginMetric
       icon={'autoupdates'}
-      value={'Auto-updates'}
+      value={'Enabled'}
       shape={'polygon'}
       tooltip={'Automatic plugin updates'}
     />
@@ -155,6 +164,8 @@ class PluginMedia extends Component {
             { this.renderUpdateTimestamp() }
 
             { this.renderScore() }
+
+            { this.renderStargazerCount() }
 
             { this.renderButton() }
           </div>

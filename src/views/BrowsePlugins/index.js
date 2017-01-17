@@ -11,20 +11,28 @@ import Pagination from 'components/Pagination'
 import {
   pluginsRequest,
   pluginsReceived,
-  pluginsPaginate
+  pluginsPaginate,
+  pluginsSortBy
 } from 'actions'
 
 class BrowsePluginsContainer extends Component {
-  componentDidMount () {
-    const { page, text } = this.props.location.query
-    this.fetchPage(page, text)
+  constructor (props) {
+    super(props)
+    this.handleFilterSelect = this.handleFilterSelect.bind(this)
   }
 
-  fetchPage = (page = 1, text) => {
+  componentDidMount () {
+    const { page, text } = this.props.location.query
+    this.fetchPage({page: page, text: text})
+  }
+
+  fetchPage = ({page = 1, text, sort}) => {
     const { dispatch } = this.props
     const { query } = this.props.location
 
-    const apiQuery = qs.stringify({...query, page: page, text: text, sort: 'updated_at:desc'})
+    const sort_by = sort || this.props.plugins.sort_by
+
+    const apiQuery = qs.stringify({...query, page: page, text: text, sort: `${sort_by}:desc`, per_page: 10})
     const browserQuery = qs.stringify({...query, text: text, page: page})
 
     dispatch(pluginsRequest())
@@ -43,7 +51,15 @@ class BrowsePluginsContainer extends Component {
 
   handlePagination = (page) => {
     const { text } = this.props.location.query
-    this.fetchPage(page, text)
+    this.fetchPage({page: page, text: text})
+  }
+
+  handleFilterSelect = (sort) => {
+    const { dispatch } = this.props
+    const { page, text } = this.props.location.query
+
+    dispatch(pluginsSortBy(sort))
+    this.fetchPage({page: page, text: text, sort: sort})
   }
 
   render () {
@@ -53,20 +69,33 @@ class BrowsePluginsContainer extends Component {
       <div>
         <section className="hero is-primary">
           <div className="container">
-            <h1 className="title">
-              Browse all plugins
-            </h1>
+            <div className="row">
+              <div className="column">
+                <h1 className="title">
+                  Browse plugins
+                </h1>
+              </div>
+
+              <div className="column column-25">
+                <span onClick={() => this.handleFilterSelect('score')}>Most Popular</span> |
+                <span onClick={() => this.handleFilterSelect('updated_at')}>Newest</span> |
+                <span onClick={() => this.handleFilterSelect('stargazers_count')}>Stargazers on Github</span> |
+                <span onClick={() => this.handleFilterSelect('version')}>Latest Version</span> |
+                <span onClick={() => this.handleFilterSelect('title')}>Alphabetical</span> |
+                <span onClick={() => this.handleFilterSelect('compatible_version')}>Sketch.app Compatibility Version</span>
+              </div>
+            </div>
           </div>
         </section>
 
         <div className="container">
-          <div className="columns">
+          <div className="row">
             <PluginList plugins={plugins.items} />
           </div>
         </div>
 
         <div className="container">
-          <div className="columns">
+          <div className="row">
             <div className="column">
               <Pagination plugins={plugins}
                 currentPage={this.props.location.query.page}

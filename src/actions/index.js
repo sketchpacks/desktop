@@ -43,6 +43,15 @@ export function logoutRequest () {
   }
 }
 
+export const PLUGINS_SORT_BY = 'plugins/SORT_BY'
+
+export function pluginsSortBy (sort) {
+  return {
+    type: PLUGINS_SORT_BY,
+    sort
+  }
+}
+
 export const PLUGINS_ERROR = 'PLUGINS_ERROR'
 
 export function pluginsError () {

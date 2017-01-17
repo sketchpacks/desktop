@@ -55,8 +55,6 @@ class App extends Component {
 
             <div className="nav-right nav-menu">
               <Link to="/browse" className="nav-item">Browse</Link>
-              <Link to="/browse/popular" className="nav-item">Popular</Link>
-              <Link to="/browse/newest" className="nav-item">Newest</Link>
             </div>
           </div>
         </nav>

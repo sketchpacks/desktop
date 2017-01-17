@@ -8,8 +8,6 @@ import App from 'containers/App'
 
 import FrontPage from 'views/FrontPage'
 import BrowsePlugins from 'views/BrowsePlugins'
-import PopularPlugins from 'views/PopularPlugins'
-import NewestPlugins from 'views/NewestPlugins'
 import PluginDetails from 'views/PluginDetails'
 import SearchResults from 'views/SearchResults'
 
@@ -26,8 +24,6 @@ export const render = () => {
         <Route path="/" component={App}>
           <IndexRoute component={FrontPage} />
           <Route path="browse" component={BrowsePlugins} />
-          <Route path="browse/popular" component={PopularPlugins} />
-          <Route path="browse/newest" component={NewestPlugins} />
 
           <Route path="search" component={SearchResults} />
 

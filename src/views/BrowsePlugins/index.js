@@ -90,7 +90,9 @@ class BrowsePluginsContainer extends Component {
 
         <div className="container">
           <div className="row">
-            <PluginList plugins={plugins.items} />
+            <div className="column">
+              <PluginList plugins={plugins.items} />
+            </div>
           </div>
         </div>
 

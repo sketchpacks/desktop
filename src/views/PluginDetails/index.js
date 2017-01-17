@@ -120,24 +120,24 @@ class PluginDetailsContainer extends Component {
                       tooltip={'Latest version'}
                       /> }
 
+                  { version && (version !== "0") && <PluginMetric
+                    icon={'autoupdates'}
+                    value={'Enabled'}
+                    shape={'polygon'}
+                    tooltip={'Automatic plugin updates'}
+                  /> }
+
                   { compatible_version && (compatible_version !== "0") && <PluginMetric
                     icon={'compatible_version'}
                     value={compatible_version}
                     tooltip={'Compatible Sketch.app version'}
                   /> }
 
-                  { stargazers_count && (parseInt(stargazers_count) > 30) && <PluginMetric
+                  { stargazers_count && parseInt(stargazers_count) && <PluginMetric
                     icon={'stargazers'}
                     value={stargazers_count}
                     shape={'polygon'}
                     tooltip={'Stargazers on Github'}
-                  /> }
-
-                  { version && (version !== "0") && <PluginMetric
-                    icon={'autoupdates'}
-                    value={'Auto-updates'}
-                    shape={'polygon'}
-                    tooltip={'Automatic plugin updates'}
                   /> }
 
                   <InstallButton plugin={this.props.pluginDetails} dispatch={this.props.dispatch} />

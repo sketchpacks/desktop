@@ -10,6 +10,10 @@
     border-radius: 0.4rem;
   }
 
+  &--recto {
+    justify-content: flex-end;
+  }
+
   .button {
     margin-bottom: 0;
   }

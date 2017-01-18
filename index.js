@@ -13,11 +13,14 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const ms = require('ms')
+const _ = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
 const autoUpdater = electron.autoUpdater
 const protocol = electron.protocol
+const url = require('url')
+const querystring = require('querystring')
 const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
@@ -56,6 +59,7 @@ const opts = {
 const menuBar = menubar(opts)
 
 let mainWindow
+let externalPluginInstallQueue = []
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
@@ -77,22 +81,34 @@ menuBar.on('after-show', () => {
 menuBar.on('after-create-window', () => {
   menuBar.window.hide()
   mainWindow = menuBar.window
+
+
+  if (externalPluginInstallQueue.length > 0) {
+    _.forEach(externalPluginInstallQueue, (pluginId) => {
+      mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
+    })
+    externalPluginInstallQueue = []
+  }
 })
 
 app.on('ready', () => {
   if (__PRODUCTION__ && __ELECTRON__) {
     const updater = require('./src/main/updater')
     updater.init()
-
   }
 
   protocol.registerHttpProtocol('sketchpacks', (request, callback) => {
     const uri = url.parse(request.url)
-
-    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, uri)
   }, (error) => {
     if (error) console.error('Failed to register protocol', error)
   })
+})
+
+app.on('open-url', (event, resource) => {
+  const uri = url.parse(resource)
+  const pluginId = uri.path.slice(1)
+
+  externalPluginInstallQueue.push(pluginId)
 })
 
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {

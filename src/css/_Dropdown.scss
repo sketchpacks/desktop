@@ -1,0 +1,32 @@
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown__display {
+}
+
+.dropdown__list {
+  background-color: #ffffff;
+  display: none;
+  position: absolute;
+  left: 0;
+  z-index: 10;
+  border: 0.1rem solid $color-primary;
+  border-radius: 0.2rem;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+}
+
+.dropdown__list-item {
+  padding-left: 1.6rem;
+  padding-right: 1.6rem;
+  line-height: 3.2rem;
+  font-size: 1.4rem;
+  min-width: 180px;
+
+  &:hover {
+    background-color: $color-primary;
+    color: $color-initial;
+  }
+}

@@ -17,7 +17,8 @@ let options = {
 
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'dist', 'web')
+    path: path.resolve(__dirname, 'dist', 'web'),
+    publicPath: '/'
   },
 
   target: 'web',

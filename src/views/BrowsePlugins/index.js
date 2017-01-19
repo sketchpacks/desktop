@@ -22,18 +22,18 @@ class BrowsePluginsContainer extends Component {
   }
 
   componentDidMount () {
-    const { page, text } = this.props.location.query
-    this.fetchPage({page: page, text: text})
+    const { page, q } = this.props.location.query
+    this.fetchPage({page: page, q: q})
   }
 
-  fetchPage = ({page = 1, text, sort}) => {
+  fetchPage = ({page = 1, q, sort = 'updated_at:desc'}) => {
     const { dispatch } = this.props
     const { query } = this.props.location
 
     const sort_by = sort || this.props.plugins.sort_by
 
-    const apiQuery = qs.stringify({...query, page: page, text: text, sort: `${sort_by}:desc`, per_page: 10})
-    const browserQuery = qs.stringify({...query, text: text, page: page})
+    const apiQuery = qs.stringify({...query, page: page, text: q, sort: `${sort_by}`, per_page: 10})
+    const browserQuery = qs.stringify({...query, page: page, q: q, sort: `${sort_by}` })
 
     dispatch(pluginsRequest())
 
@@ -50,16 +50,16 @@ class BrowsePluginsContainer extends Component {
   }
 
   handlePagination = (page) => {
-    const { text } = this.props.location.query
-    this.fetchPage({page: page, text: text})
+    const { q, sort } = this.props.location.query
+    this.fetchPage({page: page, q: q, sort: sort})
   }
 
   handleFilterSelect = (sort) => {
     const { dispatch } = this.props
-    const { page, text } = this.props.location.query
+    const { page, q } = this.props.location.query
 
     dispatch(pluginsSortBy(sort))
-    this.fetchPage({page: page, text: text, sort: sort})
+    this.fetchPage({page: page, q: q, sort: sort})
   }
 
   render () {
@@ -77,12 +77,12 @@ class BrowsePluginsContainer extends Component {
               </div>
 
               <div className="column column-25">
-                <span onClick={() => this.handleFilterSelect('score')}>Most Popular</span> |
-                <span onClick={() => this.handleFilterSelect('updated_at')}>Newest</span> |
-                <span onClick={() => this.handleFilterSelect('stargazers_count')}>Stargazers on Github</span> |
-                <span onClick={() => this.handleFilterSelect('version')}>Latest Version</span> |
-                <span onClick={() => this.handleFilterSelect('title')}>Alphabetical</span> |
-                <span onClick={() => this.handleFilterSelect('compatible_version')}>Sketch.app Compatibility Version</span>
+                <span onClick={() => this.handleFilterSelect('score:desc')}>Most Popular</span> |
+                <span onClick={() => this.handleFilterSelect('updated_at:desc')}>Newest</span> |
+                <span onClick={() => this.handleFilterSelect('stargazers_count:desc')}>Stargazers on Github</span> |
+                <span onClick={() => this.handleFilterSelect('version:desc')}>Latest Version</span> |
+                <span onClick={() => this.handleFilterSelect('title:asc')}>Alphabetical</span> |
+                <span onClick={() => this.handleFilterSelect('compatible_version:desc')}>Sketch.app Compatibility Version</span>
               </div>
             </div>
           </div>

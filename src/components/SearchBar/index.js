@@ -23,7 +23,6 @@ class SearchBar extends Component {
   }
 
   fetchPage = ({page = 1, text, sort = 'created_at'}) => {
-    console.log(this.props)
     const { dispatch } = this.props
     const { query } = this.props.location
 
@@ -38,7 +37,6 @@ class SearchBar extends Component {
       .then(response => {
         const pageMeta = linkHeader(response.headers.get('link'))
         if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
-        console.log(pageMeta)
         return response.json()
       })
       .then(json => {

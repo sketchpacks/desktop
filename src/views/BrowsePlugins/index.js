@@ -3,9 +3,9 @@ import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
 import qs from 'qs'
+import linkHeader from 'parse-link-header'
 
 import PluginList from 'components/PluginList'
-import linkHeader from 'parse-link-header'
 import Pagination from 'components/Pagination'
 
 import {

@@ -11,6 +11,9 @@ import 'normalize.css'
 import 'css/milligram.scss'
 import './registry.scss'
 
+import Icon from 'components/Icon'
+import SearchBar from 'components/SearchBar'
+
 class App extends Component {
   constructor (props) {
     super(props)
@@ -38,26 +41,30 @@ class App extends Component {
 
     return (
       <div className="registry">
-        <nav className="nav">
+        <div className="mainNav">
           <div className="container">
+            <div className="row">
+              <div className="column">
 
-            <div className="nav-left">
-              <a className="nav-item is-brand" href="/">
-                <strong>Sketchpacks</strong>
-              </a>
-            </div>
+                <nav>
+                  <a className="branding" href="/">
+                    <Icon icon={'stargazers'} shape={'polygon'} size={'1em'} />
+                    <strong>Sketchpacks</strong>
+                  </a>
 
-            <span className="nav-toggle">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
+                  <div className="searchBar">
+                      <SearchBar location={this.props.location}/>
+                  </div>
 
-            <div className="nav-right nav-menu">
-              <Link to="/browse" className="nav-item">Browse</Link>
+                  <div className="nav-group">
+                    <Link to="/browse" className="nav__item">Browse</Link>
+                  </div>
+                </nav>
+
+              </div>
             </div>
           </div>
-        </nav>
+        </div>
 
         {this.props.children}
       </div>

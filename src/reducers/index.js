@@ -9,7 +9,7 @@ const initialListState = {
   isLoading: false,
   nextPage: 1,
   lastPage: 1,
-  sort_by: 'updated_at',
+  sort_by: 'updated_at:desc',
 }
 
 function auth (state, action) {
@@ -61,7 +61,6 @@ function plugins (state = initialListState, action) {
       }
 
     case actions.PLUGINS_SORT_BY:
-      console.log(action)
       return {
         ...state,
         sort_by: action.sort

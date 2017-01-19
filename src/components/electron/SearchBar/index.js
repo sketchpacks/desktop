@@ -38,7 +38,6 @@ class SearchBar extends Component {
         placeholder="Search all plugins"
         className="searchBar"
         onKeyUp={this.handleEnterKey}
-        className="searchBar"
       />
     )
   }

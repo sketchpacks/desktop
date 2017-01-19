@@ -14,7 +14,7 @@ const PluginList = ({ plugins, authorDetails }) => {
         if (!('owner' in plugin)) plugin['owner'] = authorDetails
 
         return (
-          <PluginMedia plugin={plugin} />
+          <PluginMedia plugin={plugin} key={plugin.id} />
         )
       })}
     </div>

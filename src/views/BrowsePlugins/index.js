@@ -7,6 +7,7 @@ import linkHeader from 'parse-link-header'
 
 import PluginList from 'components/PluginList'
 import Pagination from 'components/Pagination'
+import Icon from 'components/Icon'
 
 import {
   pluginsRequest,
@@ -19,6 +20,12 @@ class BrowsePluginsContainer extends Component {
   constructor (props) {
     super(props)
     this.handleFilterSelect = this.handleFilterSelect.bind(this)
+    this.showSortList = this.showSortList.bind(this)
+    this.hideSortList = this.hideSortList.bind(this)
+
+    this.state = {
+      sortListVisible: false
+    }
   }
 
   componentDidMount () {
@@ -62,6 +69,16 @@ class BrowsePluginsContainer extends Component {
     this.fetchPage({page: page, q: q, sort: sort})
   }
 
+  showSortList = () => {
+    this.setState({ sortListVisible: true })
+    document.addEventListener("click", this.hideSortList)
+  }
+
+  hideSortList = () => {
+    this.setState({ sortListVisible: false })
+    document.removeEventListener("click", this.hideSortList)
+  }
+
   render () {
     const { plugins } = this.props
 
@@ -74,15 +91,41 @@ class BrowsePluginsContainer extends Component {
                 <h1 className="title">
                   Browse plugins
                 </h1>
-              </div>
 
-              <div className="column column-25">
-                <span onClick={() => this.handleFilterSelect('score:desc')}>Most Popular</span> |
-                <span onClick={() => this.handleFilterSelect('updated_at:desc')}>Newest</span> |
-                <span onClick={() => this.handleFilterSelect('stargazers_count:desc')}>Stargazers on Github</span> |
-                <span onClick={() => this.handleFilterSelect('version:desc')}>Latest Version</span> |
-                <span onClick={() => this.handleFilterSelect('title:asc')}>Alphabetical</span> |
-                <span onClick={() => this.handleFilterSelect('compatible_version:desc')}>Sketch.app Compatibility Version</span>
+                <div className="dropdown">
+                  <div className="dropdown__display" onClick={this.showSortList}>
+                    <span>Sort:</span>
+                    <span>{plugins.sort_by}</span>
+                    <Icon icon={'arrow_down'} shape={'polygon'} size={'1em'} />
+                  </div>
+
+                  <div className={"dropdown__list" + (this.state.sortListVisible ? " is-visible" : "")}>
+                    <div className="dropdown__list-item">
+                      <span onClick={() => this.handleFilterSelect('score:desc')}>Most Popular</span>
+                    </div>
+
+                    <div className="dropdown__list-item">
+                      <span onClick={() => this.handleFilterSelect('updated_at:desc')}>Newest</span>
+                    </div>
+
+                    <div className="dropdown__list-item">
+                      <span onClick={() => this.handleFilterSelect('stargazers_count:desc')}>Stargazers</span>
+                    </div>
+
+                    <div className="dropdown__list-item">
+                      <span onClick={() => this.handleFilterSelect('version:desc')}>Latest Version</span>
+                    </div>
+
+                    <div className="dropdown__list-item">
+                      <span onClick={() => this.handleFilterSelect('title:asc')}>Name</span>
+                    </div>
+
+                    <div className="dropdown__list-item">
+                      <span onClick={() => this.handleFilterSelect('compatible_version:desc')}>Compatibile Version</span>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
           </div>
@@ -101,7 +144,8 @@ class BrowsePluginsContainer extends Component {
             <div className="column">
               <Pagination plugins={plugins}
                 currentPage={this.props.location.query.page}
-                onSelect={(page) => this.handlePagination(page)} />
+                onSelect={(page) => this.handlePagination(page)}
+              />
             </div>
           </div>
         </div>

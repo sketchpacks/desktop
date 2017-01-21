@@ -150,9 +150,13 @@ class PluginDetailsContainer extends Component {
 
             <div className="row">
               <div className="column">
-                <Link to={source_url} className="link--small">
-                  <Icon icon={'github'} /> View on Github
-                </Link>
+
+                <div className="o-shelf o-shelf--verso">
+                  <Link to={source_url} className="link--small">
+                    <Icon icon={'github'} /> View on Github
+                  </Link>
+                </div>
+
               </div>
             </div>
 

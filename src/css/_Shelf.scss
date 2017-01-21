@@ -3,15 +3,22 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  padding-top: 1.6rem;
+  padding-bottom: 1.6rem;
 
   &--outlined {
     border: 1px solid rgba(222,226,230,1.0);
-    padding: 1.6rem 1.6rem;
     border-radius: 0.4rem;
+    padding-left: 1.6rem;
+    padding-right: 1.6rem;
   }
 
   &--recto {
     justify-content: flex-end;
+  }
+
+  &--verso {
+    justify-content: flex-start;
   }
 
   .button {

@@ -65,8 +65,10 @@ class BrowsePluginsContainer extends Component {
     const { dispatch } = this.props
     const { page, q } = this.props.location.query
 
-    dispatch(pluginsSortBy(sort))
-    this.fetchPage({page: page, q: q, sort: sort})
+    if (this.props.plugins.sort_by !== sort) {
+      dispatch(pluginsSortBy(sort))
+      this.fetchPage({page: page, q: q, sort: sort})
+    }
     this.handleToggle()
   }
 
@@ -81,7 +83,7 @@ class BrowsePluginsContainer extends Component {
       case 'updated_at':
         return "Recently updated"
       case 'title':
-        return "Name"
+        return "By Name"
       case 'stargazers_count':
         return "Stargazers"
     }
@@ -107,17 +109,17 @@ class BrowsePluginsContainer extends Component {
                     <span>{this.renderFilterLabel(plugins.sort_by.split(':')[0])}</span>
                   </button>
                   <ul className={"dropdown__menu" + (this.state.open ? " is-visible" : "")}>
-                    <li>
-                      <span onClick={() => this.handleSort('score:desc')}>Most Popular</span>
+                    <li onClick={() => this.handleSort('score:desc')}>
+                      <span>Most Popular</span>
                     </li>
-                    <li>
-                      <span onClick={() => this.handleSort('updated_at:desc')}>Newest</span>
+                    <li onClick={() => this.handleSort('updated_at:desc')}>
+                      <span>Recently Updated</span>
                     </li>
-                    <li>
-                      <span onClick={() => this.handleSort('stargazers_count:desc')}>Stargazers</span>
+                    <li onClick={() => this.handleSort('stargazers_count:desc')}>
+                      <span>Stargazers</span>
                     </li>
-                    <li>
-                      <span onClick={() => this.handleSort('title:asc')}>Name</span>
+                    <li onClick={() => this.handleSort('title:asc')}>
+                      <span>Name</span>
                     </li>
                   </ul>
                 </div>

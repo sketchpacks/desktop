@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router'
 
 import Nameplate from 'components/Nameplate'
 import ReadmeDocument from 'components/ReadmeDocument'
@@ -144,6 +145,14 @@ class PluginDetailsContainer extends Component {
                   <InstallButton plugin={this.props.pluginDetails} dispatch={this.props.dispatch} />
                 </div>
 
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="column">
+                <Link to={source_url} className="link--small">
+                  <Icon icon={'github'} /> View on Github
+                </Link>
               </div>
             </div>
 

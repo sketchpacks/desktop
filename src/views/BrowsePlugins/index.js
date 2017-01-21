@@ -79,13 +79,11 @@ class BrowsePluginsContainer extends Component {
   renderFilterLabel = (sort) => {
     switch (sort) {
       case 'score':
-        return "Score"
+        return "Most popular"
       case 'updated_at':
         return "Recently updated"
       case 'title':
         return "By Name"
-      case 'stargazers_count':
-        return "Stargazers"
     }
   }
 
@@ -114,9 +112,6 @@ class BrowsePluginsContainer extends Component {
                     </li>
                     <li onClick={() => this.handleSort('updated_at:desc')}>
                       <span>Recently Updated</span>
-                    </li>
-                    <li onClick={() => this.handleSort('stargazers_count:desc')}>
-                      <span>Stargazers</span>
                     </li>
                     <li onClick={() => this.handleSort('title:asc')}>
                       <span>Name</span>

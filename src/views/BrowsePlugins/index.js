@@ -29,11 +29,11 @@ class BrowsePluginsContainer extends Component {
   }
 
   componentDidMount () {
-    const { page, q } = this.props.location.query
-    this.fetchPage({page: page, q: q})
+    const { page, q, sort } = this.props.location.query
+    this.fetchPage({page: page, q: q, sort: sort})
   }
 
-  fetchPage = ({page = 1, q, sort = 'updated_at:desc'}) => {
+  fetchPage = ({page = 1, q, sort}) => {
     const { dispatch } = this.props
     const { query } = this.props.location
 

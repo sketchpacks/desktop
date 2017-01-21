@@ -19,12 +19,12 @@ import {
 class BrowsePluginsContainer extends Component {
   constructor (props) {
     super(props)
-    this.handleFilterSelect = this.handleFilterSelect.bind(this)
-    this.showSortList = this.showSortList.bind(this)
-    this.hideSortList = this.hideSortList.bind(this)
+    this.handleSort = this.handleSort.bind(this)
+    this.handleToggle = this.handleToggle.bind(this)
+    this.renderFilterLabel = this.renderFilterLabel.bind(this)
 
     this.state = {
-      sortListVisible: false
+      open: false
     }
   }
 
@@ -61,22 +61,30 @@ class BrowsePluginsContainer extends Component {
     this.fetchPage({page: page, q: q, sort: sort})
   }
 
-  handleFilterSelect = (sort) => {
+  handleSort = (sort) => {
     const { dispatch } = this.props
     const { page, q } = this.props.location.query
 
     dispatch(pluginsSortBy(sort))
     this.fetchPage({page: page, q: q, sort: sort})
+    this.handleToggle()
   }
 
-  showSortList = () => {
-    this.setState({ sortListVisible: true })
-    document.addEventListener("click", this.hideSortList)
+  handleToggle = () => {
+    this.setState({ open: !this.state.open })
   }
 
-  hideSortList = () => {
-    this.setState({ sortListVisible: false })
-    document.removeEventListener("click", this.hideSortList)
+  renderFilterLabel = (sort) => {
+    switch (sort) {
+      case 'score':
+        return "Score"
+      case 'updated_at':
+        return "Recently updated"
+      case 'title':
+        return "Name"
+      case 'stargazers_count':
+        return "Stargazers"
+    }
   }
 
   render () {
@@ -84,52 +92,41 @@ class BrowsePluginsContainer extends Component {
 
     return (
       <div>
-        <section className="hero is-primary">
-          <div className="container">
-            <div className="row">
-              <div className="column">
-                <h1 className="title">
+        <div className="container container--padded-top">
+          <div className="row">
+            <div className="column">
+
+              <div className="o-shelf o-shelf--baseline">
+                <h4 className="title">
                   Browse plugins
-                </h1>
+                </h4>
 
-                <div className="dropdown">
-                  <div className="dropdown__display" onClick={this.showSortList}>
+                <div className="button-group">
+                  <button type="button" className="button-clear button--dropdown" onClick={this.handleToggle}>
                     <span>Sort:</span>
-                    <span>{plugins.sort_by}</span>
-                    <Icon icon={'arrow_down'} shape={'polygon'} size={'1em'} />
-                  </div>
-
-                  <div className={"dropdown__list" + (this.state.sortListVisible ? " is-visible" : "")}>
-                    <div className="dropdown__list-item">
-                      <span onClick={() => this.handleFilterSelect('score:desc')}>Most Popular</span>
-                    </div>
-
-                    <div className="dropdown__list-item">
-                      <span onClick={() => this.handleFilterSelect('updated_at:desc')}>Newest</span>
-                    </div>
-
-                    <div className="dropdown__list-item">
-                      <span onClick={() => this.handleFilterSelect('stargazers_count:desc')}>Stargazers</span>
-                    </div>
-
-                    <div className="dropdown__list-item">
-                      <span onClick={() => this.handleFilterSelect('version:desc')}>Latest Version</span>
-                    </div>
-
-                    <div className="dropdown__list-item">
-                      <span onClick={() => this.handleFilterSelect('title:asc')}>Name</span>
-                    </div>
-
-                    <div className="dropdown__list-item">
-                      <span onClick={() => this.handleFilterSelect('compatible_version:desc')}>Compatibile Version</span>
-                    </div>
-                  </div>
-
+                    <span>{this.renderFilterLabel(plugins.sort_by.split(':')[0])}</span>
+                  </button>
+                  <ul className={"dropdown__menu" + (this.state.open ? " is-visible" : "")}>
+                    <li>
+                      <span onClick={() => this.handleSort('score:desc')}>Most Popular</span>
+                    </li>
+                    <li>
+                      <span onClick={() => this.handleSort('updated_at:desc')}>Newest</span>
+                    </li>
+                    <li>
+                      <span onClick={() => this.handleSort('stargazers_count:desc')}>Stargazers</span>
+                    </li>
+                    <li>
+                      <span onClick={() => this.handleSort('title:asc')}>Name</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
+
+
             </div>
           </div>
-        </section>
+        </div>
 
         <div className="container">
           <div className="row">

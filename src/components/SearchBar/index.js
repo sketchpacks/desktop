@@ -14,6 +14,8 @@ import {
   searchResultsReceived
 } from 'actions'
 
+import './styles.scss'
+
 class SearchBar extends Component {
   constructor (props) {
     super(props)

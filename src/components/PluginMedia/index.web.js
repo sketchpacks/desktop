@@ -140,6 +140,7 @@ class PluginMedia extends Component {
                   </Link>
                 ) }
               </h3>
+
               <p className="o-plugin__logline">
                 {description}
               </p>

@@ -74,7 +74,8 @@ class PluginDetailsContainer extends Component {
       compatible_version,
       stargazers_count,
       watchers_count,
-      score
+      score,
+      source_url
     } = this.props.pluginDetails
 
     const title_or_name = title || name
@@ -145,6 +146,7 @@ class PluginDetailsContainer extends Component {
 
               </div>
             </div>
+
           </div>
         </section>
 

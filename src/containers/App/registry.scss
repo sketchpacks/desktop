@@ -1,26 +1,26 @@
+$padding: 3.2rem;
+
 body {
   background-color: #f8f9fa;
 }
 
 .mainNav {
   background-color: #ffffff;
+  border-bottom: 1px solid rgba(222,226,230,0.8);
 
   nav {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: baseline;
-    height: 10.8rem;
     max-height: 10.8rem;
     width: 100%;
-    padding-top: 1.6rem;
-    padding-bottom: 1.6rem;
+    padding-top: $padding;
+    padding-bottom: $padding;
   }
 }
 
 .branding {
-  display: flex;
-  flex-direction: row;
   font-size: 2.0rem;
   line-height: 3.8rem;
 
@@ -30,5 +30,4 @@ body {
 }
 
 .nav-group {
-  height: 3.8rem;
 }

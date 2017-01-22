@@ -79,6 +79,12 @@ class BrowsePluginsContainer extends Component {
   renderFilterLabel = (sort) => {
     switch (sort) {
       case 'score':
+        return "Popularity"
+      case 'compatible_version':
+        return "Sketch Version"
+      case 'created_at':
+        return "Newest"
+      case 'score':
         return "Most popular"
       case 'updated_at':
         return "Recently updated"
@@ -110,11 +116,17 @@ class BrowsePluginsContainer extends Component {
                     <li onClick={() => this.handleSort('score:desc')}>
                       <span>Most Popular</span>
                     </li>
+                    <li onClick={() => this.handleSort('created:desc')}>
+                      <span>Newest</span>
+                    </li>
                     <li onClick={() => this.handleSort('updated_at:desc')}>
                       <span>Recently Updated</span>
                     </li>
                     <li onClick={() => this.handleSort('title:asc')}>
                       <span>Name</span>
+                    </li>
+                    <li onClick={() => this.handleSort('compatible_version:desc')}>
+                      <span>Supported Sketch Version</span>
                     </li>
                   </ul>
                 </div>

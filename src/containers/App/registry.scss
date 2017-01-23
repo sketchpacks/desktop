@@ -1,4 +1,4 @@
-$padding: 3.2rem;
+$padding: 2rem;
 
 body {
   background-color: #f8f9fa;
@@ -6,7 +6,8 @@ body {
 
 .mainNav {
   background-color: #ffffff;
-  border-bottom: 1px solid rgba(222,226,230,0.8);
+  // border-bottom: 1px solid rgba(222,226,230,0.8);
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
 
   nav {
     display: flex;

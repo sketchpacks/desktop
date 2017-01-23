@@ -22,7 +22,7 @@ export const render = () => {
     <Provider store={store}>
       <Router history={browserHistory}>
         <Route path="/" component={App}>
-          <IndexRoute component={FrontPage} />
+          <IndexRoute component={BrowsePlugins} />
           <Route path="browse" component={BrowsePlugins} />
 
           <Route path="search" component={SearchResults} />
@@ -30,7 +30,6 @@ export const render = () => {
           <Route path="@:owner" component={UserProfile}>
             <IndexRedirect to="plugins" />
             <Route path="plugins" component={UserPlugins} />
-            <Route path="recommends" component={UserRecommends} />
           </Route>
 
           <Route path=":owner/:id" component={PluginDetails} />

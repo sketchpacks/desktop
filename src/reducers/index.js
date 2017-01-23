@@ -71,7 +71,7 @@ function plugins (state = initialListState, action) {
         firstPage: 1,
         lastPage: 1,
         nextPage: 1,
-        prevPage: 1
+        prevPage: 1,
       }
 
       const pageInfo = {...defaults}
@@ -132,7 +132,19 @@ function pluginDetails (state, action) {
     case actions.PLUGIN_DETAILS_REQUEST:
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
+        readme: "<em>Loading...</em>",
+        id: "",
+        name: "",
+        title: "",
+        description: "",
+        version: "",
+        compatible_version: "",
+        source_url: "",
+        download_url: "",
+        score: 0.0,
+        watchers_count: 0,
+        stargazers_count: 0,
       }
 
     case actions.PLUGIN_DETAILS_ERROR:
@@ -156,9 +168,7 @@ function pluginDetails (state, action) {
 
     default:
       return {
-        ...state,
-        isLoading: false,
-        readme: "<em>Loading...</em>"
+        ...state
       }
   }
 }

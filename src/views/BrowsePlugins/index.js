@@ -29,11 +29,11 @@ class BrowsePluginsContainer extends Component {
   }
 
   componentDidMount () {
-    const { page, q } = this.props.location.query
-    this.fetchPage({page: page, q: q})
+    const { page, q, sort } = this.props.location.query
+    this.fetchPage({page: page, q: q, sort: sort})
   }
 
-  fetchPage = ({page = 1, q, sort = 'updated_at:desc'}) => {
+  fetchPage = ({page = 1, q, sort}) => {
     const { dispatch } = this.props
     const { query } = this.props.location
 
@@ -65,8 +65,10 @@ class BrowsePluginsContainer extends Component {
     const { dispatch } = this.props
     const { page, q } = this.props.location.query
 
-    dispatch(pluginsSortBy(sort))
-    this.fetchPage({page: page, q: q, sort: sort})
+    if (this.props.plugins.sort_by !== sort) {
+      dispatch(pluginsSortBy(sort))
+      this.fetchPage({page: page, q: q, sort: sort})
+    }
     this.handleToggle()
   }
 
@@ -77,13 +79,17 @@ class BrowsePluginsContainer extends Component {
   renderFilterLabel = (sort) => {
     switch (sort) {
       case 'score':
-        return "Score"
+        return "Popularity"
+      case 'compatible_version':
+        return "Sketch Version"
+      case 'created_at':
+        return "Newest"
+      case 'score':
+        return "Most popular"
       case 'updated_at':
         return "Recently updated"
       case 'title':
-        return "Name"
-      case 'stargazers_count':
-        return "Stargazers"
+        return "By Name"
     }
   }
 
@@ -107,17 +113,20 @@ class BrowsePluginsContainer extends Component {
                     <span>{this.renderFilterLabel(plugins.sort_by.split(':')[0])}</span>
                   </button>
                   <ul className={"dropdown__menu" + (this.state.open ? " is-visible" : "")}>
-                    <li>
-                      <span onClick={() => this.handleSort('score:desc')}>Most Popular</span>
+                    <li onClick={() => this.handleSort('score:desc')}>
+                      <span>Most Popular</span>
                     </li>
-                    <li>
-                      <span onClick={() => this.handleSort('updated_at:desc')}>Newest</span>
+                    <li onClick={() => this.handleSort('created:desc')}>
+                      <span>Newest</span>
                     </li>
-                    <li>
-                      <span onClick={() => this.handleSort('stargazers_count:desc')}>Stargazers</span>
+                    <li onClick={() => this.handleSort('updated_at:desc')}>
+                      <span>Recently Updated</span>
                     </li>
-                    <li>
-                      <span onClick={() => this.handleSort('title:asc')}>Name</span>
+                    <li onClick={() => this.handleSort('title:asc')}>
+                      <span>Name</span>
+                    </li>
+                    <li onClick={() => this.handleSort('compatible_version:desc')}>
+                      <span>Supported Sketch Version</span>
                     </li>
                   </ul>
                 </div>

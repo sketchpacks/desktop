@@ -4,6 +4,7 @@ import { browserHistory } from 'react-router'
 
 import qs from 'qs'
 import linkHeader from 'parse-link-header'
+import axios from 'axios'
 
 import PluginList from 'components/PluginList'
 import Pagination from 'components/Pagination'
@@ -44,14 +45,18 @@ class BrowsePluginsContainer extends Component {
 
     dispatch(pluginsRequest())
 
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins?${apiQuery}`)
+    const api = axios.create({
+      baseURL: 'https://sketchpacks-api.herokuapp.com/v1/',
+      timeout: 1500,
+      responseType: 'json',
+    })
+
+    api.get(`/plugins?${apiQuery}`)
       .then(response => {
-        const pageMeta = linkHeader(response.headers.get('link'))
+        const pageMeta = linkHeader(response.headers.link)
         if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
-        return response.json()
-      })
-      .then(json => {
-        dispatch(pluginsReceived(json))
+
+        dispatch(pluginsReceived(response.data))
         browserHistory.push(`/browse?${browserQuery}`)
       })
   }
@@ -116,7 +121,7 @@ class BrowsePluginsContainer extends Component {
                     <li onClick={() => this.handleSort('score:desc')}>
                       <span>Most Popular</span>
                     </li>
-                    <li onClick={() => this.handleSort('created:desc')}>
+                    <li onClick={() => this.handleSort('created_at:desc')}>
                       <span>Newest</span>
                     </li>
                     <li onClick={() => this.handleSort('updated_at:desc')}>

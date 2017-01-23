@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import axios from 'axios'
+
 import PluginList from 'components/PluginList'
 
 import {
@@ -14,12 +16,15 @@ class FrontPageContainer extends Component {
 
     dispatch(pluginsRequest())
 
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins?page=1&per_page=5`)
+    const api = axios.create({
+      baseURL: 'https://sketchpacks-api.herokuapp.com/v1/',
+      timeout: 1500,
+      responseType: 'json',
+    })
+
+    api.get(`/plugins?page=1&per_page=5`)
       .then(response => {
-        return response.json()
-      })
-      .then(json => {
-        dispatch(pluginsReceived(json))
+        dispatch(pluginsReceived(response.data))
       })
   }
 

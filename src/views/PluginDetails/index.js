@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
+import {SketchpacksApi} from 'api'
+
 import Nameplate from 'components/Nameplate'
 import ReadmeDocument from 'components/ReadmeDocument'
 import InstallButton from 'components/InstallButton'
@@ -17,52 +19,54 @@ import {
   authorProfileReceived
 } from 'actions'
 
-
 class PluginDetailsContainer extends Component {
   constructor (props) {
     super(props)
 
-    this.getReadme = this.getReadme.bind(this)
+    this.fetchAuthorDetails = this.fetchAuthorDetails.bind(this)
+    this.fetchPluginDetails = this.fetchPluginDetails.bind(this)
+    this.fetchReadme = this.fetchReadme.bind(this)
   }
 
-  getReadme () {
+  fetchReadme () {
     const { dispatch } = this.props
     const { id } = this.props.pluginDetails
+
     dispatch(pluginReadmeRequest())
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins/${id}/readme`)
+    SketchpacksApi.getPluginReadme({pluginId: id})
       .then(response => {
-        return response.text()
+        dispatch(pluginReadmeReceived(response.data))
       })
-      .then(markdown => {
-        dispatch(pluginReadmeReceived(markdown))
+  }
+
+  fetchPluginDetails () {
+    const { dispatch } = this.props
+    const { owner, id } = this.props.params
+    const self = this
+
+    dispatch(pluginDetailsRequest())
+    SketchpacksApi.getPlugin({userId: owner, pluginId: id})
+      .then(response => {
+        dispatch(pluginDetailsReceived(response.data))
+        self.fetchReadme()
+      })
+  }
+
+  fetchAuthorDetails () {
+    const { dispatch } = this.props
+    const { owner, id } = this.props.params
+    const self = this
+
+    dispatch(authorProfileRequest())
+    SketchpacksApi.getUser({userId: owner})
+      .then(response => {
+        dispatch(authorProfileReceived(response.data))
+        self.fetchPluginDetails()
       })
   }
 
   componentDidMount () {
-    const { dispatch } = this.props
-    const { owner, id } = this.props.params
-
-    const self = this
-
-    dispatch(authorProfileRequest())
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}`)
-      .then(response => {
-        return response.json()
-      })
-      .then(user => {
-        dispatch(authorProfileReceived(user))
-      })
-
-
-    dispatch(pluginDetailsRequest())
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/users/${owner}/plugins/${id}`)
-      .then(response => {
-        return response.json()
-      })
-      .then(plugin => {
-        dispatch(pluginDetailsReceived(plugin))
-        self.getReadme()
-      })
+    this.fetchAuthorDetails()
   }
 
   render () {
@@ -167,7 +171,7 @@ class PluginDetailsContainer extends Component {
           <div className="container">
             <div className="row">
               <div className="column">
-                <ReadmeDocument markdown={readme} />
+                <ReadmeDocument markdown={readme || '# No README found'} />
               </div>
             </div>
           </div>

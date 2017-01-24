@@ -47,10 +47,15 @@ class App extends Component {
               <div className="column">
 
                 <nav>
-                  <a className="branding" href="/">
-                    <SVGIcon icon={'stargazers'} shape={'polygon'} size={'1em'} />
+                  <Link to="/" className="branding">
+                    <SVGIcon
+                    icon={'brand'}
+                    shape={'path'}
+                    size={'1.1em'}
+                    viewBox={'0 0 48 48'}
+                    />
                     <strong>Sketchpacks</strong>
-                  </a>
+                  </Link>
 
                   <div className="searchBar">
                       <SearchBar location={this.props.location}/>

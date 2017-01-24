@@ -5,13 +5,24 @@ import qs from 'qs'
 const client = axios.create({
   baseURL: 'https://sketchpacks-api.herokuapp.com/v1/',
   timeout: 1500,
-  responseType: 'json',
 })
 
-class SketchpacksApi {
-  constructor () {
-    console.log('hello')
+class Sketchpacks {
+  getUser ({userId}) {
+    return client.get(`/users/${userId}`)
+  }
+
+  getPlugin ({userId, pluginId}) {
+    return client.get(`/users/${userId}/plugins/${pluginId}`)
+  }
+
+  getPluginReadme ({pluginId}) {
+    return client.get(`/plugins/${pluginId}/readme`)
+  }
+
+  getCatalog ({query}) {
+    return client.get(`/plugins?${query}`)
   }
 }
 
-export let Sketchpacks = new SketchpacksApi()
+export let SketchpacksApi = new Sketchpacks()

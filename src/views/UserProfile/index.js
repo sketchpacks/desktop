@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
+import {SketchpacksApi} from 'api'
+
 import {
   pluginsRequest,
   pluginsReceived,
@@ -26,13 +28,10 @@ class UserProfileContainer extends Component {
     // Get author details
     dispatch(authorProfileRequest())
     dispatch(pluginsRequest())
-    fetch(AUTHOR_PROFILE_URL)
+    SketchpacksApi.getUser({userId: owner})
       .then((response) => {
-        return response.json()
-      })
-      .then(json => {
-        dispatch(authorProfileReceived(json))
-        dispatch(pluginsReceived(json.plugins))
+        dispatch(authorProfileReceived(response.data))
+        dispatch(pluginsReceived(response.data.plugins))
       })
   }
 

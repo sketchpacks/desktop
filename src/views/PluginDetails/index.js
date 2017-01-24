@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-import axios from 'axios'
+import {SketchpacksApi} from 'api'
 
 import Nameplate from 'components/Nameplate'
 import ReadmeDocument from 'components/ReadmeDocument'
@@ -19,12 +19,6 @@ import {
   authorProfileReceived
 } from 'actions'
 
-const api = axios.create({
-  baseURL: 'https://sketchpacks-api.herokuapp.com/v1/',
-  timeout: 5000,
-  responseType: 'json',
-})
-
 class PluginDetailsContainer extends Component {
   constructor (props) {
     super(props)
@@ -39,9 +33,8 @@ class PluginDetailsContainer extends Component {
     const { id } = this.props.pluginDetails
 
     dispatch(pluginReadmeRequest())
-    api.get(`/plugins/${id}/readme`)
+    SketchpacksApi.getPluginReadme({pluginId: id})
       .then(response => {
-        console.log(response)
         dispatch(pluginReadmeReceived(response.data))
       })
   }
@@ -50,12 +43,12 @@ class PluginDetailsContainer extends Component {
     const { dispatch } = this.props
     const { owner, id } = this.props.params
     const self = this
-    
+
     dispatch(pluginDetailsRequest())
-    api.get(`/users/${owner}/plugins/${id}`)
+    SketchpacksApi.getPlugin({userId: owner, pluginId: id})
       .then(response => {
         dispatch(pluginDetailsReceived(response.data))
-        self.fetchPluginDetails()
+        self.fetchReadme()
       })
   }
 
@@ -63,10 +56,10 @@ class PluginDetailsContainer extends Component {
     const { dispatch } = this.props
     const { owner, id } = this.props.params
     const self = this
+
     dispatch(authorProfileRequest())
-    api.get(`/users/${owner}`)
+    SketchpacksApi.getUser({userId: owner})
       .then(response => {
-        console.log(response)
         dispatch(authorProfileReceived(response.data))
         self.fetchPluginDetails()
       })

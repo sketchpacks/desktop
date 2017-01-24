@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 
 import qs from 'qs'
 import linkHeader from 'parse-link-header'
-import axios from 'axios'
+import {SketchpacksApi} from 'api'
 
 import PluginList from 'components/PluginList'
 import Pagination from 'components/Pagination'
@@ -45,13 +45,7 @@ class BrowsePluginsContainer extends Component {
 
     dispatch(pluginsRequest())
 
-    const api = axios.create({
-      baseURL: 'https://sketchpacks-api.herokuapp.com/v1/',
-      timeout: 1500,
-      responseType: 'json',
-    })
-
-    api.get(`/plugins?${apiQuery}`)
+    SketchpacksApi.getCatalog({query: apiQuery})
       .then(response => {
         const pageMeta = linkHeader(response.headers.link)
         if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }

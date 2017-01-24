@@ -9,7 +9,6 @@ import App from 'containers/App'
 import FrontPage from 'views/FrontPage'
 import BrowsePlugins from 'views/BrowsePlugins'
 import PluginDetails from 'views/PluginDetails'
-import SearchResults from 'views/SearchResults'
 
 import UserProfile from 'views/UserProfile'
 import UserRecommends from 'views/UserRecommends'
@@ -24,8 +23,6 @@ export const render = () => {
         <Route path="/" component={App}>
           <IndexRoute component={BrowsePlugins} />
           <Route path="browse" component={BrowsePlugins} />
-
-          <Route path="search" component={SearchResults} />
 
           <Route path="@:owner" component={UserProfile}>
             <IndexRedirect to="plugins" />

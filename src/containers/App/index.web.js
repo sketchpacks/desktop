@@ -11,7 +11,7 @@ import 'normalize.css'
 import 'css/milligram.scss'
 import './registry.scss'
 
-import Icon from 'components/Icon'
+import SVGIcon from 'components/SVGIcon'
 import SearchBar from 'components/SearchBar'
 
 class App extends Component {
@@ -48,7 +48,7 @@ class App extends Component {
 
                 <nav>
                   <a className="branding" href="/">
-                    <Icon icon={'stargazers'} shape={'polygon'} size={'1em'} />
+                    <SVGIcon icon={'stargazers'} shape={'polygon'} size={'1em'} />
                     <strong>Sketchpacks</strong>
                   </a>
 

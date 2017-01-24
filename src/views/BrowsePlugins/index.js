@@ -8,7 +8,6 @@ import {SketchpacksApi} from 'api'
 
 import PluginList from 'components/PluginList'
 import Pagination from 'components/Pagination'
-import Icon from 'components/Icon'
 
 import {
   pluginsRequest,

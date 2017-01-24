@@ -34,7 +34,7 @@ class SearchBar extends Component {
   render () {
     return (
       <input
-        type="input"
+        type="text"
         placeholder="Search all plugins"
         className="searchBar"
         onKeyUp={this.handleEnterKey}

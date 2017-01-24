@@ -7,7 +7,7 @@ import {SketchpacksApi} from 'api'
 import Nameplate from 'components/Nameplate'
 import ReadmeDocument from 'components/ReadmeDocument'
 import InstallButton from 'components/InstallButton'
-import Icon from 'components/Icon'
+import SVGIcon from 'components/SVGIcon'
 import PluginMetric from 'components/PluginMetric'
 
 import {
@@ -157,7 +157,7 @@ class PluginDetailsContainer extends Component {
 
                 <div className="o-shelf o-shelf--verso">
                   <Link to={source_url} className="link--small">
-                    <Icon icon={'github'} /> View on Github
+                    <SVGIcon icon={'github'} /> View on Github
                   </Link>
                 </div>
 

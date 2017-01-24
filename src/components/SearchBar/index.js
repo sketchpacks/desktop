@@ -5,6 +5,7 @@ import { push } from 'react-router-redux'
 
 import qs from 'qs'
 import linkHeader from 'parse-link-header'
+import {SketchpacksApi} from 'api'
 
 import {
   pluginsRequest,
@@ -35,14 +36,12 @@ class SearchBar extends Component {
 
     dispatch(pluginsRequest())
 
-    fetch(`https://sketchpacks-api.herokuapp.com/v1/plugins?${apiQuery}`)
+    SketchpacksApi.getCatalog({query: apiQuery})
       .then(response => {
-        const pageMeta = linkHeader(response.headers.get('link'))
+        const pageMeta = linkHeader(response.headers.link)
         if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
-        return response.json()
-      })
-      .then(json => {
-        dispatch(pluginsReceived(json))
+        
+        dispatch(pluginsReceived(response.data))
         browserHistory.push(`/browse?${browserQuery}`)
       })
   }
@@ -63,10 +62,10 @@ class SearchBar extends Component {
     return (
       <div>
         <input
-        type="text"
-        placeholder="Search all plugins"
-        className="searchBar"
-        onKeyUp={this.handleEnterKey}
+          type="text"
+          placeholder="Search all plugins"
+          className="searchBar"
+          onKeyUp={this.handleEnterKey}
         />
       </div>
     )

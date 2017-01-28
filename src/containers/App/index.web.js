@@ -72,6 +72,29 @@ class App extends Component {
         </div>
 
         {this.props.children}
+
+        <footer className="registry__footer">
+          <div className="container">
+            <div className="row">
+              <div className="column">
+                <a className="branding" href="/">
+                  <SVGIcon icon={'stargazers'} shape={'polygon'} size={'1em'} />
+                  <strong>Sketchpacks</strong>
+                </a>
+
+                <p>
+                  Discover and manage your Sketch plugins from the menu bar.
+                </p>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="column">
+                links
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     )
   }

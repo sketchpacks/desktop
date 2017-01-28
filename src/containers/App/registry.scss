@@ -4,6 +4,12 @@ body {
   background-color: #f8f9fa;
 }
 
+.registry {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 .mainNav {
   background-color: #ffffff;
   // border-bottom: 1px solid rgba(222,226,230,0.8);
@@ -31,4 +37,18 @@ body {
 }
 
 .nav-group {
+}
+
+
+.registry-footer {
+  color: rgba(173,181,189,1.0);
+  background-color: #282833;
+  padding-top: $padding * 4;
+  padding-bottom: $padding * 4;
+}
+.registry-footer__branding {
+  p {
+    font-size: 2.4rem;
+    width: 18.0em;
+  }
 }

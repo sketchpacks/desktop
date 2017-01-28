@@ -49,10 +49,10 @@ class App extends Component {
                 <nav>
                   <Link to="/" className="branding">
                     <SVGIcon
-                    icon={'brand'}
-                    shape={'path'}
-                    size={'1.1em'}
-                    viewBox={'0 0 48 48'}
+                      icon={'brand'}
+                      shape={'path'}
+                      size={'1.1em'}
+                      viewBox={'0 0 48 48'}
                     />
                     <strong>Sketchpacks</strong>
                   </Link>
@@ -73,18 +73,22 @@ class App extends Component {
 
         {this.props.children}
 
-        <footer className="registry__footer">
+        <footer className="registry-footer">
           <div className="container">
             <div className="row">
-              <div className="column">
-                <a className="branding" href="/">
-                  <SVGIcon icon={'stargazers'} shape={'polygon'} size={'1em'} />
-                  <strong>Sketchpacks</strong>
-                </a>
+              <div className="column registry-footer__branding">
+                <SVGIcon
+                  icon={'brand'}
+                  shape={'path'}
+                  size={'5em'}
+                  viewBox={'0 0 48 48'}
+                />
 
                 <p>
                   Discover and manage your Sketch plugins from the menu bar.
                 </p>
+
+                <em>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</em>
               </div>
             </div>
 

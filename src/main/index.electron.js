@@ -75,6 +75,8 @@ export const render = () => {
     </Provider>,
     document.getElementById('root')
   )
+
+  ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
 }
 
 const catalogCheck = () => {

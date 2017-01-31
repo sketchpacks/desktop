@@ -81,14 +81,6 @@ menuBar.on('after-show', () => {
 menuBar.on('after-create-window', () => {
   menuBar.window.hide()
   mainWindow = menuBar.window
-
-
-  if (externalPluginInstallQueue.length > 0) {
-    _.forEach(externalPluginInstallQueue, (pluginId) => {
-      mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
-    })
-    externalPluginInstallQueue = []
-  }
 })
 
 app.on('ready', () => {
@@ -105,10 +97,17 @@ app.on('ready', () => {
 })
 
 app.on('open-url', (event, resource) => {
+  event.preventDefault() // Handle event ourselves
+
   const uri = url.parse(resource)
   const pluginId = uri.path.slice(1)
 
-  externalPluginInstallQueue.push(pluginId)
+  if (!app.isReady()) {
+    externalPluginInstallQueue.push(pluginId)
+  }
+  else {
+    mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
+  }
 })
 
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
@@ -123,4 +122,13 @@ ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
     .then((plugin) => {
       event.sender.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
     })
+})
+
+ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
+  if (externalPluginInstallQueue.length > 0) {
+    _.forEach(externalPluginInstallQueue, (pluginId) => {
+      event.sender.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
+    })
+    externalPluginInstallQueue = null
+  }
 })

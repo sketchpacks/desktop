@@ -13,10 +13,14 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const ms = require('ms')
+const _ = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
 const autoUpdater = electron.autoUpdater
+const protocol = electron.protocol
+const url = require('url')
+const querystring = require('querystring')
 const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
@@ -55,6 +59,7 @@ const opts = {
 const menuBar = menubar(opts)
 
 let mainWindow
+let externalPluginInstallQueue = []
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
@@ -83,6 +88,26 @@ app.on('ready', () => {
     const updater = require('./src/main/updater')
     updater.init()
   }
+
+  protocol.registerHttpProtocol('sketchpacks', (request, callback) => {
+    const uri = url.parse(request.url)
+  }, (error) => {
+    if (error) console.error('Failed to register protocol', error)
+  })
+})
+
+app.on('open-url', (event, resource) => {
+  event.preventDefault() // Handle event ourselves
+
+  const uri = url.parse(resource)
+  const pluginId = uri.path.slice(1)
+
+  if (!app.isReady()) {
+    externalPluginInstallQueue.push(pluginId)
+  }
+  else {
+    mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
+  }
 })
 
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
@@ -92,11 +117,18 @@ ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
     })
 })
 
-
-
 ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.uninstall(event, arg)
     .then((plugin) => {
       event.sender.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
     })
+})
+
+ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
+  if (externalPluginInstallQueue.length > 0) {
+    _.forEach(externalPluginInstallQueue, (pluginId) => {
+      event.sender.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
+    })
+    externalPluginInstallQueue = null
+  }
 })

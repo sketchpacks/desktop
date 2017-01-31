@@ -30,14 +30,13 @@ import {
 } from 'actions'
 
 import {
-  installPluginProgress,
+  installPluginRequest,
   installPluginSuccess,
   installPluginError,
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
 
-  uninstallPluginProgress,
   uninstallPluginSuccess,
   uninstallPluginError,
   UNINSTALL_PLUGIN_REQUEST,
@@ -76,6 +75,8 @@ export const render = () => {
     </Provider>,
     document.getElementById('root')
   )
+
+  ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
 }
 
 const catalogCheck = () => {
@@ -92,6 +93,11 @@ const catalogCheck = () => {
   }
 }
 catalogCheck()
+
+ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
+  Catalog.getPluginById(pluginId)
+    .then((plugin) => store.dispatch(installPluginRequest(plugin)))
+})
 
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)

@@ -5,6 +5,7 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 var argv = require('minimist')(process.argv.slice(2))
 const isWeb = (argv && argv.target === 'web')
@@ -74,7 +75,11 @@ let options = {
         warnings: false
       }
     }),
-    new ExtractTextPlugin("styles.css")
+    new ExtractTextPlugin("styles.css"),
+    new CopyWebpackPlugin([ {
+      from: 'static/*',
+      to: path.resolve(__dirname,'dist','web')
+    } ])
   ],
 
   resolve: {

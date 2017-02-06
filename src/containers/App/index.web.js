@@ -91,12 +91,6 @@ class App extends Component {
                 <em>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</em>
               </div>
             </div>
-
-            <div className="row">
-              <div className="column">
-                links
-              </div>
-            </div>
           </div>
         </footer>
       </div>

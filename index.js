@@ -59,6 +59,7 @@ const opts = {
 const menuBar = menubar(opts)
 
 let mainWindow
+let updater
 let externalPluginInstallQueue = []
 
 menuBar.on('ready', () => {
@@ -85,7 +86,7 @@ menuBar.on('after-create-window', () => {
 
 app.on('ready', () => {
   if (__PRODUCTION__ && __ELECTRON__) {
-    const updater = require('./src/main/updater')
+    updater = require('./src/main/updater')
     updater.init()
   }
 
@@ -131,4 +132,10 @@ ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
     })
     externalPluginInstallQueue = null
   }
+})
+
+
+
+ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
+  updater.checkForUpdates
 })

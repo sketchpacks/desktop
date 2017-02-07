@@ -57,8 +57,11 @@ const Connect = ComposedComponent =>
       return (
         <ComposedComponent
           {...this.props}
+          className={this.state.activity === 'installed' ? 'button button-installed' : 'button'}
           actionVerb={this.renderButtonText()}
-          onClick={this.handleClick} />
+          onClick={this.handleClick}
+
+        />
       )
     }
   }

@@ -49,10 +49,10 @@ const opts = {
   height: 540,
   index: `http://localhost:${SERVER_PORT}/`,
   resizable: false,
-  alwaysOnTop: true,
+  alwaysOnTop: false,
   showOnAllWorkspaces: true,
   preloadWindow: true,
-  tooltip: `Sketchpacks for macOS v${pkg.version}`,
+  tooltip: `Sketchpacks v${pkg.version}`,
   backgroundColor: '#f8f9fa',
 }
 
@@ -73,10 +73,10 @@ menuBar.on('ready', () => {
 })
 
 menuBar.on('after-show', () => {
-  // if (__DEVELOPMENT__ || __DEBUG__) {
-    // require('devtron').install()
+  if (__DEVELOPMENT__ || __DEBUG__) {
+    require('devtron').install()
     menuBar.window.openDevTools({ mode: 'detach' })
-  // }
+  }
 })
 
 menuBar.on('after-create-window', () => {

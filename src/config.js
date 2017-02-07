@@ -7,11 +7,11 @@ module.exports = {
   APP_VERSION: require('../package.json').version,
   SERVER_PORT: process.env.PORT || 8080,
 
-  WEB_URL: 'https://sketchpacks-dev.firebaseapp.com',
+  WEB_URL: 'https://www.sketchpacks.com',
   API_URL: 'https://sketchpacks-api.herokuapp.com/',
 
-  CATALOG_FETCH_DELAY: '10s',
-  CATALOG_FETCH_INTERVAL: process.env.NODE_ENV === 'development' ? '30s' : '30m',
+  CATALOG_FETCH_DELAY: '30s',
+  CATALOG_FETCH_INTERVAL: process.env.NODE_ENV === 'development' ? '5m' : '30m',
 
   HOME_PATH: process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE,
   PLUGIN_PATHS: [

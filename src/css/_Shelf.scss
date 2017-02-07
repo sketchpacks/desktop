@@ -21,6 +21,10 @@
     justify-content: flex-start;
   }
 
+  &--centered {
+    justify-content: center;
+  }
+
   .button {
     margin-bottom: 0;
   }

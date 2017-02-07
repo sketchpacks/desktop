@@ -3,15 +3,18 @@ $sidebar-width: 140px;
 .app__sidebar {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   flex-shrink: 0;
   flex-basis: $sidebar-width;
-  height: 100vh;
   max-height: 100vh;
   width: $sidebar-width;
   max-width: $sidebar-width;
   border-right: 1px solid #D7DBDD;
   background-color: #323A49;
-  padding: 10px 0;
+
+  nav {
+    padding-top: 1.6rem;
+  }
 }
 
 .app__sidebar-section {

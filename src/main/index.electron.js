@@ -5,7 +5,7 @@ import { Router, Route, IndexRoute, IndexRedirect, browserHistory } from 'react-
 import { syncHistoryWithStore } from 'react-router-redux'
 import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
-import { ipcRenderer } from 'electron'
+import { ipcRenderer, ipcMain } from 'electron'
 import Promsie from 'promise'
 
 import _ from 'lodash'
@@ -113,4 +113,17 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
       Catalog.getAllPlugins()
         .then((plugins) => store.dispatch(pluginsReceived(plugins)))
     })
+})
+
+ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
+  Catalog.update()
+    .then(plugins => Catalog.autoUpdatePlugins())
+})
+
+ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt) => {
+  ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', null)
+})
+
+ipcRenderer.on('CHECK_FOR_CATALOG_UPDATES', (evt) => {
+  Catalog.update()
 })

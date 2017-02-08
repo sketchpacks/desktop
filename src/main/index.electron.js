@@ -6,6 +6,7 @@ import { syncHistoryWithStore } from 'react-router-redux'
 import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
 import { ipcRenderer, ipcMain } from 'electron'
+import waterfall from 'async/waterfall'
 import Promsie from 'promise'
 
 import _ from 'lodash'
@@ -84,12 +85,23 @@ const catalogCheck = () => {
     setTimeout(catalogCheck, 100)
   }
   else {
-    Catalog.setStore(store)
-    Catalog.enableAutoUpdate()
-
-    store.dispatch(pluginsRequest())
-    Catalog.getAllPlugins()
-      .then(plugins => store.dispatch(pluginsReceived(plugins)))
+    waterfall([
+      (callback) => {
+        Catalog.setStore(store)
+        Catalog.update().then(plugins => callback(null, plugins))
+      },
+      (plugins, callback) => {
+        Catalog.upsert(plugins)
+        callback(null)
+      },
+      (callback) => {
+        Catalog.getAllPlugins().then(plugins => callback(null, plugins))
+      }
+    ], (err, result) => {
+      Catalog.enableAutoUpdate()
+      store.dispatch(pluginsRequest())
+      store.dispatch(pluginsReceived(result))
+    })
   }
 }
 catalogCheck()

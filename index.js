@@ -73,8 +73,8 @@ menuBar.on('ready', () => {
 })
 
 menuBar.on('after-show', () => {
-  if (__DEVELOPMENT__ || __DEBUG__) {
-    require('devtron').install()
+  if (__DEVELOPMENT__) {
+    // require('devtron').install()
     menuBar.window.openDevTools({ mode: 'detach' })
   }
 })

@@ -85,23 +85,33 @@ const catalogCheck = () => {
     setTimeout(catalogCheck, 100)
   }
   else {
-    waterfall([
-      (callback) => {
-        Catalog.setStore(store)
-        Catalog.update().then(plugins => callback(null, plugins))
-      },
-      (plugins, callback) => {
-        Catalog.upsert(plugins)
-        callback(null)
-      },
-      (callback) => {
-        Catalog.getAllPlugins().then(plugins => callback(null, plugins))
-      }
-    ], (err, result) => {
-      Catalog.enableAutoUpdate()
-      store.dispatch(pluginsRequest())
-      store.dispatch(pluginsReceived(result))
-    })
+    Catalog.getAllPlugins()
+      .then(plugins => {
+        if (plugins.length > 0) {
+          store.dispatch(pluginsReceived(plugins))
+        }
+        else {
+          waterfall([
+            (callback) => {
+              Catalog.setStore(store)
+              Catalog.update().then(plugins => callback(null, plugins))
+            },
+            (plugins, callback) => {
+              Catalog.upsert(plugins)
+              callback(null)
+            },
+            (callback) => {
+              Catalog.getAllPlugins().then(plugins => callback(null, plugins))
+            }
+          ], (err, result) => {
+
+            store.dispatch(pluginsRequest())
+            store.dispatch(pluginsReceived(result))
+          })
+        }
+
+        Catalog.enableAutoUpdate()
+      })
   }
 }
 catalogCheck()

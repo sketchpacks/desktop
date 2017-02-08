@@ -46,6 +46,12 @@ const Catalog = {
     })
   },
 
+  getCatalogSize: () => new Promise((resolve, reject) => {
+    database.count({}, (err, count) => {
+      if (err) return reject(err)
+      return resolve(count)
+    })
+  }),
 
   getPluginById: (id) => new Promise((resolve, reject) => {
     if (database === undefined) return new Error("Set a database to query")

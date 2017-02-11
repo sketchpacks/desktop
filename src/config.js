@@ -13,6 +13,8 @@ module.exports = {
   CATALOG_FETCH_DELAY: '30s',
   CATALOG_FETCH_INTERVAL: process.env.NODE_ENV === 'development' ? '5m' : '30m',
 
+  UPDATER_INTERVAL: process.env.NODE_ENV === 'development' ? '30s' : '30m',
+
   HOME_PATH: process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE,
   PLUGIN_PATHS: [
     "/Library/Application Support/com.bohemiancoding.sketch3/Plugins/", // Sketch 3

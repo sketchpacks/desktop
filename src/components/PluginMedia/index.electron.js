@@ -114,8 +114,8 @@ class PluginMedia extends Component {
   renderAutoupdates () {
     const { version } = this.props.plugin
 
-    if (version === "0") return
-    if (typeof version === null) return
+    if (!auto_updates) return
+    if (typeof auto_updates === null) return
 
     return <PluginMetric
       icon={'autoupdates'}

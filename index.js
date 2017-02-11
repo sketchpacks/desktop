@@ -49,7 +49,7 @@ const opts = {
   height: 540,
   index: `http://localhost:${SERVER_PORT}/`,
   resizable: false,
-  alwaysOnTop: false,
+  alwaysOnTop: true,
   showOnAllWorkspaces: true,
   preloadWindow: true,
   tooltip: `Sketchpacks v${pkg.version}`,
@@ -134,8 +134,7 @@ ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
   }
 })
 
-
-
 ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
-  updater.checkForUpdates
+  const { confirm } = arg
+  updater.checkForUpdates(confirm)
 })

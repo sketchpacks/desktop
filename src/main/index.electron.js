@@ -142,8 +142,8 @@ ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
     .then(plugins => Catalog.autoUpdatePlugins())
 })
 
-ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt) => {
-  ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', null)
+ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
+  ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
 
 ipcRenderer.on('CHECK_FOR_CATALOG_UPDATES', (evt) => {

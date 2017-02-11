@@ -51,7 +51,9 @@ class PluginMedia extends Component {
 
     return (
       <div className="o-media__right u-mar-left-large">
-        <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
+        <div className="o-plugin__thumbnail">
+          <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
+        </div>
       </div>
     )
   }

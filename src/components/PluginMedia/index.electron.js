@@ -114,6 +114,8 @@ class PluginMedia extends Component {
   renderAutoupdates () {
     const { version } = this.props.plugin
 
+    const auto_updates = false // FIXME: Should use attrs from updated Catalog JSON
+
     if (!auto_updates) return
     if (typeof auto_updates === null) return
 

@@ -173,6 +173,7 @@ const Catalog = {
             published_at: plugin.created_at,
             updated_at: plugin.updated_at,
             title: plugin.title,
+            auto_updates: plugin.auto_updates,
           } }, { upsert: true }, (err, num) => {
           if (err) error = err
           updatedPlugins.push(plugin)

@@ -1,3 +1,9 @@
+.ReactVirtualized__Grid {
+  &:focus {
+    outline: none;
+  }
+}
+
 .o-plugin {
   display: flex;
   flex-direction: column;

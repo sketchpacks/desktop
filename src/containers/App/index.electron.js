@@ -6,6 +6,7 @@ import 'css/milligram.scss'
 
 import './app.scss'
 
+import SVGIcon from 'components/SVGIcon'
 import SideBarMenu from 'components/electron/SideBarMenu'
 import SearchBar from 'components/electron/SearchBar'
 
@@ -23,6 +24,14 @@ class App extends Component {
 
       <div className="app">
         <header className="app__header">
+          <SVGIcon
+            icon={'brand'}
+            shape={'path'}
+            size={'3.2rem'}
+            viewBox={'0 0 48 48'}
+            fill={'#FFFFFF'}
+          />
+
           <SearchBar {...this.props} />
         </header>
 

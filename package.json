@@ -21,7 +21,9 @@
   "license": "ISC",
   "build": {
     "appId": "DGHF878J4A.com.sketchpacks.macos",
-    "asar": false,
+    "asar": true,
+    "asarUnpack": "node_modules/node-notifier/vendor/**",
+    "prune": true,
     "protocols": {
       "name": "Sketchpacks",
       "schemes": [

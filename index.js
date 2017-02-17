@@ -114,21 +114,21 @@ app.on('open-url', (event, resource) => {
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.install(event, arg)
     .then((plugin) => {
-      event.sender.send(INSTALL_PLUGIN_SUCCESS, plugin)
+      mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
     })
 })
 
 ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.uninstall(event, arg)
     .then((plugin) => {
-      event.sender.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
+      mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
     })
 })
 
 ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
   if (externalPluginInstallQueue.length > 0) {
     _.forEach(externalPluginInstallQueue, (pluginId) => {
-      event.sender.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
+      mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
     })
     externalPluginInstallQueue = null
   }

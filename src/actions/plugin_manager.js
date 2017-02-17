@@ -1,6 +1,6 @@
 const { ipcRenderer, remote } = require('electron')
 const ms = require('ms')
-
+const notifier = require('node-notifier')
 
 const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
 
@@ -11,24 +11,16 @@ function installPluginRequest (plugin) {
 }
 
 
-const INSTALL_PLUGIN_PROGRESS = 'manager/INSTALL_PROGRESS'
-
-function installPluginProgress (plugin, bytesReceived, bytesTotal) {
-  return {
-    type: INSTALL_PLUGIN_PROGRESS,
-    plugin,
-    progress: {
-      bytesTotal: bytesTotal,
-      bytesReceived: bytesReceived,
-      percentage: ((bytesReceived / bytesTotal) * 100)
-    }
-  }
-}
-
-
 const INSTALL_PLUGIN_SUCCESS = 'manager/INSTALL_SUCCESS'
 
 function installPluginSuccess (plugin) {
+  notifier.notify({
+    title: 'test',
+    message: 'test',
+    sound: true,
+    wait: false,
+  })
+
   return {
     type: INSTALL_PLUGIN_SUCCESS,
     plugin
@@ -78,7 +70,6 @@ function uninstallPluginError (error, plugin) {
 
 module.exports = {
   installPluginRequest,
-  installPluginProgress,
   installPluginSuccess,
   installPluginError,
 
@@ -87,7 +78,6 @@ module.exports = {
   uninstallPluginError,
 
   INSTALL_PLUGIN_REQUEST,
-  INSTALL_PLUGIN_PROGRESS,
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
 

@@ -1,6 +1,7 @@
 import semver from 'semver'
 import { createSelector } from 'reselect'
 const _ = require('lodash')
+import {sanitizeSemVer} from 'lib/utils'
 
 
 const getList = (state) => state.app.location
@@ -31,12 +32,6 @@ export const getInstalledPlugins = createSelector(
   }
 )
 
-const sanitizeVersion = (version) => {
-  if (version === "0") return "0.0.0"
-
-  return version
-}
-
 const hasNewVersion = (plugin) => {
   if (plugin.installed === undefined) return false
   if (!plugin.installed) return false
@@ -45,7 +40,7 @@ const hasNewVersion = (plugin) => {
   let localVersion = plugin.installed_version
 
   return plugin.installed
-    && semver.lt(sanitizeVersion(localVersion),sanitizeVersion(remoteVersion))
+    && semver.lt(sanitizeSemVer(localVersion),sanitizeSemVer(remoteVersion))
 }
 
 export const getUpdatedPlugins = createSelector(

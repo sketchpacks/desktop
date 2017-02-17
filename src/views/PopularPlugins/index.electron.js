@@ -4,35 +4,44 @@ import { browserHistory } from 'react-router'
 
 import { getPopularPlugins } from 'selectors'
 
+import { CellMeasurer, AutoSizer, List } from 'react-virtualized'
+
 import PluginList from 'components/PluginList'
+import PluginMedia from 'components/PluginMedia'
+
+import 'react-virtualized/styles.css'
 
 class PopularPluginsContainer extends Component {
-  renderList () {
-    const { plugins } = this.props
-
-    if (plugins.isLoading) return (<div>Loading plugins...</div>)
-
-    if (plugins.length === 0) return (<div>No plugins found</div>)
-
-    return (<PluginList plugins={plugins} />)
+  constructor (props) {
+    super(props)
   }
 
   render () {
     const { plugins } = this.props
 
+    const listProps = {
+      width: 560,
+      height: 486,
+      rowHeight: 245,
+      rowCount: plugins.length,
+      rowRenderer: ({ key, index, isScrolling, isVisible, style }) => {
+        return (
+          <div className="row" key={key} style={style}>
+            <div className="column">
+              <PluginMedia plugin={plugins[index]} />
+            </div>
+          </div>
+        )
+      }
+    }
+
     return (
       <div>
         <div className="container">
-          <div className="row">
-            <div className="column">
-              <h3 className="page-title">
-                Popular plugins
-              </h3>
-            </div>
-          </div>
+          <List
+            {...listProps}
+          />
         </div>
-
-        { this.renderList() }
       </div>
     )
   }

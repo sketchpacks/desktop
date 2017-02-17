@@ -184,7 +184,7 @@ function app (state, action) {
       if (state === undefined) {
         return {
           ...state,
-          location: '/browse'
+          location: '/browse/popular'
         }
       }
       else {

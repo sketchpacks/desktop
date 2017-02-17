@@ -51,7 +51,9 @@ class PluginMedia extends Component {
 
     return (
       <div className="o-media__right u-mar-left-large">
-        <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
+        <div className="o-plugin__thumbnail">
+          <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
+        </div>
       </div>
     )
   }
@@ -112,8 +114,10 @@ class PluginMedia extends Component {
   renderAutoupdates () {
     const { version } = this.props.plugin
 
-    if (version === "0") return
-    if (typeof version === null) return
+    const auto_updates = false // FIXME: Should use attrs from updated Catalog JSON
+
+    if (!auto_updates) return
+    if (typeof auto_updates === null) return
 
     return <PluginMetric
       icon={'autoupdates'}

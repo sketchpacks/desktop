@@ -12,7 +12,7 @@ const settingsMenu = [
   {
     label: 'Check for Update',
     click(item, window, event) {
-      window.webContents.send('CHECK_FOR_CLIENT_UPDATES', null)
+      window.webContents.send('CHECK_FOR_CLIENT_UPDATES', { confirm: true })
     },
   },
 

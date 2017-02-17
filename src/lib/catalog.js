@@ -6,6 +6,7 @@ const semver = require('semver')
 const log = require('electron-log')
 const {ipcRenderer} = require('electron')
 
+const {sanitizeSemVer} = require('./utils')
 
 const {
   API_URL,
@@ -102,17 +103,13 @@ const Catalog = {
     if (database === undefined) return new Error("Set a database to query")
 
     function updateAvailable (plugin) {
-      if (plugin.installed === undefined) return false
+      if (typeof plugin.installed === undefined) return false
       if (!plugin.installed) return false
 
-      let remoteVersion = plugin.version
-      let localVersion = plugin.installed_version
+      let remoteVersion = sanitizeSemVer(plugin.version)
+      let localVersion = sanitizeSemVer(plugin.installed_version)
 
-      // FIXME: API should return valid SemVer by default
-      if (remoteVersion === "0") remoteVersion = "0.0.0"
-      if (localVersion === "0") remoteVersion = "0.0.0"
-
-      return plugin.installed && semver.lt(localVersion,remoteVersion)
+      return semver.lt(localVersion,remoteVersion)
     }
 
     database.find({ $where: function () { return updateAvailable(this) } })
@@ -173,6 +170,7 @@ const Catalog = {
             published_at: plugin.created_at,
             updated_at: plugin.updated_at,
             title: plugin.title,
+            auto_updates: plugin.auto_updates,
           } }, { upsert: true }, (err, num) => {
           if (err) error = err
           updatedPlugins.push(plugin)

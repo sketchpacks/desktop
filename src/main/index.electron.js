@@ -8,6 +8,7 @@ import configureStore from 'store/configureStore'
 import { ipcRenderer, ipcMain } from 'electron'
 import waterfall from 'async/waterfall'
 import Promsie from 'promise'
+import log from 'electron-log'
 
 import _ from 'lodash'
 
@@ -124,6 +125,7 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
+      store.dispatch(installPluginSuccess(plugin))
       Catalog.getAllPlugins()
         .then((plugins) => store.dispatch(pluginsReceived(plugins)))
     })
@@ -132,18 +134,20 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginRemoved(plugin)
     .then((plugin) => {
+      store.dispatch(uninstallPluginSuccess(plugin))
       Catalog.getAllPlugins()
         .then((plugins) => store.dispatch(pluginsReceived(plugins)))
     })
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
+  log.info('CHECK_FOR_PLUGIN_UPDATES')
   Catalog.update()
     .then(plugins => Catalog.autoUpdatePlugins())
 })
 
-ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt) => {
-  ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', null)
+ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
+  ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
 
 ipcRenderer.on('CHECK_FOR_CATALOG_UPDATES', (evt) => {

@@ -110,7 +110,7 @@ class PluginMedia extends Component {
       : <PluginMetric
           icon={'versions'}
           shape={'path'}
-          value={sanitizeSemVer(installed_version)} 
+          value={sanitizeSemVer(installed_version)}
           tooltip={'Installed version'} />
   }
 

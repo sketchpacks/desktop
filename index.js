@@ -13,7 +13,7 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const ms = require('ms')
-const _ = require('lodash')
+const {forEach} = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
@@ -134,7 +134,7 @@ ipcMain.on(TOGGLE_VERSION_LOCK_REQUEST, (event, args) => {
 
 ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
   if (externalPluginInstallQueue.length > 0) {
-    _.forEach(externalPluginInstallQueue, (pluginId) => {
+    forEach(externalPluginInstallQueue, (pluginId) => {
       mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
     })
     externalPluginInstallQueue = null

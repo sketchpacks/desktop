@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const {forEach,map,without} = require('lodash')
 const Promise = require('promise')
 const request = require('request')
 const ms = require('ms')
@@ -41,7 +41,7 @@ const Catalog = {
 
   autoUpdatePlugins: () => {
     Catalog.getUpdatedPlugins().then((plugins) => {
-      _(plugins).forEach((plugin) => {
+      plugins.forEach((plugin) => {
         ipcRenderer.send('manager/INSTALL_REQUEST', plugin)
       })
     })
@@ -126,7 +126,7 @@ const Catalog = {
       database.find({ $or: [{name: regx}, {title: regx}, {description: regx}] },
         { id: 1 }, (err, plugins) => {
         if (err) return reject(err)
-        return resolve(_.map(plugins, (p) => p.id ))
+        return resolve(map(plugins, (p) => p.id ))
       })
     })
   },
@@ -152,10 +152,10 @@ const Catalog = {
     new Promise((resolve, reject) => {
       let error
 
-      const filteredPlugins = _.without(JSON.parse(plugins), null, undefined)
+      const filteredPlugins = without(JSON.parse(plugins), null, undefined)
       const updatedPlugins = []
 
-      _(filteredPlugins).forEach((plugin) => {
+      filteredPlugins.forEach((plugin) => {
         database.update({ id: plugin.id }, { $set: {
             name: plugin.name,
             description: plugin.description,

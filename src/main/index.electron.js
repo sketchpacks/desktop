@@ -10,8 +10,6 @@ import waterfall from 'async/waterfall'
 import Promsie from 'promise'
 import log from 'electron-log'
 
-import _ from 'lodash'
-
 import App from 'containers/App'
 
 import PopularPlugins from 'views/PopularPlugins'

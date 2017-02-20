@@ -10,6 +10,7 @@ import {SketchpacksApi} from 'api'
 import PluginList from 'components/PluginList'
 
 import {
+  fetchPluginsReceived,
   pluginsRequest,
   pluginsReceived,
   pluginsPaginate,
@@ -29,7 +30,10 @@ class BrowsePluginsContainer extends Component {
 
   componentDidMount () {
     const { page, q, sort } = this.props.location.query
-    this.fetchData({page: page || 1, q: q, sort: sort})
+
+    if (this.props.plugins.length === 0) {
+      this.fetchData({page: page || 1, q: q, sort: sort})
+    }
   }
 
   componentWillReceiveProps () {
@@ -66,7 +70,7 @@ class BrowsePluginsContainer extends Component {
         const pageMeta = linkHeader(response.headers.link)
         if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
 
-        dispatch(pluginsReceived(response.data))
+        dispatch(fetchPluginsReceived(response.data))
         browserHistory.push(`/browse?${browserQuery}`)
         this.setState({ loading: false })
       })

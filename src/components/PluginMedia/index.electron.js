@@ -119,8 +119,8 @@ class PluginMedia extends Component {
     const {plugin,dispatch} = this.props
 
     return (location === '/library/updates')
-      ? <UpdateButton plugin={plugin} dispatch={dispatch} />
-      : <InstallButton plugin={plugin} dispatch={dispatch} />
+      ? <UpdateButton {...this.props} />
+      : <InstallButton {...this.props} />
   }
 
   toggleLock () {

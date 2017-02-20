@@ -4,12 +4,13 @@ import * as actions from 'actions'
 
 import jwt from 'jwt-simple'
 
+
 const initialListState = {
   items: [],
   isLoading: false,
   nextPage: 1,
   lastPage: 1,
-  sort_by: 'updated_at:desc',
+  sort_by: 'score:desc',
 }
 
 function auth (state, action) {
@@ -38,6 +39,13 @@ function auth (state, action) {
   }
 }
 
+const updateObjectInArray = (array, action) => {
+  return array.map(plugin => (plugin.id !== action.plugin.id)
+    ? plugin
+    : { ...plugin, ...action.plugin }
+  )
+}
+
 function plugins (state = initialListState, action) {
   switch (action.type) {
     case actions.PLUGINS_REQUEST:
@@ -50,6 +58,13 @@ function plugins (state = initialListState, action) {
     case actions.PLUGINS_RECEIVED:
       return {
         ...state,
+        items: action.payload,
+        isLoading: false
+      }
+
+    case actions.PLUGINS_FETCH_RECEIVED:
+      return {
+        ...state,
         items: state.items.concat(action.payload),
         isLoading: false
       }
@@ -59,6 +74,18 @@ function plugins (state = initialListState, action) {
         ...state,
         items: action.payload,
         isLoading: false
+      }
+
+    case 'manager/UNINSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
+      }
+
+    case 'manager/INSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
       }
 
     case actions.PLUGINS_ERROR:

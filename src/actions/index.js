@@ -80,6 +80,16 @@ export function pluginsReceived (payload) {
 }
 
 
+export const PLUGINS_FETCH_RECEIVED = 'plugins/FETCH_RECEIVED'
+
+export function fetchPluginsReceived (payload) {
+  return {
+    type: PLUGINS_FETCH_RECEIVED,
+    payload: payload
+  }
+}
+
+
 export const PLUGINS_PAGINATE = 'PLUGINS_PAGINATE'
 
 export function pluginsPaginate (payload) {

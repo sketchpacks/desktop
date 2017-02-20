@@ -28,12 +28,13 @@ import UserPlugins from 'views/UserPlugins'
 import {
   pluginsRequest,
   pluginsReceived,
-} from 'actions'
 
-import {
   fetchLibraryRequest,
-  fetchLibraryReceived
-} from 'actions/library'
+  fetchLibraryReceived,
+
+  FETCH_LIBRARY_REQUEST,
+  FETCH_LIBRARY_RECEIVED,
+} from 'actions'
 
 import {
   installPluginRequest,
@@ -136,8 +137,8 @@ ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
   Catalog.toggleVersionLock({id: args.id, locked: args.locked})
     .then((plugin) => {
       store.dispatch(toggleVersionLockSuccess(plugin))
-      Catalog.getAllPlugins()
-        .then((plugins) => store.dispatch(pluginsReceived(plugins)))
+      Catalog.getInstalledPlugins()
+        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
     })
 })
 
@@ -145,8 +146,8 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
       store.dispatch(installPluginSuccess(plugin))
-      Catalog.getAllPlugins()
-        .then((plugins) => store.dispatch(pluginsReceived(plugins)))
+      Catalog.getInstalledPlugins()
+        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
     })
 })
 
@@ -154,8 +155,8 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginRemoved(plugin)
     .then((plugin) => {
       store.dispatch(uninstallPluginSuccess(plugin))
-      Catalog.getAllPlugins()
-        .then((plugins) => store.dispatch(pluginsReceived(plugins)))
+      Catalog.getInstalledPlugins()
+        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
     })
 })
 

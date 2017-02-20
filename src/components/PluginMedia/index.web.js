@@ -52,7 +52,9 @@ class PluginMedia extends Component {
 
     return (
       <div className="o-media__right u-mar-left-large">
-        <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
+        <div className="o-plugin__thumbnail">
+          <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
+        </div>
       </div>
     )
   }
@@ -107,7 +109,7 @@ class PluginMedia extends Component {
   }
 
   renderAutoupdates () {
-    const { version } = this.props.plugin
+    const { version, auto_updates } = this.props.plugin
 
     if (!auto_updates) return
 

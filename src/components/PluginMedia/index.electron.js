@@ -15,6 +15,8 @@ import InstallButton from 'components/InstallButton'
 import UpdateButton from 'components/UpdateButton'
 import PluginMetric from 'components/PluginMetric'
 
+import {sanitizeSemVer} from 'lib/utils'
+
 import {
   toggleVersionLockRequest
 } from 'actions/plugin_manager'
@@ -100,14 +102,17 @@ class PluginMedia extends Component {
     const { version, installed_version } = this.props.plugin
     const {location} = this.props.state.app
 
-    if (typeof version === undefined) return
-    if (version === "0") return
-    if (version === "") return
-    if (version === null) return
-
     return (location === '/library/updates')
-      ? <PluginMetric icon={'versions'} shape={'path'} value={version} tooltip={'Latest version'} />
-      : <PluginMetric icon={'versions'} shape={'path'} value={installed_version} tooltip={'Installed version'} />
+      ? <PluginMetric
+          icon={'versions'}
+          shape={'path'}
+          value={sanitizeSemVer(version)}
+          tooltip={'Latest version'} />
+      : <PluginMetric
+          icon={'versions'}
+          shape={'path'}
+          value={sanitizeSemVer(installed_version)} 
+          tooltip={'Installed version'} />
   }
 
   renderButton () {
@@ -129,21 +134,27 @@ class PluginMedia extends Component {
   }
 
   renderVersionLock () {
+    const {plugin} = this.props
     const {location} = this.props.state.app
     if (location !== '/library/installed') return
 
     return (
-      <div onClick={this.toggleLock}>{this.state.locked ? '🔒' : '🔓'}</div>
+      <div
+        onClick={this.toggleLock}
+        className="tooltipped tooltipped-n"
+        aria-label={this.state.locked
+          ? 'Enable auto-updates'
+          : `Lock this version at v${sanitizeSemVer(plugin.installed_version)}` }
+      >
+        {this.state.locked ? '🔒' : '🔓'}
+      </div>
     )
   }
 
   renderAutoupdates () {
-    const { version } = this.props.plugin
-
-    const auto_updates = false // FIXME: Should use attrs from updated Catalog JSON
+    const { version, auto_updates } = this.props.plugin
 
     if (!auto_updates) return
-    if (typeof auto_updates === null) return
 
     return <PluginMetric
       icon={'autoupdates'}
@@ -156,6 +167,7 @@ class PluginMedia extends Component {
   render () {
     const { name, description, owner, version, score, handleCTAClick, title } = this.props.plugin
     const title_or_name = title || name
+    const isInstalled = this.props.plugin || false
 
     return (
         <article className="o-plugin">

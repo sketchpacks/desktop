@@ -105,6 +105,7 @@ const Catalog = {
     function updateAvailable (plugin) {
       if (typeof plugin.installed === undefined) return false
       if (!plugin.installed) return false
+      if (plugin.locked) return false
 
       let remoteVersion = sanitizeSemVer(plugin.version)
       let localVersion = sanitizeSemVer(plugin.installed_version)
@@ -181,6 +182,17 @@ const Catalog = {
 
       Catalog.autoUpdatePlugins()
       return resolve(filteredPlugins)
+    })
+  },
+
+  toggleVersionLock: ({ id, locked }) => {
+    return new Promise((resolve, reject) => {
+      database.update({ id: id },
+        { $set: { locked: !locked } },
+        { returnUpdatedDocs: true }, (err, num, plugin) => {
+          if (err) return reject(err)
+          return resolve(plugin)
+        })
     })
   },
 

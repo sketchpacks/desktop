@@ -2,6 +2,35 @@ const { ipcRenderer, remote } = require('electron')
 const ms = require('ms')
 const notifier = require('node-notifier')
 
+const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
+
+function toggleVersionLockRequest (id, locked) {
+  return (dispatch, getState) => {
+    ipcRenderer.send(TOGGLE_VERSION_LOCK_REQUEST, {id: id, locked: locked || false} )
+  }
+}
+
+
+const TOGGLE_VERSION_LOCK_SUCCESS = 'manager/TOGGLE_VERSION_LOCK_SUCCESS'
+
+function toggleVersionLockSuccess (plugin) {
+  return {
+    type: TOGGLE_VERSION_LOCK_SUCCESS,
+    plugin
+  }
+}
+
+
+const TOGGLE_VERSION_LOCK_ERROR = 'manager/TOGGLE_VERSION_LOCK_ERROR'
+
+function toggleVersionLockError (plugin) {
+  return {
+    type: TOGGLE_VERSION_LOCK_ERROR,
+    plugin
+  }
+}
+
+
 const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
 
 function installPluginRequest (plugin) {
@@ -76,6 +105,14 @@ module.exports = {
   uninstallPluginRequest,
   uninstallPluginSuccess,
   uninstallPluginError,
+
+  toggleVersionLockRequest,
+  toggleVersionLockSuccess,
+  toggleVersionLockError,
+
+  TOGGLE_VERSION_LOCK_REQUEST,
+  TOGGLE_VERSION_LOCK_SUCCESS,
+  TOGGLE_VERSION_LOCK_ERROR,
 
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,

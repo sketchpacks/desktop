@@ -15,6 +15,10 @@ import InstallButton from 'components/InstallButton'
 import UpdateButton from 'components/UpdateButton'
 import PluginMetric from 'components/PluginMetric'
 
+import {
+  toggleVersionLockRequest
+} from 'actions/plugin_manager'
+
 import moment from 'moment'
 
 import './plugin_media.scss'
@@ -28,9 +32,13 @@ class PluginMedia extends Component {
     this.renderScore = this.renderScore.bind(this)
     this.renderUpdateTimestamp = this.renderUpdateTimestamp.bind(this)
     this.renderButton = this.renderButton.bind(this)
+    this.renderVersionLock = this.renderVersionLock.bind(this)
+
+    this.toggleLock = this.toggleLock.bind(this)
 
     this.state = {
-      hidePreview: false
+      hidePreview: false,
+      locked: props.plugin.locked || false,
     }
   }
 
@@ -111,6 +119,24 @@ class PluginMedia extends Component {
       : <InstallButton plugin={plugin} dispatch={dispatch} />
   }
 
+  toggleLock () {
+    const {plugin,dispatch} = this.props
+    dispatch(toggleVersionLockRequest(plugin.id,plugin.locked))
+
+    this.setState({
+      locked: !this.state.locked
+    })
+  }
+
+  renderVersionLock () {
+    const {location} = this.props.state.app
+    if (location !== '/library/installed') return
+
+    return (
+      <div onClick={this.toggleLock}>{this.state.locked ? '🔒' : '🔓'}</div>
+    )
+  }
+
   renderAutoupdates () {
     const { version } = this.props.plugin
 
@@ -170,6 +196,8 @@ class PluginMedia extends Component {
             { this.renderUpdateTimestamp() }
 
             { this.renderScore() }
+
+            { this.renderVersionLock() }
 
             { this.renderButton() }
           </div>

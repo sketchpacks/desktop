@@ -43,7 +43,12 @@ import {
   uninstallPluginError,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
-  UNINSTALL_PLUGIN_ERROR
+  UNINSTALL_PLUGIN_ERROR,
+
+  toggleVersionLockRequest,
+  toggleVersionLockSuccess,
+  TOGGLE_VERSION_LOCK_REQUEST,
+  TOGGLE_VERSION_LOCK_SUCCESS
 } from 'actions/plugin_manager'
 
 let store = configureStore()
@@ -120,6 +125,15 @@ catalogCheck()
 ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
   Catalog.getPluginById(pluginId)
     .then((plugin) => store.dispatch(installPluginRequest(plugin)))
+})
+
+ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
+  Catalog.toggleVersionLock({id: args.id, locked: args.locked})
+    .then((plugin) => {
+      store.dispatch(toggleVersionLockSuccess(plugin))
+      Catalog.getAllPlugins()
+        .then((plugins) => store.dispatch(pluginsReceived(plugins)))
+    })
 })
 
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {

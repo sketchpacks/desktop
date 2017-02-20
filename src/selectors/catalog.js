@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-const _ = require('lodash')
+const {filter,orderBy} = require('lodash')
 
 const getLocation = (state) => state.app.location
 const getPlugins = (state) => state.plugins.items
@@ -9,14 +9,14 @@ export const getPluginList = createSelector(
   (listFilter, plugins) => {
     switch (listFilter) {
       case '/library':
-        return _.filter(plugins, {"installed": true})
+        return filter(plugins, {"installed": true})
       case '/browse':
       case '/browse/newest':
-        return _.orderBy(plugins, ['updated_at'], ['desc'])
+        return orderBy(plugins, ['updated_at'], ['desc'])
       case '/browse/popular':
-        return _.orderBy(plugins, ['score'], ['desc'])
+        return orderBy(plugins, ['score'], ['desc'])
       default:
-        return _.orderBy(plugins, ['updated_at'], ['desc'])
+        return orderBy(plugins, ['updated_at'], ['desc'])
     }
   }
 )

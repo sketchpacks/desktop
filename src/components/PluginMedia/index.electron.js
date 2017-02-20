@@ -6,7 +6,6 @@ import {
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import _ from 'lodash'
 
 import { Link } from 'react-router'
 
@@ -111,7 +110,7 @@ class PluginMedia extends Component {
       : <PluginMetric
           icon={'versions'}
           shape={'path'}
-          value={sanitizeSemVer(installed_version)} 
+          value={sanitizeSemVer(installed_version)}
           tooltip={'Installed version'} />
   }
 

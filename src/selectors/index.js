@@ -1,6 +1,7 @@
 import semver from 'semver'
 import { createSelector } from 'reselect'
-const _ = require('lodash')
+const {filter,orderBy,find} = require('lodash')
+const {forEach} = require('lodash')
 import {sanitizeSemVer} from 'lib/utils'
 
 
@@ -16,19 +17,19 @@ export const getAllPlugins = createSelector(
 
 export const getPopularPlugins = createSelector(
   [ getAllPlugins ], (plugins) => {
-    return _.orderBy(plugins, ['score'], ['desc'])
+    return orderBy(plugins, ['score'], ['desc'])
   }
 )
 
 export const getNewestPlugins = createSelector(
   [ getAllPlugins ], (plugins) => {
-    return _.orderBy(plugins, ['updated_at'], ['desc'])
+    return orderBy(plugins, ['updated_at'], ['desc'])
   }
 )
 
 export const getInstalledPlugins = createSelector(
   [ getAllPlugins ], (plugins) => {
-    return _.filter(plugins, {"installed": true})
+    return filter(plugins, {"installed": true})
   }
 )
 
@@ -45,7 +46,7 @@ const hasNewVersion = (plugin) => {
 
 export const getUpdatedPlugins = createSelector(
   [ getInstalledPlugins ], (plugins) => {
-    return _.filter(plugins, (p => hasNewVersion(p)))
+    return filter(plugins, (p => hasNewVersion(p)))
   }
 )
 
@@ -59,8 +60,8 @@ export const getSearchResults = createSelector(
   [ getAllPlugins, getSearchResultIds ],
   (plugins, ids) => {
     let results = []
-    _.forEach(ids, (id) => {
-      results.push(_.find(plugins, ['id', id]))
+    forEach(ids, (id) => {
+      results.push(find(plugins, ['id', id]))
     })
 
     return results

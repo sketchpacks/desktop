@@ -5,7 +5,7 @@ const Promise = require('promise')
 const fs = require('fs')
 const path = require('path')
 const exec = require('child_process').exec
-const _ = require('lodash')
+const {find} = require('lodash')
 const IsThere = require("is-there")
 const contentDisposition = require('content-disposition')
 const AdmZip = require('adm-zip')
@@ -19,7 +19,7 @@ const TEMP_DIR_PATH = app.getPath('temp')
 const DOWNLOAD_PATH = app.getPath('downloads')
 
 const getInstallPath = () => {
-  const installPath = _.find(PLUGIN_PATHS, (installPath) => {
+  const installPath = find(PLUGIN_PATHS, (installPath) => {
     return IsThere(path.join(HOME_PATH,installPath))
   })
 

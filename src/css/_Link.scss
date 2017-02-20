@@ -13,4 +13,10 @@ a {
 
 .link--small {
   font-size: 1.4rem;
+
+  &:focus,
+  &:hover {
+    color: $color-secondary;
+    text-decoration: underline;
+  }
 }

@@ -156,8 +156,12 @@ class PluginDetailsContainer extends Component {
               <div className="column">
 
                 <div className="o-shelf o-shelf--verso">
-                  <Link to={source_url} className="link--small">
-                    <SVGIcon icon={'github'} /> View on Github
+                  <Link to={source_url} className="link--small u-mar-right-medium" target="_blank">
+                    View on Github
+                  </Link>
+
+                  <Link to={`${source_url}/issues/new`} className="link--small" target="_blank">
+                    Report a Bug
                   </Link>
                 </div>
 

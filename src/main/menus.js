@@ -21,12 +21,16 @@ const settingsMenu = [
   },
 
   {
-    label: 'Sketchpacks Website',
+    label: 'Visit Sketchpacks.com',
     click: () => shell.openExternal('https://www.sketchpacks.com')
   },
   {
-    label: 'Give us Feedback',
-    click: () => shell.openExternal('https://www.sketchpacks.com')
+    label: 'Report a Bug',
+    click: () => shell.openExternal('https://github.com/sketchpacks/bug-reports/issues')
+  },
+  {
+    label: 'Give Feedback',
+    click: () => shell.openExternal('https://github.com/sketchpacks/feedback/issues')
   },
 
   {

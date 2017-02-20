@@ -1,5 +1,9 @@
 const sanitizeSemVer = (semver) => {
-	if (typeof semver !== 'string') return false
+	if (typeof semver === undefined) return "0.0.0"
+	if (typeof semver !== 'string') return "0.0.0"
+	if (typeof semver === 'integer') return "0.0.0"
+	if (semver === 0) return "0.0.0"
+	if (semver === "0") return "0.0.0"
 
   const x = semver.split('.')
 

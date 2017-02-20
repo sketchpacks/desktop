@@ -15,6 +15,12 @@ import InstallButton from 'components/InstallButton'
 import UpdateButton from 'components/UpdateButton'
 import PluginMetric from 'components/PluginMetric'
 
+import {sanitizeSemVer} from 'lib/utils'
+
+import {
+  toggleVersionLockRequest
+} from 'actions/plugin_manager'
+
 import moment from 'moment'
 
 import './plugin_media.scss'
@@ -28,9 +34,13 @@ class PluginMedia extends Component {
     this.renderScore = this.renderScore.bind(this)
     this.renderUpdateTimestamp = this.renderUpdateTimestamp.bind(this)
     this.renderButton = this.renderButton.bind(this)
+    this.renderVersionLock = this.renderVersionLock.bind(this)
+
+    this.toggleLock = this.toggleLock.bind(this)
 
     this.state = {
-      hidePreview: false
+      hidePreview: false,
+      locked: props.plugin.locked || false,
     }
   }
 
@@ -92,14 +102,17 @@ class PluginMedia extends Component {
     const { version, installed_version } = this.props.plugin
     const {location} = this.props.state.app
 
-    if (typeof version === undefined) return
-    if (version === "0") return
-    if (version === "") return
-    if (version === null) return
-
     return (location === '/library/updates')
-      ? <PluginMetric icon={'versions'} shape={'path'} value={version} tooltip={'Latest version'} />
-      : <PluginMetric icon={'versions'} shape={'path'} value={installed_version} tooltip={'Installed version'} />
+      ? <PluginMetric
+          icon={'versions'}
+          shape={'path'}
+          value={sanitizeSemVer(version)}
+          tooltip={'Latest version'} />
+      : <PluginMetric
+          icon={'versions'}
+          shape={'path'}
+          value={sanitizeSemVer(installed_version)} 
+          tooltip={'Installed version'} />
   }
 
   renderButton () {
@@ -111,13 +124,37 @@ class PluginMedia extends Component {
       : <InstallButton plugin={plugin} dispatch={dispatch} />
   }
 
-  renderAutoupdates () {
-    const { version } = this.props.plugin
+  toggleLock () {
+    const {plugin,dispatch} = this.props
+    dispatch(toggleVersionLockRequest(plugin.id,plugin.locked))
 
-    const auto_updates = false // FIXME: Should use attrs from updated Catalog JSON
+    this.setState({
+      locked: !this.state.locked
+    })
+  }
+
+  renderVersionLock () {
+    const {plugin} = this.props
+    const {location} = this.props.state.app
+    if (location !== '/library/installed') return
+
+    return (
+      <div
+        onClick={this.toggleLock}
+        className="tooltipped tooltipped-n"
+        aria-label={this.state.locked
+          ? 'Enable auto-updates'
+          : `Lock this version at v${sanitizeSemVer(plugin.installed_version)}` }
+      >
+        {this.state.locked ? '🔒' : '🔓'}
+      </div>
+    )
+  }
+
+  renderAutoupdates () {
+    const { version, auto_updates } = this.props.plugin
 
     if (!auto_updates) return
-    if (typeof auto_updates === null) return
 
     return <PluginMetric
       icon={'autoupdates'}
@@ -130,6 +167,7 @@ class PluginMedia extends Component {
   render () {
     const { name, description, owner, version, score, handleCTAClick, title } = this.props.plugin
     const title_or_name = title || name
+    const isInstalled = this.props.plugin || false
 
     return (
         <article className="o-plugin">
@@ -170,6 +208,8 @@ class PluginMedia extends Component {
             { this.renderUpdateTimestamp() }
 
             { this.renderScore() }
+
+            { this.renderVersionLock() }
 
             { this.renderButton() }
           </div>

@@ -39,7 +39,10 @@ const {
   INSTALL_PLUGIN_ERROR,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
-  UNINSTALL_PLUGIN_ERROR
+  UNINSTALL_PLUGIN_ERROR,
+  TOGGLE_VERSION_LOCK_REQUEST,
+  TOGGLE_VERSION_LOCK_SUCCESS,
+  TOGGLE_VERSION_LOCK_ERROR
 } = require('./src/actions/plugin_manager')
 
 const opts = {
@@ -123,6 +126,10 @@ ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
     .then((plugin) => {
       mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
     })
+})
+
+ipcMain.on(TOGGLE_VERSION_LOCK_REQUEST, (event, args) => {
+  mainWindow.webContents.send(TOGGLE_VERSION_LOCK_REQUEST, args)
 })
 
 ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {

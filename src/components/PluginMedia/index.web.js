@@ -14,6 +14,8 @@ import Nameplate from 'components/Nameplate'
 import InstallButton from 'components/InstallButton'
 import PluginMetric from 'components/PluginMetric'
 
+import {sanitizeSemVer} from 'lib/utils'
+
 import moment from 'moment'
 
 import './plugin_media.scss'
@@ -95,9 +97,7 @@ class PluginMedia extends Component {
   renderVersion () {
     const { version } = this.props.plugin
 
-    if (version === "0") return
-
-    return <PluginMetric icon={'versions'} shape={'path'} value={version} tooltip={'Latest version'} />
+    return <PluginMetric icon={'versions'} shape={'path'} value={sanitizeSemVer(version)} tooltip={'Latest version'} />
   }
 
   renderButton () {
@@ -111,7 +111,6 @@ class PluginMedia extends Component {
     const { version } = this.props.plugin
 
     if (!auto_updates) return
-    if (typeof auto_updates === null) return
 
     return <PluginMetric
       icon={'autoupdates'}
@@ -124,7 +123,6 @@ class PluginMedia extends Component {
   render () {
     const { name, description, owner, version, score, handleCTAClick, title } = this.props.plugin
     const title_or_name = title || name
-
 
     return (
         <article className="o-plugin">

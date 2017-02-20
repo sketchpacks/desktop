@@ -12,9 +12,14 @@ class UpdatedPluginsContainer extends Component {
 
     if (plugins.isLoading) return (<div>Loading plugins...</div>)
 
-    if (plugins.length === 0) return (<div>No plugins found</div>)
+    if (plugins.length === 0) return (
+      <div className="empty-state--expanded">
+        <h4>No updates found</h4>
+        <p>All your plugins are up to date</p>
+      </div>
+    )
 
-    return (<PluginList plugins={plugins} />)
+    return (<PluginList plugins={plugins.items} />)
   }
 
   render () {
@@ -22,16 +27,6 @@ class UpdatedPluginsContainer extends Component {
 
     return (
       <div>
-        <div className="container">
-          <div className="row">
-            <div className="column">
-              <h3 className="page-title">
-                Pending updates
-              </h3>
-            </div>
-          </div>
-        </div>
-
         { this.renderList() }
       </div>
     )

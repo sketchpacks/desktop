@@ -13,7 +13,7 @@ class UserPluginsContainer extends Component {
           <div className="column">
             <h4>Published Plugins</h4>
 
-            <PluginList plugins={plugins.items} authorDetails={authorDetails} />
+            <PluginList plugins={plugins} authorDetails={authorDetails} />
           </div>
         </div>
       </div>

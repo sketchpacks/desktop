@@ -22,6 +22,7 @@ class BrowsePluginsContainer extends Component {
     this.handleSort = this.handleSort.bind(this)
     this.handleToggle = this.handleToggle.bind(this)
     this.renderFilterLabel = this.renderFilterLabel.bind(this)
+    this.renderPagination = this.renderPagination.bind(this)
 
     this.state = {
       open: false
@@ -91,6 +92,22 @@ class BrowsePluginsContainer extends Component {
     }
   }
 
+  renderPagination = () => {
+    const {plugins} = this.props
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="column">
+            <Pagination plugins={plugins}
+              currentPage={this.props.location.query.page}
+              onSelect={(page) => this.handlePagination(page)}
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   render () {
     const { plugins } = this.props
 
@@ -138,21 +155,14 @@ class BrowsePluginsContainer extends Component {
         <div className="container">
           <div className="row">
             <div className="column">
-              <PluginList plugins={plugins.items} />
+              <PluginList plugins={plugins} />
             </div>
           </div>
         </div>
 
-        <div className="container">
-          <div className="row">
-            <div className="column">
-              <Pagination plugins={plugins}
-                currentPage={this.props.location.query.page}
-                onSelect={(page) => this.handlePagination(page)}
-              />
-            </div>
-          </div>
-        </div>
+        { !plugins.isLoading
+            && plugins.items.length > 0
+            && this.renderPagination() }
       </div>
     )
   }

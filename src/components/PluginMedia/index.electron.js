@@ -105,13 +105,13 @@ class PluginMedia extends Component {
       ? <PluginMetric
           icon={'versions'}
           shape={'path'}
-          value={sanitizeSemVer(version)}
-          tooltip={'Latest version'} />
+          value={sanitizeSemVer(installed_version)}
+          tooltip={'Installed version'} />
       : <PluginMetric
           icon={'versions'}
           shape={'path'}
-          value={sanitizeSemVer(installed_version)}
-          tooltip={'Installed version'} />
+          value={sanitizeSemVer(version)}
+          tooltip={'Latest version'} />
   }
 
   renderButton () {
@@ -174,9 +174,9 @@ class PluginMedia extends Component {
             <div className="o-media__content">
               <h3 className="o-plugin__name">
                 { __ELECTRON__ ? (
-                  <a href={`${WEB_URL}/${owner.handle}/${name}`}>
+                  <span onClick={() => require('electron').remote.shell.openExternal(`${WEB_URL}/${owner.handle}/${name}`)}>
                     {title_or_name}
-                  </a>
+                  </span>
                 ) : (
                   <Link to={`/${owner.handle}/${name}`}>
                     {title_or_name}

@@ -50,6 +50,13 @@ function plugins (state = initialListState, action) {
     case actions.PLUGINS_RECEIVED:
       return {
         ...state,
+        items: state.items.concat(action.payload),
+        isLoading: false
+      }
+
+    case actions.SEARCH_RESULTS_RECEIVED:
+      return {
+        ...state,
         items: action.payload,
         isLoading: false
       }
@@ -230,11 +237,6 @@ function search (state = initialSearchState, action) {
       return {
         ...state,
         keyword: action.payload
-      }
-    case actions.SEARCH_RESULTS_RECEIVED:
-      return {
-        ...state,
-        items: action.payload
       }
     default:
       if (typeof state === undefined) {

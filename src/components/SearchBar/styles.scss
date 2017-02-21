@@ -1,3 +1,30 @@
 .searchBar {
   margin-bottom: 0rem;
 }
+
+$placeholder-color: rgba(#818EA7,1.0);
+
+.searchBar {
+  border-radius: 3px;
+  width: 25rem;
+  outline: none;
+  background: #536DAE;
+  border: 0;
+  color: #ffffff;
+
+  &::-webkit-input-placeholder {
+    color: $placeholder-color;
+  }
+
+  &:-moz-placeholder {
+    color: $placeholder-color;
+  }
+
+  &::-moz-placeholder {
+    color: $placeholder-color;
+  }
+
+  &:-ms-input-placeholder {
+    color: $placeholder-color;
+  }
+}

@@ -40,7 +40,7 @@ class SearchBar extends Component {
       .then(response => {
         const pageMeta = linkHeader(response.headers.link)
         if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
-        
+
         dispatch(pluginsReceived(response.data))
         browserHistory.push(`/browse?${browserQuery}`)
       })

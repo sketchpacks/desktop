@@ -8,7 +8,7 @@ import './app.scss'
 
 import SVGIcon from 'components/SVGIcon'
 import SideBarMenu from 'components/electron/SideBarMenu'
-import SearchBar from 'components/electron/SearchBar'
+import SearchBar from 'components/SearchBar'
 
 import {getUpdatesCount} from 'selectors'
 

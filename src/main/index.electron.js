@@ -12,6 +12,7 @@ import log from 'electron-log'
 
 import App from 'containers/App'
 
+import BrowsePlugins from 'views/BrowsePlugins'
 import PopularPlugins from 'views/PopularPlugins'
 import NewestPlugins from 'views/NewestPlugins'
 import InstalledPlugins from 'views/InstalledPlugins'
@@ -57,9 +58,10 @@ export const render = () => {
     <Provider store={store}>
       <Router history={history}>
         <Route path="/" component={App}>
-          <IndexRoute component={PopularPlugins} />
-          <Route path="browse/popular" component={PopularPlugins} />
-          <Route path="browse/newest" component={NewestPlugins} />
+          <IndexRoute component={BrowsePlugins} />
+          <Route path="browse" component={BrowsePlugins} />
+          <Route path="browse/popular" component={BrowsePlugins} />
+          <Route path="browse/newest" component={BrowsePlugins} />
 
           <Route path="search" component={SearchResults} />
 
@@ -89,33 +91,33 @@ const catalogCheck = () => {
     setTimeout(catalogCheck, 100)
   }
   else {
-    Catalog.getAllPlugins()
-      .then(plugins => {
-        if (plugins.length > 0) {
-          store.dispatch(pluginsReceived(plugins))
-        }
-        else {
-          waterfall([
-            (callback) => {
-              Catalog.setStore(store)
-              Catalog.update().then(plugins => callback(null, plugins))
-            },
-            (plugins, callback) => {
-              Catalog.upsert(plugins)
-              callback(null)
-            },
-            (callback) => {
-              Catalog.getAllPlugins().then(plugins => callback(null, plugins))
-            }
-          ], (err, result) => {
-
-            store.dispatch(pluginsRequest())
-            store.dispatch(pluginsReceived(result))
-          })
-        }
-
-        Catalog.enableAutoUpdate()
-      })
+    // Catalog.getAllPlugins()
+    //   .then(plugins => {
+    //     if (plugins.length > 0) {
+    //       store.dispatch(pluginsReceived(plugins))
+    //     }
+    //     else {
+    //       waterfall([
+    //         (callback) => {
+    //           Catalog.setStore(store)
+    //           Catalog.update().then(plugins => callback(null, plugins))
+    //         },
+    //         (plugins, callback) => {
+    //           Catalog.upsert(plugins)
+    //           callback(null)
+    //         },
+    //         (callback) => {
+    //           Catalog.getAllPlugins().then(plugins => callback(null, plugins))
+    //         }
+    //       ], (err, result) => {
+    //
+    //         store.dispatch(pluginsRequest())
+    //         store.dispatch(pluginsReceived(result))
+    //       })
+    //     }
+    //
+    //     Catalog.enableAutoUpdate()
+    //   })
   }
 }
 catalogCheck()

@@ -37,6 +37,11 @@ import {
 } from 'actions'
 
 import {
+  fetchLibraryRequest,
+  fetchLibraryReceived
+} from 'actions/library'
+
+import {
   installPluginRequest,
   installPluginSuccess,
   installPluginError,

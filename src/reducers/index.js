@@ -107,6 +107,33 @@ function plugins (state = initialListState, action) {
   }
 }
 
+function library (state = initialListState, action) {
+  switch (action.type) {
+    case actions.FETCH_LIBRARY_REQUEST:
+      return {
+        ...state,
+        items: [],
+        isLoading: true
+      }
+
+    case actions.FETCH_LIBRARY_RECEIVED:
+      return {
+        ...state,
+        items: action.payload,
+        isLoading: false
+      }
+
+    case actions.FETCH_LIBRARY_ERROR:
+      return {
+        ...state,
+        isLoading: false
+      }
+
+    default:
+      return state
+  }
+}
+
 function recommends (state = initialListState, action) {
   switch (action.type) {
     case actions.RECOMMENDS_REQUEST:
@@ -256,11 +283,11 @@ const rootReducer = combineReducers({
   routing: routerReducer,
   auth,
   plugins,
+  library,
   pluginDetails,
-  recommends,
   app,
   authorDetails,
-  search
+  search,
 })
 
 export default rootReducer

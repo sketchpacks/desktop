@@ -7,6 +7,7 @@ import {sanitizeSemVer} from 'lib/utils'
 
 const getList = (state) => state.app.location
 const getPlugins = (state) => state.plugins.items
+const getLibrary = (state) => state.library.items
 const getSearchResultIds = (state) => state.search.items
 
 export const getAllPlugins = createSelector(
@@ -28,8 +29,8 @@ export const getNewestPlugins = createSelector(
 )
 
 export const getInstalledPlugins = createSelector(
-  [ getAllPlugins ], (plugins) => {
-    return filter(plugins, {"installed": true})
+  [ getLibrary ], (plugins) => {
+    return plugins
   }
 )
 
@@ -45,7 +46,7 @@ const hasNewVersion = (plugin) => {
 }
 
 export const getUpdatedPlugins = createSelector(
-  [ getInstalledPlugins ], (plugins) => {
+  [ getLibrary ], (plugins) => {
     return filter(plugins, (p => hasNewVersion(p)))
   }
 )

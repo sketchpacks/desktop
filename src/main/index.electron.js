@@ -31,6 +31,11 @@ import {
 } from 'actions'
 
 import {
+  fetchLibraryRequest,
+  fetchLibraryReceived
+} from 'actions/library'
+
+import {
   installPluginRequest,
   installPluginSuccess,
   installPluginError,
@@ -91,33 +96,33 @@ const catalogCheck = () => {
     setTimeout(catalogCheck, 100)
   }
   else {
-    // Catalog.getAllPlugins()
-    //   .then(plugins => {
-    //     if (plugins.length > 0) {
-    //       store.dispatch(pluginsReceived(plugins))
-    //     }
-    //     else {
-    //       waterfall([
-    //         (callback) => {
-    //           Catalog.setStore(store)
-    //           Catalog.update().then(plugins => callback(null, plugins))
-    //         },
-    //         (plugins, callback) => {
-    //           Catalog.upsert(plugins)
-    //           callback(null)
-    //         },
-    //         (callback) => {
-    //           Catalog.getAllPlugins().then(plugins => callback(null, plugins))
-    //         }
-    //       ], (err, result) => {
-    //
-    //         store.dispatch(pluginsRequest())
-    //         store.dispatch(pluginsReceived(result))
-    //       })
-    //     }
-    //
-    //     Catalog.enableAutoUpdate()
-    //   })
+    Catalog.getInstalledPlugins()
+      .then(plugins => {
+        store.dispatch(fetchLibraryReceived(plugins))
+
+        Catalog.enableAutoUpdate()
+      })
+        // else {
+        //   waterfall([
+        //     (callback) => {
+        //       Catalog.setStore(store)
+        //       Catalog.update().then(plugins => callback(null, plugins))
+        //     },
+        //     (plugins, callback) => {
+        //       Catalog.upsert(plugins)
+        //       callback(null)
+        //     },
+        //     (callback) => {
+        //       Catalog.getInstalledPlugins().then(plugins => callback(null, plugins))
+        //     }
+        //   ], (err, result) => {
+        //
+        //     store.dispatch(pluginsRequest())
+        //     store.dispatch(fetchLibraryReceived(result))
+        //   })
+        // }
+
+
   }
 }
 catalogCheck()

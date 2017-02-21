@@ -40,7 +40,7 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins } = state
+  const { library } = state
 
   return {
     state,

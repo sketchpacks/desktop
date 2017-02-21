@@ -27,10 +27,6 @@ class BrowsePluginsContainer extends Component {
     this.fetchData = this.fetchData.bind(this)
   }
 
-  componentWillMount () {
-    this.props.dispatch(pluginsRequest())
-  }
-
   componentDidMount () {
     const { page, q, sort } = this.props.location.query
     this.fetchData({page: page || 1, q: q, sort: sort})
@@ -50,11 +46,9 @@ class BrowsePluginsContainer extends Component {
 
     this.setState({ loading: true })
 
-    const sort_by = sort || plugins.sort_by
-
     const apiQuery = qs.stringify({
       ...query,
-      sort: sort_by,
+      sort: sort || plugins.sort_by,
       per_page: 15,
       page: page || plugins.nextPage,
       text: q || search.keyword,
@@ -64,7 +58,7 @@ class BrowsePluginsContainer extends Component {
       ...query,
       page: page,
       q: q || search.keyword,
-      sort: sort_by,
+      sort: sort || plugins.sort_by,
     })
 
     SketchpacksApi.getCatalog({query: apiQuery})
@@ -74,6 +68,7 @@ class BrowsePluginsContainer extends Component {
 
         dispatch(pluginsReceived(response.data))
         browserHistory.push(`/browse?${browserQuery}`)
+        this.setState({ loading: false })
       })
   }
 

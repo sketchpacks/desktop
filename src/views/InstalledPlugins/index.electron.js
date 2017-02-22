@@ -12,7 +12,7 @@ class InstalledPluginsContainer extends Component {
 
     if (plugins.isLoading) return (<div>Loading plugins...</div>)
 
-    if (plugins.length === 0) return (
+    if (plugins.items.length === 0) return (
       <div className="empty-state--expanded">
         <h4>No installed plugins found</h4>
         <p>Your installed plugins will be shown here</p>

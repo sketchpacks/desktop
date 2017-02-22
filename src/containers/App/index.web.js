@@ -71,6 +71,36 @@ class App extends Component {
           </div>
         </div>
 
+        <div className="hero hero--promo">
+          <div className="container">
+            <div className="row">
+
+              <div className="column">
+                <h1>Get Sketchpacks for macOS</h1>
+                <h3>Discover and manage Sketch plugins right from your menu bar</h3>
+
+                <Link
+                  to="https://sketchpacks-releases.herokuapp.com/download"
+                  className="button"
+                >
+                  Download Sketchpacks
+                </Link>
+
+                <small>
+                   macOS 10.10 or above required &bull; Sketch 40 or above required
+                </small>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="column">
+                <img src={require('static/images/promo-screenshot.png')} />
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
         {this.props.children}
 
         <footer className="registry-footer">

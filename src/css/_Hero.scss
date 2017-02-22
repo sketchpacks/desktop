@@ -6,13 +6,57 @@ $height: 24vh;
   margin-bottom: 3.2rem;
   box-shadow: 0px 8px 10px rgba(0, 0, 0, 0.1);
 
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
   .container {
     min-height: $height;
-    padding-top: 4vh;
-    padding-bottom: 4vh;
+    padding-top: 2vh;
   }
 
   .tabnav {
     margin-bottom: -4vh;
+  }
+
+  &--promo {
+    .column {
+      text-align: center;
+    }
+
+    .container {
+      min-height: 44vh;
+    }
+
+    .row {
+      padding: 4rem 0 0 0;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      margin-bottom: 1rem;
+      font-weight: bold;
+      color: rgba(#343a40, 1.0);
+    }
+
+    h3 {
+      font-size: 2.2rem;
+      margin-right: 2rem;
+      color: rgba(#343a40, 0.6);
+    }
+
+    .button {
+      height: 4.4rem;
+      line-height: 4.2rem;
+      font-size: 1.6rem;
+      text-transform: none;
+      margin: 2rem 0 1rem 0;
+    }
+
+    small {
+      display: inline-block;
+      margin-bottom: 4rem;
+    }
   }
 }

@@ -4,7 +4,7 @@ import PluginMedia from 'components/PluginMedia'
 
 const PluginList = ({ plugins, authorDetails }) => {
   return (
-    <div className="container">
+    <div className="container container--padded-top">
       {plugins.items.map((plugin, idx) => {
         // Set the owner property if not present
         if (!('owner' in plugin)) plugin['owner'] = authorDetails

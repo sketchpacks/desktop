@@ -47,46 +47,12 @@ const Catalog = {
     })
   },
 
-  getCatalogSize: () => new Promise((resolve, reject) => {
-    database.count({}, (err, count) => {
-      if (err) return reject(err)
-      return resolve(count)
-    })
-  }),
-
   getPluginById: (id) => new Promise((resolve, reject) => {
     if (database === undefined) return new Error("Set a database to query")
 
     database.findOne({ id: id }).exec((err, plugin) => {
       if (err) return reject(err)
       return resolve(plugin)
-    })
-  }),
-
-  getAllPlugins: () => new Promise((resolve, reject) => {
-    if (database === undefined) return new Error("Set a database to query")
-
-    database.find({}).exec((err, plugins) => {
-      if (err) return reject(err)
-      return resolve(plugins)
-    })
-  }),
-
-  getPopularPlugins: () => new Promise((resolve, reject) => {
-    if (database === undefined) return new Error("Set a database to query")
-
-    database.find({}).sort({ score: -1 }).exec((err, plugins) => {
-      if (err) return reject(err)
-      return resolve(plugins)
-    })
-  }),
-
-  getNewestPlugins: () => new Promise((resolve, reject) => {
-    if (database === undefined) return new Error("Set a database to query")
-
-    database.find({}).sort({ updated_at: -1 }).exec((err, plugins) => {
-      if (err) return reject(err)
-      return resolve(plugins)
     })
   }),
 
@@ -119,17 +85,6 @@ const Catalog = {
       return resolve(plugins)
     })
   }),
-
-  search: (keyword) => {
-    const regx = new RegExp(keyword)
-    return new Promise((resolve, reject) => {
-      database.find({ $or: [{name: regx}, {title: regx}, {description: regx}] },
-        { id: 1 }, (err, plugins) => {
-        if (err) return reject(err)
-        return resolve(map(plugins, (p) => p.id ))
-      })
-    })
-  },
 
   update: () => {
     const opts = {

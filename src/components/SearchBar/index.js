@@ -1,7 +1,13 @@
+import {
+  __ELECTRON__,
+} from 'config'
+
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 import { push } from 'react-router-redux'
+
+import SVGIcon from 'components/SVGIcon'
 
 import qs from 'qs'
 import linkHeader from 'parse-link-header'
@@ -60,12 +66,17 @@ class SearchBar extends Component {
 
   render () {
     return (
-      <div>
+      <div className="searchBar__container">
         <input
+          className={this.props.classNames}
           type="text"
           placeholder="Search all plugins"
-          className="searchBar"
           onKeyUp={this.handleEnterKey}
+        />
+        <SVGIcon
+          icon={'search'}
+          shape={'path'}
+          fill={__ELECTRON__ ? '#ffffff' : '#000000'}
         />
       </div>
     )

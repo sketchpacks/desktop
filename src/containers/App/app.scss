@@ -43,21 +43,15 @@
   align-items: center;
   position: relative;
 
-  svg {
-    fill: #ffffff;
-    align-self: center;
-    position: absolute;
-    left: 2.0rem;
-  }
 }
 
-.searchBar {
-  background-color: #ffffff;
-  height: 3.2rem;
-  padding: 0.6rem 1rem;
-  width: 20.0rem;
-  margin-bottom: 0px;
+.icon-brand {
+  fill: #ffffff;
+  align-self: center;
+  position: absolute;
+  left: 2.0rem;
 }
+
 
 .page-title {
   font-size: 2.4rem;

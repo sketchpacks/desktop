@@ -57,9 +57,7 @@ class App extends Component {
                     <strong>Sketchpacks</strong>
                   </Link>
 
-                  <div className="searchBar">
-                      <SearchBar location={this.props.location}/>
-                  </div>
+                  <SearchBar location={this.props.location} classNames={'searchBar'} />
 
                   <div className="nav-group">
                     <Link to="/browse" className="nav__item">Browse</Link>
@@ -97,7 +95,7 @@ class App extends Component {
                 <img src={require('static/images/promo-screenshot.png')} />
               </div>
             </div>
-            
+
           </div>
         </div>
 

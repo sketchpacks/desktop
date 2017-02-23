@@ -32,7 +32,7 @@ class App extends Component {
             fill={'#FFFFFF'}
           />
 
-          <SearchBar {...this.props} />
+          <SearchBar {...this.props} classNames={'searchBar searchBar--app'} />
         </header>
 
         <div className="app__body">

@@ -3,8 +3,6 @@ import React from 'react'
 import PluginMedia from 'components/PluginMedia'
 
 const PluginList = ({ plugins, authorDetails }) => {
-  if (plugins.items.length === 0) return (<em>No plugins found</em>)
-
   return (
     <div className="container">
       {plugins.items.map((plugin, idx) => {

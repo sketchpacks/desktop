@@ -58,6 +58,17 @@ let options = {
           /(dist)/
         ],
         loaders: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.jpe?g$|\.gif$|\.png$|\.svg$|\.woff$|\.ttf$|\.wav$|\.mp3$/,
+        loader: 'url-loader',
+        options: {
+          limit: 25000,
+        },
+        exclude: [
+          /(dist)/,
+          /(node_modules)/
+        ],
       }
     ]
   },
@@ -83,7 +94,7 @@ let options = {
   ],
 
   resolve: {
-    extensions: ['.js', '.scss', '.web.js'],
+    extensions: ['.js', '.scss', '.web.js', '.jpg', '.png', '.gif'],
     modules: [path.resolve(__dirname, "src"), "node_modules"]
   }
 }

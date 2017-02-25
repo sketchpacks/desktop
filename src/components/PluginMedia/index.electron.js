@@ -7,6 +7,8 @@ import {
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import PluginManagerHOC from 'hoc/Manager'
+
 import { Link } from 'react-router'
 
 import Nameplate from 'components/Nameplate'
@@ -31,15 +33,11 @@ class PluginMedia extends Component {
     this.renderPreview = this.renderPreview.bind(this)
     this.renderVersion = this.renderVersion.bind(this)
     this.renderScore = this.renderScore.bind(this)
-    this.renderUpdateTimestamp = this.renderUpdateTimestamp.bind(this)
     this.renderButton = this.renderButton.bind(this)
     this.renderVersionLock = this.renderVersionLock.bind(this)
 
-    this.toggleLock = this.toggleLock.bind(this)
-
     this.state = {
       hidePreview: false,
-      locked: props.plugin.locked || false,
     }
   }
 
@@ -83,69 +81,47 @@ class PluginMedia extends Component {
     )
   }
 
-  renderUpdateTimestamp () {
-    return // todo: How might this be more informative?
-
-    const { updated_at } = this.props.plugin
-    const relativeDateTime = moment(updated_at).fromNow()
-
-    if (updated_at === undefined)
-      return
-
-    return (
-      <span>Released {relativeDateTime}</span>
-    )
-  }
-
   renderVersion () {
     const { version, installed_version } = this.props.plugin
     const {location} = this.props.state.app
 
-    return (location === '/library/updates')
-      ? <PluginMetric
-          icon={'versions'}
-          shape={'path'}
-          value={sanitizeSemVer(installed_version)}
-          tooltip={'Installed version'} />
-      : <PluginMetric
-          icon={'versions'}
-          shape={'path'}
-          value={sanitizeSemVer(version)}
-          tooltip={'Latest version'} />
+    const value = (location === '/library/updates')
+      ? installed_version
+      : version
+
+    const tooltip = (location === '/library/updates')
+      ? 'Installed version'
+      : 'Latest version'
+
+    return <PluginMetric
+      icon={'versions'}
+      shape={'path'}
+      value={sanitizeSemVer(value)}
+      tooltip={tooltip} />
   }
 
   renderButton () {
     const {location} = this.props.state.app
-    const {plugin,dispatch} = this.props
 
     return (location === '/library/updates')
       ? <UpdateButton {...this.props} />
       : <InstallButton {...this.props} />
   }
 
-  toggleLock () {
-    const {plugin,dispatch} = this.props
-    dispatch(toggleVersionLockRequest(plugin.id,plugin.locked))
-
-    this.setState({
-      locked: !this.state.locked
-    })
-  }
-
   renderVersionLock () {
-    const {plugin} = this.props
+    const {plugin,handlePluginEvent} = this.props
     const {location} = this.props.state.app
     if (location !== '/library/installed') return
 
     return (
       <div
-        onClick={this.toggleLock}
+        onClick={() => handlePluginEvent({ type: 'lock', plugin })}
         className="tooltipped tooltipped-n"
-        aria-label={this.state.locked
+        aria-label={plugin.locked
           ? 'Enable auto-updates'
           : `Lock this version at v${sanitizeSemVer(plugin.installed_version)}` }
       >
-        {this.state.locked ? '🔒' : '🔓'}
+        {plugin.locked ? '🔒' : '🔓'}
       </div>
     )
   }
@@ -204,8 +180,6 @@ class PluginMedia extends Component {
 
             { this.renderAutoupdates() }
 
-            { this.renderUpdateTimestamp() }
-
             { this.renderScore() }
 
             { this.renderVersionLock() }
@@ -229,4 +203,4 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)( PluginMedia )
+export default connect(mapStateToProps, mapDispatchToProps)( PluginManagerHOC(PluginMedia) )

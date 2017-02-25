@@ -280,12 +280,8 @@ function authorDetails (state, action) {
   }
 }
 
-const initialSearchState = {
-  keyword: '',
-  items: []
-}
 
-function search (state = initialSearchState, action) {
+function search (state = {...initialListState, keyword: ''}, action) {
   switch (action.type) {
     case actions.SEARCH:
       return {

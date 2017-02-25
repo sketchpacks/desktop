@@ -4,15 +4,12 @@ import { browserHistory } from 'react-router'
 
 import Waypoint from 'react-waypoint'
 import qs from 'qs'
-import linkHeader from 'parse-link-header'
 import {SketchpacksApi} from 'api'
 
 import PluginList from 'components/PluginList'
 
 import {
   fetchPluginsReceived,
-  pluginsPaginate,
-  pluginsSortBy,
   fetchCatalog
 } from 'actions'
 
@@ -70,18 +67,8 @@ class BrowsePluginsContainer extends Component {
     })
 
     dispatch(fetchCatalog(apiQuery))
-    browserHistory.push(`/browse?${browserQuery}`)
+    browserHistory.push(`${this.props.location.pathname}?${browserQuery}`)
     this.setState({ loading: false })
-
-    // SketchpacksApi.getCatalog({query: apiQuery})
-    //   .then(response => {
-    //     const pageMeta = linkHeader(response.headers.link)
-    //     if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
-    //
-    //     dispatch(fetchPluginsReceived(response.data))
-    //     browserHistory.push(`/browse?${browserQuery}`)
-    //     this.setState({ loading: false })
-    //   })
   }
 
   renderLoading () {

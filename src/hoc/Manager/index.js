@@ -40,6 +40,7 @@ const PluginManagerHOC = ComposedComponent =>
         <ComposedComponent
           plugin={this.props.plugin}
           state={this.props.state}
+          dispatch={this.props.dispatch}
           handlePluginEvent={this.handlePluginEvent} />
       )
     }

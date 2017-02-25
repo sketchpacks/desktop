@@ -2,9 +2,6 @@ import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 import * as actions from 'actions'
 
-import jwt from 'jwt-simple'
-
-
 const initialListState = {
   items: [],
   isLoading: false,
@@ -13,31 +10,6 @@ const initialListState = {
   sort_by: 'score:desc',
 }
 
-function auth (state, action) {
-  switch (action.type) {
-    case actions.LOGIN_SUCCESS:
-      const decoded = jwt.decode(action.token, '', true, 'HS256')
-      return {
-        ...state,
-        token: action.token,
-        handle: decoded.user.handle,
-        userId: decoded.user.id
-      }
-
-    case actions.LOGOUT_SUCCESS:
-      return {
-        ...state,
-        token: null,
-        handle: null,
-        userId: null
-      }
-
-    default:
-      return {
-        ...state
-      }
-  }
-}
 
 const updateObjectInArray = (array, action) => {
   return array.map(plugin => (plugin.id !== action.plugin.id)
@@ -66,13 +38,6 @@ function plugins (state = initialListState, action) {
       return {
         ...state,
         items: state.items.concat(action.payload),
-        isLoading: false
-      }
-
-    case actions.SEARCH_RESULTS_RECEIVED:
-      return {
-        ...state,
-        items: action.payload,
         isLoading: false
       }
 
@@ -134,6 +99,79 @@ function plugins (state = initialListState, action) {
   }
 }
 
+function catalog (state = initialListState, action) {
+  switch (action.type) {
+    case actions.FETCH_CATALOG_REQUEST:
+      return {
+        ...state,
+        isLoading: true
+      }
+
+    case actions.FETCH_CATALOG_RECEIVED:
+      return {
+        ...state,
+        items: (action.append) ? state.items.concat(action.payload) : action.payload,
+        isLoading: false
+      }
+
+    case actions.FETCH_CATALOG_ERROR:
+      return {
+        ...state,
+        isLoading: false
+      }
+
+    case actions.CATALOG_SORT_BY:
+      return {
+        ...state,
+        sort_by: action.sort
+      }
+
+    case actions.CATALOG_PAGINATE:
+      const defaults = {
+        firstPage: 1,
+        lastPage: 1,
+        nextPage: 1,
+        prevPage: 1,
+      }
+
+      const pageInfo = {...defaults}
+
+      if ('payload' in action) {
+        const { payload } = action
+        pageInfo.firstPage = ('first' in payload) ? payload.first.page : 1,
+        pageInfo.lastPage = ('last' in payload) ? payload.last.page : 1
+        pageInfo.nextPage = ('next' in payload) ? payload.next.page : 1
+        pageInfo.prevPage = ('prev' in payload) ? payload.prev.page : 1
+      }
+      else {
+        return {
+          ...state,
+          ...defaults
+        }
+      }
+
+      return {
+        ...state,
+        ...pageInfo
+      }
+
+    case 'manager/UNINSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
+      }
+
+    case 'manager/INSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
+      }
+
+    default:
+      return state
+  }
+}
+
 function library (state = initialListState, action) {
   switch (action.type) {
     case actions.FETCH_LIBRARY_REQUEST:
@@ -154,6 +192,18 @@ function library (state = initialListState, action) {
       return {
         ...state,
         isLoading: false
+      }
+
+    case 'manager/UNINSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
+      }
+
+    case 'manager/INSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
       }
 
     default:
@@ -199,8 +249,8 @@ function pluginDetails (state, action) {
         name: "",
         title: "",
         description: "",
-        version: "",
-        compatible_version: "",
+        version: "0.0.0",
+        compatible_version: "0.0.0",
         source_url: "",
         download_url: "",
         score: 0.0,
@@ -283,11 +333,39 @@ function authorDetails (state, action) {
 
 function search (state = {...initialListState, keyword: ''}, action) {
   switch (action.type) {
-    case actions.SEARCH:
+    case actions.FETCH_SEARCH_REQUEST:
       return {
         ...state,
-        keyword: action.payload
+        items: [],
+        keyword: action.payload,
+        isLoading: true
       }
+
+    case actions.FETCH_SEARCH_RECEIVED:
+      return {
+        ...state,
+        items: state.items.concat(action.payload),
+        isLoading: false
+      }
+
+    case actions.FETCH_SEARCH_ERROR:
+      return {
+        ...state,
+        isLoading: false
+      }
+
+    case 'manager/UNINSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
+      }
+
+    case 'manager/INSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
+      }
+
     default:
       if (typeof state === undefined) {
         return {
@@ -304,8 +382,8 @@ function search (state = {...initialListState, keyword: ''}, action) {
 
 const rootReducer = combineReducers({
   routing: routerReducer,
-  auth,
   plugins,
+  catalog,
   library,
   pluginDetails,
   app,

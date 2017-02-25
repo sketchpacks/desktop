@@ -13,8 +13,6 @@ import log from 'electron-log'
 import App from 'containers/App'
 
 import BrowsePlugins from 'views/BrowsePlugins'
-import PopularPlugins from 'views/PopularPlugins'
-import NewestPlugins from 'views/NewestPlugins'
 import InstalledPlugins from 'views/InstalledPlugins'
 import UpdatedPlugins from 'views/UpdatedPlugins'
 

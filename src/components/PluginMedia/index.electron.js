@@ -101,6 +101,7 @@ class PluginMedia extends Component {
   }
 
   renderButton () {
+
     const {location} = this.props.state.app
 
     return (location === '/library/updates')

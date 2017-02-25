@@ -47,6 +47,8 @@ const install = (event, plugin) => {
         const archiveFileStream = fs.createWriteStream(savePath)
         const installPath = getInstallPath()
 
+        console.log(filename)
+
         let extractionPath
 
         archiveFileStream.on('finish', () => {

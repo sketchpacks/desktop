@@ -11,10 +11,9 @@ import PluginList from 'components/PluginList'
 
 import {
   fetchPluginsReceived,
-  pluginsRequest,
-  pluginsReceived,
   pluginsPaginate,
-  pluginsSortBy
+  pluginsSortBy,
+  fetchCatalog
 } from 'actions'
 
 class BrowsePluginsContainer extends Component {
@@ -31,8 +30,12 @@ class BrowsePluginsContainer extends Component {
   componentDidMount () {
     const { page, q, sort } = this.props.location.query
 
-    if (this.props.plugins.length === 0) {
-      this.fetchData({page: page || 1, q: q, sort: sort})
+    if (this.props.plugins.items.length === 0 && !this.state.loading) {
+      this.fetchData({
+        page: page || 1,
+        q: q,
+        sort: sort
+      })
     }
   }
 
@@ -53,27 +56,32 @@ class BrowsePluginsContainer extends Component {
     const apiQuery = qs.stringify({
       ...query,
       sort: sort || plugins.sort_by,
-      per_page: 15,
       page: page || plugins.nextPage,
+      per_page: 15,
       text: q || search.keyword,
     })
 
     const browserQuery = qs.stringify({
       ...query,
-      page: page,
       q: q || search.keyword,
+      page: page,
+      per_page: 15,
       sort: sort || plugins.sort_by,
     })
 
-    SketchpacksApi.getCatalog({query: apiQuery})
-      .then(response => {
-        const pageMeta = linkHeader(response.headers.link)
-        if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
+    dispatch(fetchCatalog(apiQuery))
+    browserHistory.push(`/browse?${browserQuery}`)
+    this.setState({ loading: false })
 
-        dispatch(fetchPluginsReceived(response.data))
-        browserHistory.push(`/browse?${browserQuery}`)
-        this.setState({ loading: false })
-      })
+    // SketchpacksApi.getCatalog({query: apiQuery})
+    //   .then(response => {
+    //     const pageMeta = linkHeader(response.headers.link)
+    //     if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
+    //
+    //     dispatch(fetchPluginsReceived(response.data))
+    //     browserHistory.push(`/browse?${browserQuery}`)
+    //     this.setState({ loading: false })
+    //   })
   }
 
   renderLoading () {
@@ -99,6 +107,7 @@ class BrowsePluginsContainer extends Component {
           && this.renderLoading() }
 
         { !this.state.loading
+          && plugins.items.length > 0
           && <Waypoint onEnter={this.fetchData} /> }
       </div>
     )
@@ -112,10 +121,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins,search } = state
+  const { catalog,search } = state
 
   return {
-    plugins,
+    plugins: catalog,
     search
   }
 }

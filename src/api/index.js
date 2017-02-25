@@ -1,9 +1,13 @@
+import {
+  API_URL
+} from 'config'
+
 import axios from 'axios'
 import linkHeader from 'parse-link-header'
 import qs from 'qs'
 
 const client = axios.create({
-  baseURL: 'https://sketchpacks-api.herokuapp.com/v1/',
+  baseURL: `${API_URL}/v1`,
   timeout: 1500,
 })
 

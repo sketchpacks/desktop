@@ -43,13 +43,6 @@ function installPluginRequest (plugin) {
 const INSTALL_PLUGIN_SUCCESS = 'manager/INSTALL_SUCCESS'
 
 function installPluginSuccess (plugin) {
-  notifier.notify({
-    title: 'test',
-    message: 'test',
-    sound: true,
-    wait: false,
-  })
-
   return {
     type: INSTALL_PLUGIN_SUCCESS,
     plugin

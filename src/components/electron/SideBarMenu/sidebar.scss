@@ -1,4 +1,4 @@
-$sidebar-width: 140px;
+$sidebar-width: 14.0rem;
 
 .app__sidebar {
   display: flex;
@@ -9,7 +9,6 @@ $sidebar-width: 140px;
   max-height: 100vh;
   width: $sidebar-width;
   max-width: $sidebar-width;
-  border-right: 1px solid #D7DBDD;
   background-image: linear-gradient(-180deg, #323A49 0%, #3E485C 100%);
 
   nav {

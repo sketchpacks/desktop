@@ -15,7 +15,7 @@ class UpdatedPluginsContainer extends Component {
     if (plugins.length === 0) return (
       <div className="empty-state--expanded">
         <h4>No updates found</h4>
-        <p>All your plugins are up to date</p>
+        <p>Available plugin updates are listed here. 🔒 a plugin to prevent future updates from being applied.</p>
       </div>
     )
 

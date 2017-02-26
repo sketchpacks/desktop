@@ -62,7 +62,7 @@ class SearchBar extends Component {
         <SVGIcon
           icon={'search'}
           shape={'path'}
-          fill={__ELECTRON__ ? '#ffffff' : '#000000'}
+          fill={'#B1B4BA'}
         />
       </div>
     )

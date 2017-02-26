@@ -10,7 +10,7 @@ $sidebar-width: 140px;
   width: $sidebar-width;
   max-width: $sidebar-width;
   border-right: 1px solid #D7DBDD;
-  background-color: #323A49;
+  background-image: linear-gradient(-180deg, #323A49 0%, #3E485C 100%);
 
   nav {
     padding-top: 1.6rem;

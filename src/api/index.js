@@ -1,19 +1,25 @@
 import {
   API_URL
 } from 'config'
+const DEFAULT_TIMEOUT = 1500
 
 import axios from 'axios'
 import linkHeader from 'parse-link-header'
 import qs from 'qs'
 
+
 const client = axios.create({
   baseURL: `${API_URL}/v1`,
-  timeout: 1500,
+  timeout: DEFAULT_TIMEOUT,
 })
 
 class Sketchpacks {
   getUser ({userId}) {
     return client.get(`/users/${userId}`)
+  }
+
+  getUserPlugins (endpoint) {
+    return axios.request({ url: endpoint, method: 'get', timeout: DEFAULT_TIMEOUT })
   }
 
   getPlugin ({userId, pluginId}) {

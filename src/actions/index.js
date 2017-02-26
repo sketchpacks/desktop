@@ -133,23 +133,6 @@ export function recommendsReceived (payload) {
 }
 
 
-export const AUTHOR_PROFILE_REQUEST = 'author/PROFILE_REQUEST'
-
-export function authorProfileRequest () {
-  return {
-    type: AUTHOR_PROFILE_REQUEST
-  }
-}
-
-export const AUTHOR_PROFILE_RECEIVED = 'author/PROFILE_RECEIVED'
-
-export function authorProfileReceived (payload) {
-  return {
-    type: AUTHOR_PROFILE_RECEIVED,
-    payload
-  }
-}
-
 
 //
 // CATALOG
@@ -303,5 +286,68 @@ export function fetchLibraryError (error) {
   return {
     type: FETCH_LIBRARY_ERROR,
     error
+  }
+}
+
+//
+// USER
+//
+
+export function fetchUser (user) {
+  return (dispatch, getState, {api}) => {
+    dispatch(fetchUserRequest(user))
+
+    api.getUser({userId: user})
+      .then(response => {
+        dispatch(fetchUserReceived(response.data))
+        dispatch(fetchUserPlugins(response.data.plugins_url))
+      })
+      .catch(error => dispatch(fetchUserError(error)))
+  }
+}
+
+export const FETCH_USER_REQUEST = 'user/FETCH_REQUEST'
+
+export function fetchUserRequest (user) {
+  return {
+    type: FETCH_USER_REQUEST,
+    payload: user
+  }
+}
+
+export const FETCH_USER_RECEIVED = 'user/FETCH_RECEIVED'
+
+export function fetchUserReceived (user) {
+  return {
+    type: FETCH_USER_RECEIVED,
+    payload: user
+  }
+}
+
+export const FETCH_USER_PLUGINS_RECEIVED = 'user/FETCH_PLUGINS_RECEIVED'
+
+export function fetchUserPluginsReceived (plugins) {
+  return {
+    type: FETCH_USER_PLUGINS_RECEIVED,
+    payload: plugins
+  }
+}
+
+export const FETCH_USER_PLUGINS_ERROR = 'user/FETCH_PLUGINS_ERROR'
+
+export function fetchUserError (error) {
+  return {
+    type: FETCH_USER_PLUGINS_ERROR,
+    error
+  }
+}
+
+export function fetchUserPlugins (endpoint) {
+  return (dispatch, getState, {api}) => {
+    api.getUserPlugins(endpoint)
+      .then(response => {
+        dispatch(fetchUserPluginsReceived(response.data))
+      })
+      .catch(error => dispatch(fetchUserPluginsError(error)))
   }
 }

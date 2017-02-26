@@ -24,6 +24,7 @@ class BrowsePluginsContainer extends Component {
       page: 1,
       append: false,
       sort: this.props.location.query.sort,
+      text: this.props.location.query.q,
     })
   }
 
@@ -34,12 +35,12 @@ class BrowsePluginsContainer extends Component {
       this.fetchData({
         page: 1,
         sort: nextProps.location.query.sort,
-        append: false,
+        append: false
       })
     }
   }
 
-  fetchData ({ sort, page, append }) {
+  fetchData ({ sort, page, append, q }) {
     const {dispatch,plugins} = this.props
 
     if (plugins.isLoading === true) return
@@ -48,6 +49,7 @@ class BrowsePluginsContainer extends Component {
       page: page || parseInt(plugins.nextPage),
       per_page: 10,
       sort: sort || plugins.sort,
+      text: '' || q
     })
 
     dispatch(fetchCatalog(queryParams, append))
@@ -57,7 +59,9 @@ class BrowsePluginsContainer extends Component {
     return (
       <div className="container">
         <div className="row">
-          <h4>Fetching more plugins...</h4>
+          <div className="column">
+            <h4>Fetching more plugins...</h4>
+          </div>
         </div>
       </div>
     )
@@ -68,12 +72,19 @@ class BrowsePluginsContainer extends Component {
 
     return (
       <div style={{position: 'relative'}}>
-        <PluginList
-          plugins={plugins}
-        />
+        <div className="container">
+          <div className="row">
+            <div className="column column__content">
+              <PluginList
+                plugins={plugins}
+              />
+            </div>
+          </div>
+        </div>
+
 
         { plugins.isLoading
-            && this.renderLoading() }
+          && this.renderLoading() }
 
         { !plugins.isLoading
           && plugins.items.length > 0

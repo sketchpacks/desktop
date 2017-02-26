@@ -2,13 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-import {SketchpacksApi} from 'api'
-
 import {
-  pluginsRequest,
-  pluginsReceived,
-  authorProfileRequest,
-  authorProfileReceived
+  fetchUser
 } from 'actions'
 
 import Nameplate from 'components/Nameplate'
@@ -19,20 +14,8 @@ class UserProfileContainer extends Component {
   componentDidMount () {
     const { dispatch } = this.props
     const { owner } = this.props.params
-    const AUTHOR_PROFILE_URL = `https://sketchpacks-api.herokuapp.com/v1/users/${owner}`
-    const opts = {
-      method: 'GET',
-      uri: AUTHOR_PROFILE_URL
-    }
 
-    // Get author details
-    dispatch(authorProfileRequest())
-    dispatch(pluginsRequest())
-    SketchpacksApi.getUser({userId: owner})
-      .then((response) => {
-        dispatch(authorProfileReceived(response.data))
-        dispatch(pluginsReceived(response.data.plugins))
-      })
+    dispatch(fetchUser(owner))
   }
 
   render () {
@@ -81,11 +64,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins, authorDetails } = state
+  const { authorDetails } = state
 
   return {
-    authorDetails,
-    plugins
+    authorDetails
   }
 }
 

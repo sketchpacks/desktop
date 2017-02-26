@@ -38,7 +38,14 @@ $sidebar-width: 14.0rem;
   &--active {
     border-left: 0.4rem solid #5F7DC9;
     color: #ffffff;
-    background-color: rgba(#ffffff,0.02);
+    background-color: rgba(#000000,0.05);
+  }
+
+  .badge {
+    // Quick fix to align badges within the menu bar
+    float: right;
+    top: 0.1rem;
+    position: relative;
   }
 }
 

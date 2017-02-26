@@ -155,7 +155,7 @@ export function authorProfileReceived (payload) {
 // CATALOG
 //
 
-export function fetchCatalog (query) {
+export function fetchCatalog (query, append=true) {
   return (dispatch, getState, {api}) => {
     dispatch(fetchCatalogRequest(query))
 
@@ -167,7 +167,7 @@ export function fetchCatalog (query) {
 
         dispatch(fetchCatalogReceived({
           payload: response.data,
-          append: true
+          append: append
         }))
       })
       .catch(error => dispatch(fetchCatalogError(error)))

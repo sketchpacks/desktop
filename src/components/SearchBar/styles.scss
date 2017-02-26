@@ -1,58 +1,32 @@
-$placeholder-color: rgba(#A6A9AC, 1.0);
+$placeholder-color: rgba(#5F7DC9,0.40);
 
 .searchBar__container {
   position: relative;
 
   svg {
     position: absolute;
-    right: 1.2rem;
+    left: 0.6rem;
     top: 50%;
-    margin-top: -0.9rem;
+    margin-top: -1rem;
+    fill: rgba(50,58,73,0.60);
   }
 }
 
-
 input.searchBar {
-  border-radius: 5rem;
   width: 20rem;
   outline: none;
-  background-color: rgba(#ffffff, 1.0);
-  border: 2px solid #DDE0E4;
-  color: #5F7DC9;
-  padding-left: 2rem;
-  padding-right: 3.2rem;
+  border: 0;
+  border-radius: 3px;
+  background: rgba(52,60,76,0.03);
+  color: #323A49;
+  padding-left: 3.2rem;
+  padding-right: 1.2rem;
   height: 3.2rem;
   margin: auto 0;
 
-  &--app {
-    background-color: rgba(#000000, 0.1);
-    color: #ffffff;
-    border: 0;
-
-    svg {
-      fill: #ffffff;
-    }
+  &:focus {
+    border-color: $placeholder-color;
   }
-
-  &::-webkit-input-placeholder {
-    color: $placeholder-color;
-  }
-
-  &:-moz-placeholder {
-    color: $placeholder-color;
-  }
-
-  &::-moz-placeholder {
-    color: $placeholder-color;
-  }
-
-  &:-ms-input-placeholder {
-    color: $placeholder-color;
-  }
-}
-
-.registry input.searchBar {
-  $placeholder-color: rgba(#000000,0.2);
 
   &::-webkit-input-placeholder {
     color: $placeholder-color;

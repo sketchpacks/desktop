@@ -1,47 +1,7 @@
+import linkHeader from 'parse-link-header'
+import qs from 'qs'
+
 export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE'
-
-export const LOGIN_REQUEST = 'LOGIN_REQUEST'
-
-export function loginRequest () {
-  return {
-    type: LOGIN_REQUEST
-  }
-}
-
-
-export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
-
-export function loginSuccess (jwt) {
-  return {
-    type: LOGIN_SUCCESS,
-    token: jwt
-  }
-}
-
-
-export const LOGIN_FAIL = 'LOGIN_FAIL'
-
-export function loginFail () {
-  return {
-    type: LOGIN_FAIL
-  }
-}
-
-export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
-
-export function logoutSuccess () {
-  return {
-    type: LOGOUT_SUCCESS
-  }
-}
-
-export const LOGOUT_REQUEST = 'LOGOUT_REQUEST'
-
-export function logoutRequest () {
-  return (dispatch, getState) => {
-    dispatch(logoutSuccess())
-  }
-}
 
 export const PLUGINS_SORT_BY = 'plugins/SORT_BY'
 
@@ -191,23 +151,133 @@ export function authorProfileReceived (payload) {
 }
 
 
-export const SEARCH = 'plugins/SEARCH'
+//
+// CATALOG
+//
 
-export function search (payload) {
+export function fetchCatalog (query, append=true) {
+  return (dispatch, getState, {api}) => {
+    dispatch(fetchCatalogRequest({payload: query, append: append}))
+
+    api.getCatalog({query: query})
+      .then(response => {
+        const pageMeta = linkHeader(response.headers.link)
+
+        if (pageMeta) dispatch(catalogPaginate(pageMeta))
+
+        dispatch(fetchCatalogReceived({
+          payload: response.data,
+          append: append
+        }))
+      })
+      .catch(error => dispatch(fetchCatalogError(error)))
+  }
+}
+
+export const FETCH_CATALOG_REQUEST = 'catalog/FETCH_REQUEST'
+
+export function fetchCatalogRequest ({payload, append}) {
+  return (dispatch, getState) => {
+    const {sort} = qs.parse(payload)
+    dispatch(catalogSortBy(sort))
+
+    return {
+      type: FETCH_CATALOG_REQUEST,
+      payload,
+      append
+    }
+  }
+}
+
+export const FETCH_CATALOG_RECEIVED = 'catalog/FETCH_RECEIVED'
+
+export function fetchCatalogReceived ({payload, append}) {
   return {
-    type: SEARCH,
+    type: FETCH_CATALOG_RECEIVED,
+    payload: payload,
+    append
+  }
+}
+
+export const FETCH_CATALOG_ERROR = 'catalog/FETCH_ERROR'
+
+export function fetchCatalogError (error) {
+  return {
+    type: FETCH_CATALOG_ERROR,
+    error
+  }
+}
+
+export const CATALOG_PAGINATE = 'catalog/PAGINATE'
+
+export function catalogPaginate (payload) {
+  return {
+    type: CATALOG_PAGINATE,
+    payload: payload
+  }
+}
+
+export const CATALOG_SORT_BY = 'catalog/SORT_BY'
+
+export function catalogSortBy (sort) {
+  return {
+    type: CATALOG_SORT_BY,
+    sort
+  }
+}
+
+
+//
+// SEARCH
+//
+
+export function fetchSearch (keyword) {
+  return (dispatch, getState, {api}) => {
+    dispatch(fetchSearchRequest(keyword))
+
+    api.getCatalog({query: `text=${keyword}`})
+      .then(response => {
+        const pageMeta = linkHeader(response.headers.link)
+
+        if (pageMeta) dispatch(pluginsPaginate(pageMeta))
+
+        dispatch(fetchSearchReceived(response.data))
+      })
+      .catch(error => dispatch(fetchSearchError(error)))
+  }
+}
+
+export const FETCH_SEARCH_REQUEST = 'search/FETCH_REQUEST'
+
+export function fetchSearchRequest (payload) {
+  return {
+    type: FETCH_SEARCH_REQUEST,
     payload
   }
 }
 
-export const SEARCH_RESULTS_RECEIVED = 'plugins/SEARCH_RESULTS_RECEIVED'
+export const FETCH_SEARCH_RECEIVED = 'search/FETCH_RECEIVED'
 
-export function searchResultsReceived (payload) {
+export function fetchSearchReceived (payload) {
   return {
-    type: SEARCH_RESULTS_RECEIVED,
+    type: FETCH_SEARCH_RECEIVED,
     payload: payload
   }
 }
+
+export const FETCH_SEARCH_ERROR = 'search/FETCH_ERROR'
+
+export function fetchSearchError (error) {
+  return {
+    type: FETCH_SEARCH_ERROR,
+    error
+  }
+}
+
+
+//
+// LIBRARY
+//
 
 export const FETCH_LIBRARY_REQUEST = 'library/FETCH_REQUEST'
 

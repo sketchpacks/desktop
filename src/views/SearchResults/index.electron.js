@@ -15,7 +15,7 @@ class SearchResultsContainer extends Component {
           <div className="row">
             <div className="column">
               <h3 className="page-title">
-                Showing { plugins.length } results for { keyword }
+                Showing { plugins.items.length } results for { keyword }
               </h3>
             </div>
           </div>
@@ -36,10 +36,11 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { keyword } = state.search
+  const {search} = state
+  
   return {
-    keyword,
-    plugins: getSearchResults(state),
+    keyword: search.keyword,
+    plugins: search,
   }
 }
 

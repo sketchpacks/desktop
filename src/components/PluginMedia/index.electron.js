@@ -6,17 +6,19 @@ import {
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router'
+
+import LazyLoad from 'react-lazyload'
 
 import PluginManagerHOC from 'hoc/Manager'
+import {sanitizeSemVer} from 'lib/utils'
 
-import { Link } from 'react-router'
 
 import Nameplate from 'components/Nameplate'
 import InstallButton from 'components/InstallButton'
 import UpdateButton from 'components/UpdateButton'
 import PluginMetric from 'components/PluginMetric'
 
-import {sanitizeSemVer} from 'lib/utils'
 
 import {
   toggleVersionLockRequest
@@ -59,7 +61,9 @@ class PluginMedia extends Component {
     return (
       <div className="o-media__right u-mar-left-large">
         <div className="o-plugin__thumbnail">
-          <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
+          <LazyLoad height={120} offset={400} overflow once>
+            <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
+          </LazyLoad>
         </div>
       </div>
     )
@@ -101,6 +105,7 @@ class PluginMedia extends Component {
   }
 
   renderButton () {
+
     const {location} = this.props.state.app
 
     return (location === '/library/updates')

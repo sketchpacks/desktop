@@ -4,76 +4,53 @@ import { browserHistory } from 'react-router'
 
 import Waypoint from 'react-waypoint'
 import qs from 'qs'
-import linkHeader from 'parse-link-header'
 import {SketchpacksApi} from 'api'
 
 import PluginList from 'components/PluginList'
 
 import {
-  fetchPluginsReceived,
-  pluginsRequest,
-  pluginsReceived,
-  pluginsPaginate,
-  pluginsSortBy
+  fetchCatalog
 } from 'actions'
 
 class BrowsePluginsContainer extends Component {
   constructor (props) {
     super(props)
 
-    this.state = {
-      loading: false,
-    }
-
     this.fetchData = this.fetchData.bind(this)
   }
 
   componentDidMount () {
-    const { page, q, sort } = this.props.location.query
+    this.fetchData({
+      page: 1,
+      append: false,
+      sort: this.props.location.query.sort,
+    })
+  }
 
-    if (this.props.plugins.length === 0) {
-      this.fetchData({page: page || 1, q: q, sort: sort})
+  componentWillReceiveProps (nextProps) {
+    if (this.props.plugins.isLoading === true) return
+
+    if (this.props.location.query.sort !== nextProps.location.query.sort) {
+      this.fetchData({
+        page: 1,
+        sort: nextProps.location.query.sort,
+        append: false,
+      })
     }
   }
 
-  componentWillReceiveProps () {
-    this.setState({ loading: false })
-  }
+  fetchData ({ sort, page, append }) {
+    const {dispatch,plugins} = this.props
 
-  fetchData ({page, q, sort}) {
-    const {dispatch,plugins,search} = this.props
-    const {query} = this.props.location
-    if (this.state.loading) return
-    if (parseInt(plugins.nextPage) === 1
-        && parseInt(plugins.nextPage) >= parseInt(plugins.lastPage)
-        && plugins.items.length > 0) return
+    if (plugins.isLoading === true) return
 
-    this.setState({ loading: true })
-
-    const apiQuery = qs.stringify({
-      ...query,
-      sort: sort || plugins.sort_by,
-      per_page: 15,
-      page: page || plugins.nextPage,
-      text: q || search.keyword,
+    const queryParams = qs.stringify({
+      page: page || parseInt(plugins.nextPage),
+      per_page: 10,
+      sort: sort || plugins.sort,
     })
 
-    const browserQuery = qs.stringify({
-      ...query,
-      page: page,
-      q: q || search.keyword,
-      sort: sort || plugins.sort_by,
-    })
-
-    SketchpacksApi.getCatalog({query: apiQuery})
-      .then(response => {
-        const pageMeta = linkHeader(response.headers.link)
-        if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
-
-        dispatch(fetchPluginsReceived(response.data))
-        browserHistory.push(`/browse?${browserQuery}`)
-        this.setState({ loading: false })
-      })
+    dispatch(fetchCatalog(queryParams, append))
   }
 
   renderLoading () {
@@ -95,11 +72,15 @@ class BrowsePluginsContainer extends Component {
           plugins={plugins}
         />
 
-        { this.state.loading
-          && this.renderLoading() }
+        { plugins.isLoading
+            && this.renderLoading() }
 
-        { !this.state.loading
-          && <Waypoint onEnter={this.fetchData} /> }
+        { !plugins.isLoading
+          && plugins.items.length > 0
+          && parseInt(plugins.nextPage) !== 1
+          && parseInt(plugins.lastPage) >= parseInt(plugins.nextPage)
+          && <Waypoint
+              onEnter={() => this.fetchData({ sort: plugins.sort })} /> }
       </div>
     )
   }
@@ -112,10 +93,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins,search } = state
+  const { catalog,search } = state
 
   return {
-    plugins,
+    plugins: catalog,
     search
   }
 }

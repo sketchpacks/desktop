@@ -23,20 +23,20 @@ class App extends Component {
     return (
 
       <div className="app">
-        <header className="app__header">
-          <SVGIcon
-            icon={'brand'}
-            shape={'path'}
-            size={'3.2rem'}
-            viewBox={'0 0 48 48'}
-            fill={'#FFFFFF'}
-          />
-
-          <SearchBar {...this.props} classNames={'searchBar searchBar--app'} />
-        </header>
+        <SideBarMenu updatesCount={availableUpdates} />
 
         <div className="app__body">
-          <SideBarMenu updatesCount={availableUpdates} />
+          <header className="app__header">
+            <SVGIcon
+              icon={'brand'}
+              shape={'path'}
+              size={'3.2rem'}
+              viewBox={'0 0 48 48'}
+              fill={'#FFFFFF'}
+            />
+
+            <SearchBar {...this.props} classNames={'searchBar'} />
+          </header>
 
           <div className="app__viewport">
             { this.props.children }

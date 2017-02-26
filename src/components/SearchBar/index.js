@@ -17,8 +17,10 @@ import {
   pluginsRequest,
   pluginsReceived,
   pluginsPaginate,
-  search,
-  searchResultsReceived
+  fetchSearchRequest,
+  fetchSearchReceived,
+  fetchSearchError,
+  fetchSearch
 } from 'actions'
 
 import './styles.scss'
@@ -32,24 +34,9 @@ class SearchBar extends Component {
   }
 
   fetchPage = ({page = 1, text, sort = 'created_at'}) => {
-    const { dispatch } = this.props
-    const { query } = this.props.location
-
-    const sort_by = sort || this.props.plugins.sort_by
-
-    const apiQuery = qs.stringify({...query, page: page, text: text, sort: `${sort_by}:desc`, per_page: 10})
-    const browserQuery = qs.stringify({...query, q: text, page: page})
-
-    dispatch(pluginsRequest())
-
-    SketchpacksApi.getCatalog({query: apiQuery})
-      .then(response => {
-        const pageMeta = linkHeader(response.headers.link)
-        if (pageMeta) { dispatch(pluginsPaginate(pageMeta)) }
-
-        dispatch(pluginsReceived(response.data))
-        browserHistory.push(`/browse?${browserQuery}`)
-      })
+    const {dispatch} = this.props
+    dispatch(fetchSearch(text))
+    browserHistory.push(`/search?q=${text}`)
   }
 
   handleEnterKey (e) {
@@ -60,7 +47,6 @@ class SearchBar extends Component {
     const {dispatch} = this.props
     const keyword = e.target.value
 
-    dispatch(search(keyword))
     this.fetchPage({ text: keyword })
   }
 
@@ -76,7 +62,7 @@ class SearchBar extends Component {
         <SVGIcon
           icon={'search'}
           shape={'path'}
-          fill={__ELECTRON__ ? '#ffffff' : '#000000'}
+          fill={'#B1B4BA'}
         />
       </div>
     )

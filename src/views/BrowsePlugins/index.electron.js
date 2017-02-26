@@ -9,7 +9,6 @@ import {SketchpacksApi} from 'api'
 import PluginList from 'components/PluginList'
 
 import {
-  fetchPluginsReceived,
   fetchCatalog
 } from 'actions'
 
@@ -17,58 +16,41 @@ class BrowsePluginsContainer extends Component {
   constructor (props) {
     super(props)
 
-    this.state = {
-      loading: false,
-    }
-
     this.fetchData = this.fetchData.bind(this)
   }
 
   componentDidMount () {
-    const { page, q, sort } = this.props.location.query
+    this.fetchData({
+      page: 1,
+      append: false,
+      sort: this.props.location.query.sort,
+    })
+  }
 
-    if (this.props.plugins.items.length === 0 && !this.state.loading) {
+  componentWillReceiveProps (nextProps) {
+    if (this.props.plugins.isLoading === true) return
+
+    if (this.props.location.query.sort !== nextProps.location.query.sort) {
       this.fetchData({
-        page: page || 1,
-        q: q,
-        sort: sort
+        page: 1,
+        sort: nextProps.location.query.sort,
+        append: false,
       })
     }
   }
 
-  componentWillReceiveProps () {
-    this.setState({ loading: false })
-  }
+  fetchData ({ sort, page, append }) {
+    const {dispatch,plugins} = this.props
 
-  fetchData ({page, q, sort}) {
-    const {dispatch,plugins,search} = this.props
-    const {query} = this.props.location
-    if (this.state.loading) return
-    if (parseInt(plugins.nextPage) === 1
-        && parseInt(plugins.nextPage) >= parseInt(plugins.lastPage)
-        && plugins.items.length > 0) return
+    if (plugins.isLoading === true) return
 
-    this.setState({ loading: true })
-
-    const apiQuery = qs.stringify({
-      ...query,
-      sort: sort || plugins.sort_by,
-      page: page || plugins.nextPage,
-      per_page: 15,
-      text: q || search.keyword,
+    const queryParams = qs.stringify({
+      page: page || parseInt(plugins.nextPage),
+      per_page: 10,
+      sort: sort || plugins.sort,
     })
 
-    const browserQuery = qs.stringify({
-      ...query,
-      q: q || search.keyword,
-      page: page,
-      per_page: 15,
-      sort: sort || plugins.sort_by,
-    })
-
-    dispatch(fetchCatalog(apiQuery))
-    browserHistory.push(`${this.props.location.pathname}?${browserQuery}`)
-    this.setState({ loading: false })
+    dispatch(fetchCatalog(queryParams, append))
   }
 
   renderLoading () {
@@ -90,12 +72,15 @@ class BrowsePluginsContainer extends Component {
           plugins={plugins}
         />
 
-        { this.state.loading
-          && this.renderLoading() }
+        { plugins.isLoading
+            && this.renderLoading() }
 
-        { !this.state.loading
+        { !plugins.isLoading
           && plugins.items.length > 0
-          && <Waypoint onEnter={this.fetchData} /> }
+          && parseInt(plugins.nextPage) !== 1
+          && parseInt(plugins.lastPage) >= parseInt(plugins.nextPage)
+          && <Waypoint
+              onEnter={() => this.fetchData({ sort: plugins.sort })} /> }
       </div>
     )
   }

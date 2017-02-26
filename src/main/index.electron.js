@@ -66,6 +66,7 @@ export const render = () => {
           <Route path="browse" component={BrowsePlugins} />
           <Route path="browse/popular" component={BrowsePlugins} />
           <Route path="browse/newest" component={BrowsePlugins} />
+          <Route path="browse/name" component={BrowsePlugins} />
 
           <Route path="search" component={SearchResults} />
 

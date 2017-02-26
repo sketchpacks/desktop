@@ -7,7 +7,7 @@ const initialListState = {
   isLoading: false,
   nextPage: 1,
   lastPage: 1,
-  sort_by: 'score:desc',
+  sort: 'score:desc',
 }
 
 
@@ -18,99 +18,19 @@ const updateObjectInArray = (array, action) => {
   )
 }
 
-function plugins (state = initialListState, action) {
-  switch (action.type) {
-    case actions.PLUGINS_REQUEST:
-      return {
-        ...state,
-        items: [],
-        isLoading: true
-      }
-
-    case actions.PLUGINS_RECEIVED:
-      return {
-        ...state,
-        items: action.payload,
-        isLoading: false
-      }
-
-    case actions.PLUGINS_FETCH_RECEIVED:
-      return {
-        ...state,
-        items: state.items.concat(action.payload),
-        isLoading: false
-      }
-
-    case 'manager/UNINSTALL_SUCCESS':
-      return {
-        ...state,
-        items: updateObjectInArray(state.items, action)
-      }
-
-    case 'manager/INSTALL_SUCCESS':
-      return {
-        ...state,
-        items: updateObjectInArray(state.items, action)
-      }
-
-    case actions.PLUGINS_ERROR:
-      return {
-        ...state,
-        isLoading: false
-      }
-
-    case actions.PLUGINS_SORT_BY:
-      return {
-        ...state,
-        sort_by: action.sort
-      }
-
-    case actions.PLUGINS_PAGINATE:
-      const defaults = {
-        firstPage: 1,
-        lastPage: 1,
-        nextPage: 1,
-        prevPage: 1,
-      }
-
-      const pageInfo = {...defaults}
-
-      if ('payload' in action) {
-        const { payload } = action
-        pageInfo.firstPage = ('first' in payload) ? payload.first.page : 1,
-        pageInfo.lastPage = ('last' in payload) ? payload.last.page : 1
-        pageInfo.nextPage = ('next' in payload) ? payload.next.page : 1
-        pageInfo.prevPage = ('prev' in payload) ? payload.prev.page : 1
-      }
-      else {
-        return {
-          ...state,
-          ...defaults
-        }
-      }
-
-      return {
-        ...state,
-        ...pageInfo
-      }
-
-    default:
-      return state
-  }
-}
-
 function catalog (state = initialListState, action) {
   switch (action.type) {
     case actions.FETCH_CATALOG_REQUEST:
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
+        items: action.append ? state.items : []
       }
 
     case actions.FETCH_CATALOG_RECEIVED:
       return {
         ...state,
-        items: (action.append) ? state.items.concat(action.payload) : action.payload,
+        items: action.append ? state.items.concat(action.payload) : action.payload,
         isLoading: false
       }
 
@@ -123,7 +43,7 @@ function catalog (state = initialListState, action) {
     case actions.CATALOG_SORT_BY:
       return {
         ...state,
-        sort_by: action.sort
+        sort: action.sort
       }
 
     case actions.CATALOG_PAGINATE:
@@ -382,7 +302,6 @@ function search (state = {...initialListState, keyword: ''}, action) {
 
 const rootReducer = combineReducers({
   routing: routerReducer,
-  plugins,
   catalog,
   library,
   pluginDetails,

@@ -1,5 +1,5 @@
 import linkHeader from 'parse-link-header'
-
+import qs from 'qs'
 
 export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE'
 
@@ -157,7 +157,7 @@ export function authorProfileReceived (payload) {
 
 export function fetchCatalog (query, append=true) {
   return (dispatch, getState, {api}) => {
-    dispatch(fetchCatalogRequest(query))
+    dispatch(fetchCatalogRequest({payload: query, append: append}))
 
     api.getCatalog({query: query})
       .then(response => {
@@ -176,10 +176,16 @@ export function fetchCatalog (query, append=true) {
 
 export const FETCH_CATALOG_REQUEST = 'catalog/FETCH_REQUEST'
 
-export function fetchCatalogRequest (payload) {
-  return {
-    type: FETCH_CATALOG_REQUEST,
-    payload
+export function fetchCatalogRequest ({payload, append}) {
+  return (dispatch, getState) => {
+    const {sort} = qs.parse(payload)
+    dispatch(catalogSortBy(sort))
+
+    return {
+      type: FETCH_CATALOG_REQUEST,
+      payload,
+      append
+    }
   }
 }
 

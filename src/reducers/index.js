@@ -24,26 +24,26 @@ function catalog (state = initialListState, action) {
       return {
         ...state,
         isLoading: true,
-        items: action.append ? state.items : []
+        items: action.append ? state.items : [],
       }
 
     case actions.FETCH_CATALOG_RECEIVED:
       return {
         ...state,
+        isLoading: false,
         items: action.append ? state.items.concat(action.payload) : action.payload,
-        isLoading: false
       }
 
     case actions.FETCH_CATALOG_ERROR:
       return {
         ...state,
-        isLoading: false
+        isLoading: false,
       }
 
     case actions.CATALOG_SORT_BY:
       return {
         ...state,
-        sort: action.sort
+        sort: action.sort,
       }
 
     case actions.CATALOG_PAGINATE:
@@ -58,7 +58,7 @@ function catalog (state = initialListState, action) {
 
       if ('payload' in action) {
         const { payload } = action
-        pageInfo.firstPage = ('first' in payload) ? payload.first.page : 1,
+        pageInfo.firstPage = ('first' in payload) ? payload.first.page : 1
         pageInfo.lastPage = ('last' in payload) ? payload.last.page : 1
         pageInfo.nextPage = ('next' in payload) ? payload.next.page : 1
         pageInfo.prevPage = ('prev' in payload) ? payload.prev.page : 1
@@ -226,14 +226,15 @@ function app (state, action) {
 
 function authorDetails (state, action) {
   switch (action.type) {
-    case actions.AUTHOR_PROFILE_RECEIVED:
+    case actions.FETCH_USER_RECEIVED:
       return {
         ...state,
         name: action.payload.name,
         handle: action.payload.handle,
         email: action.payload.email,
-        avatar_url: action.payload.avatar_url
+        avatar_url: action.payload.avatar_url,
       }
+
     default:
       if (state === undefined) {
         return {
@@ -247,6 +248,45 @@ function authorDetails (state, action) {
       else {
         return state
       }
+  }
+}
+
+function authorPlugins (state = initialListState, action) {
+  switch (action.type) {
+    case actions.FETCH_USER_PLUGINS_REQUEST:
+      return {
+        ...state,
+        isLoading: true,
+        items: action.append ? state.items : []
+      }
+
+    case actions.FETCH_USER_PLUGINS_RECEIVED:
+      return {
+        ...state,
+        items: action.append ? state.items.concat(action.payload) : action.payload,
+        isLoading: false
+      }
+
+    case actions.FETCH_USER_PLUGINS_ERROR:
+      return {
+        ...state,
+        isLoading: false
+      }
+
+    case 'manager/UNINSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
+      }
+
+    case 'manager/INSTALL_SUCCESS':
+      return {
+        ...state,
+        items: updateObjectInArray(state.items, action)
+      }
+
+    default:
+      return state
   }
 }
 
@@ -307,6 +347,7 @@ const rootReducer = combineReducers({
   pluginDetails,
   app,
   authorDetails,
+  authorPlugins,
   search,
 })
 

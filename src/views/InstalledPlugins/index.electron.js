@@ -4,8 +4,6 @@ import { browserHistory } from 'react-router'
 
 import PluginList from 'components/PluginList'
 
-import { getInstalledPlugins } from 'selectors'
-
 class InstalledPluginsContainer extends Component {
   renderList () {
     const { plugins } = this.props

@@ -9,18 +9,18 @@ class SearchResultsContainer extends Component {
     const { plugins, keyword } = this.props
 
     return (
-      <div>
-        <div className="container">
-          <div className="row">
-            <div className="column">
-              <h3 className="page-title">
-                Showing { plugins.items.length } results for { keyword }
-              </h3>
-            </div>
+      <div className="container">
+        <div className="row">
+          <div className="column column__content">
+            <h5 className="page-title">
+              Showing { plugins.items.length } results for { keyword }
+            </h5>
+
+            <PluginList
+              plugins={plugins}
+            />
           </div>
         </div>
-
-        <PluginList plugins={plugins} />
       </div>
     )
   }

@@ -1,9 +1,16 @@
 import React from 'react'
 import Button from 'components/Button'
+
+import {map,includes} from 'lodash'
+
 import {
   installPluginRequest,
   uninstallPluginRequest
 } from 'actions/plugin_manager'
+
+const isInstalled = (state, pluginId) => {
+  return includes(map(state.library.items, 'id'), pluginId)
+}
 
 const Connect = ComposedComponent =>
   class extends React.Component {
@@ -13,20 +20,24 @@ const Connect = ComposedComponent =>
       this.handleClick = this.handleClick.bind(this)
 
       this.state = {
-        activity: props.plugin.installed ? 'installed' : 'idle'
+        activity: isInstalled(props.state, props.plugin.id)
+          ? 'installed'
+          : 'idle'
       }
     }
 
     handleClick () {
       const { dispatch, plugin } = this.props
 
-      if (!plugin.installed) {
-        dispatch(installPluginRequest(this.props.plugin))
+      const installed = isInstalled(this.props.state, plugin.id)
+
+      if (!installed) {
+        dispatch(installPluginRequest(plugin))
         this.setState({ activity: 'installing' })
       }
 
-      if (plugin.installed) {
-        dispatch(uninstallPluginRequest(this.props.plugin))
+      if (installed) {
+        dispatch(uninstallPluginRequest(plugin))
         this.setState({ activity: 'removing' })
       }
     }
@@ -34,7 +45,9 @@ const Connect = ComposedComponent =>
     componentWillReceiveProps (nextProps) {
       const { plugin } = nextProps
       this.setState({
-        activity: plugin.installed ? 'installed' : 'idle'
+        activity: isInstalled(nextProps.state, plugin.id)
+          ? 'installed'
+          : 'idle'
       })
     }
 

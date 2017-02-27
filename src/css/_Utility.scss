@@ -53,13 +53,17 @@
   justify-content: space-between;
 }
 
-.column__content {
-  padding-top: 3.2rem;
-  padding-bottom: 3.2rem;
+.column.column__content {
+  padding-top: getSize("large");
+  padding-bottom: getSize("large");
 }
 
 .is-visible { display: block; }
 
 .container--padded-top {
-  padding-top: 3.2rem
+  padding-top: getSize("large");
+}
+
+.container--padded-bottom {
+  padding-top: getSize("large");
 }

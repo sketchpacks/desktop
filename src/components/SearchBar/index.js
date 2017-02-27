@@ -33,7 +33,7 @@ class SearchBar extends Component {
     this.fetchPage = this.fetchPage.bind(this)
   }
 
-  fetchPage = ({page = 1, text, sort = 'created_at'}) => {
+  fetchPage = ({page = 1, text, sort = 'score'}) => {
     const {dispatch} = this.props
     dispatch(fetchSearch(text))
     browserHistory.push(`/search?q=${text}`)

@@ -4,16 +4,18 @@ import { connect } from 'react-redux'
 import PluginList from 'components/PluginList'
 
 class UserPluginsContainer extends Component {
-  render () {
-    const { plugins, authorDetails } = this.props
+  constructor (props) {
+    super(props)
+  }
 
+  render () {
     return (
       <div className="container">
         <div className="row">
-          <div className="column">
+          <div className="column column__content">
             <h4>Published Plugins</h4>
 
-            <PluginList plugins={plugins} authorDetails={authorDetails} />
+            <PluginList plugins={this.props.plugins} />
           </div>
         </div>
       </div>
@@ -28,11 +30,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { plugins, authorDetails } = state
+  const { authorPlugins } = state
 
   return {
-    plugins,
-    authorDetails
+    plugins: authorPlugins
   }
 }
 

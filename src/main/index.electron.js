@@ -72,16 +72,6 @@ export const render = () => {
 
           <Route path="library/installed" component={InstalledPlugins} />
           <Route path="library/updates" component={UpdatedPlugins} />
-
-
-          <Route path="@:owner" component={UserProfile}>
-            <IndexRedirect to="plugins" />
-            <Route path="recommends" component={UserRecommends} />
-            <Route path="plugins" component={UserPlugins} />
-          </Route>
-
-          <Route path=":owner/:id" component={PluginDetails} />
-
         </Route>
       </Router>
     </Provider>,

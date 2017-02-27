@@ -11,62 +11,17 @@ import SVGIcon from 'components/SVGIcon'
 import PluginMetric from 'components/PluginMetric'
 
 import {
-  pluginDetailsRequest,
-  pluginDetailsReceived,
-  pluginReadmeRequest,
-  pluginReadmeReceived,
-  authorProfileRequest,
-  authorProfileReceived
+  fetchUser,
+  fetchPluginDetails
 } from 'actions'
 
 class PluginDetailsContainer extends Component {
-  constructor (props) {
-    super(props)
-
-    this.fetchAuthorDetails = this.fetchAuthorDetails.bind(this)
-    this.fetchPluginDetails = this.fetchPluginDetails.bind(this)
-    this.fetchReadme = this.fetchReadme.bind(this)
-  }
-
-  fetchReadme () {
-    const { dispatch } = this.props
-    const { id } = this.props.pluginDetails
-
-    dispatch(pluginReadmeRequest())
-    SketchpacksApi.getPluginReadme({pluginId: id})
-      .then(response => {
-        dispatch(pluginReadmeReceived(response.data))
-      })
-  }
-
-  fetchPluginDetails () {
-    const { dispatch } = this.props
-    const { owner, id } = this.props.params
-    const self = this
-
-    dispatch(pluginDetailsRequest())
-    SketchpacksApi.getPlugin({userId: owner, pluginId: id})
-      .then(response => {
-        dispatch(pluginDetailsReceived(response.data))
-        self.fetchReadme()
-      })
-  }
-
-  fetchAuthorDetails () {
-    const { dispatch } = this.props
-    const { owner, id } = this.props.params
-    const self = this
-
-    dispatch(authorProfileRequest())
-    SketchpacksApi.getUser({userId: owner})
-      .then(response => {
-        dispatch(authorProfileReceived(response.data))
-        self.fetchPluginDetails()
-      })
-  }
-
   componentDidMount () {
-    this.fetchAuthorDetails()
+    const { dispatch } = this.props
+    const { owner, id } = this.props.params
+
+    dispatch(fetchUser(owner))
+    dispatch(fetchPluginDetails({ pluginId: id, userId: owner }))
   }
 
   render () {

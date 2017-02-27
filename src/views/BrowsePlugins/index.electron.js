@@ -24,6 +24,7 @@ class BrowsePluginsContainer extends Component {
       page: 1,
       append: false,
       sort: this.props.location.query.sort,
+      text: this.props.location.query.q,
     })
   }
 
@@ -34,12 +35,12 @@ class BrowsePluginsContainer extends Component {
       this.fetchData({
         page: 1,
         sort: nextProps.location.query.sort,
-        append: false,
+        append: false
       })
     }
   }
 
-  fetchData ({ sort, page, append }) {
+  fetchData ({ sort, page, append, q }) {
     const {dispatch,plugins} = this.props
 
     if (plugins.isLoading === true) return
@@ -48,6 +49,7 @@ class BrowsePluginsContainer extends Component {
       page: page || parseInt(plugins.nextPage),
       per_page: 10,
       sort: sort || plugins.sort,
+      text: '' || q
     })
 
     dispatch(fetchCatalog(queryParams, append))
@@ -73,7 +75,7 @@ class BrowsePluginsContainer extends Component {
         />
 
         { plugins.isLoading
-            && this.renderLoading() }
+          && this.renderLoading() }
 
         { !plugins.isLoading
           && plugins.items.length > 0

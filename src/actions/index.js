@@ -60,52 +60,6 @@ export function pluginsPaginate (payload) {
 }
 
 
-export const PLUGIN_DETAILS_REQUEST = 'PLUGIN_DETAILS_REQUEST'
-
-export function pluginDetailsRequest () {
-  return {
-    type: PLUGIN_DETAILS_REQUEST
-  }
-}
-
-export const PLUGIN_DETAILS_ERROR = 'PLUGIN_DETAILS_ERROR'
-
-export function pluginDetailsError () {
-  return {
-    type: PLUGIN_DETAILS_ERROR
-  }
-}
-
-
-export const PLUGIN_DETAILS_RECEIVED = 'PLUGIN_DETAILS_RECEIVED'
-
-export function pluginDetailsReceived (payload) {
-  return {
-    type: PLUGIN_DETAILS_RECEIVED,
-    payload: payload
-  }
-}
-
-
-export const PLUGIN_README_REQUEST = 'PLUGIN_README_REQUEST'
-
-export function pluginReadmeRequest () {
-  return {
-    type: PLUGIN_README_REQUEST
-  }
-}
-
-
-export const PLUGIN_README_RECEIVED = 'PLUGIN_README_RECEIVED'
-
-export function pluginReadmeReceived (payload) {
-  return {
-    type: PLUGIN_README_RECEIVED,
-    payload: payload
-  }
-}
-
-
 export const RECOMMENDS_REQUEST = 'RECOMMENDS_REQUEST'
 
 export function recommendsRequest () {
@@ -349,5 +303,92 @@ export function fetchUserPlugins (endpoint) {
         dispatch(fetchUserPluginsReceived(response.data))
       })
       .catch(error => dispatch(fetchUserPluginsError(error)))
+  }
+}
+
+
+//
+// PLUGIN DETAILS
+//
+
+export function fetchPluginDetails ({userId, pluginId}) {
+  return (dispatch, getState, {api}) => {
+    dispatch(fetchPluginDetailsRequest())
+
+    api.getPlugin({userId, pluginId})
+      .then(response => {
+
+        dispatch(fetchPluginDetailsReceived(response.data))
+        dispatch(fetchPluginReadme(response.data.readme_url))
+      })
+      .catch(error => dispatch(fetchPluginDetailsError(error)))
+  }
+}
+
+export const PLUGIN_DETAILS_REQUEST = 'plugins/FETCH_PLUGIN_DETAILS_REQUEST'
+
+export function fetchPluginDetailsRequest () {
+  return {
+    type: PLUGIN_DETAILS_REQUEST
+  }
+}
+
+export const PLUGIN_DETAILS_ERROR = 'plugins/FETCH_PLUGIN_DETAILS_ERROR'
+
+export function fetchPluginDetailsError (error) {
+  return {
+    type: PLUGIN_DETAILS_ERROR,
+    error
+  }
+}
+
+
+export const PLUGIN_DETAILS_RECEIVED = 'plugins/FETCH_PLUGIN_DETAILS_RECEIVED'
+
+export function fetchPluginDetailsReceived (payload) {
+  return {
+    type: PLUGIN_DETAILS_RECEIVED,
+    payload
+  }
+}
+
+export function fetchPluginReadme (endpoint) {
+  return (dispatch, getState, {api}) => {
+    dispatch(fetchPluginReadmeRequest())
+
+    api.getPluginReadme(endpoint)
+      .then(response => {
+
+        dispatch(fetchPluginReadmeReceived(response.data))
+      })
+      .catch(error => dispatch(fetchPluginReadmeError(error)))
+  }
+}
+
+
+export const PLUGIN_README_REQUEST = 'plugins/FETCH_PLUGIN_README_REQUEST'
+
+export function fetchPluginReadmeRequest () {
+  return {
+    type: PLUGIN_README_REQUEST
+  }
+}
+
+
+export const PLUGIN_README_RECEIVED = 'plugins/FETCH_PLUGIN_README_RECEIVED'
+
+export function fetchPluginReadmeReceived (payload) {
+  return {
+    type: PLUGIN_README_RECEIVED,
+    payload
+  }
+}
+
+export const PLUGIN_README_ERROR = 'plugins/FETCH_PLUGIN_README_ERROR'
+
+export function fetchPluginReadmeError (error) {
+  return {
+    type: PLUGIN_README_ERROR,
+    error
   }
 }

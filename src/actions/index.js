@@ -116,7 +116,7 @@ export const FETCH_CATALOG_REQUEST = 'catalog/FETCH_REQUEST'
 export function fetchCatalogRequest ({payload, append}) {
   return (dispatch, getState) => {
     const {sort} = qs.parse(payload)
-    dispatch(catalogSortBy(sort))
+    // dispatch(catalogSortBy(sort))
 
     return {
       type: FETCH_CATALOG_REQUEST,
@@ -157,9 +157,21 @@ export function catalogPaginate (payload) {
 export const CATALOG_SORT_BY = 'catalog/SORT_BY'
 
 export function catalogSortBy (sort) {
-  return {
-    type: CATALOG_SORT_BY,
-    sort
+  const queryParams = qs.stringify({
+    page: 1,
+    per_page: 10,
+    q: '',
+    sort: sort
+  })
+  
+  return (dispatch, getState, {api}) => {
+
+    dispatch(fetchCatalog(queryParams, false))
+
+    return {
+      type: CATALOG_SORT_BY,
+      sort
+    }
   }
 }
 
@@ -274,6 +286,15 @@ export const FETCH_USER_RECEIVED = 'user/FETCH_RECEIVED'
 export function fetchUserReceived (user) {
   return {
     type: FETCH_USER_RECEIVED,
+    payload: user
+  }
+}
+
+export const FETCH_USER_PLUGINS_REQUEST = 'user/FETCH_PLUGINS_REQUEST'
+
+export function fetchUserPluginsRequest (user) {
+  return {
+    type: FETCH_USER_PLUGINS_REQUEST,
     payload: user
   }
 }

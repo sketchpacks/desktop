@@ -9,7 +9,8 @@ import {SketchpacksApi} from 'api'
 import PluginList from 'components/PluginList'
 
 import {
-  fetchCatalog
+  fetchCatalog,
+  catalogSortBy
 } from 'actions'
 
 class BrowsePluginsContainer extends Component {
@@ -68,13 +69,38 @@ class BrowsePluginsContainer extends Component {
   }
 
   render () {
-    const {plugins} = this.props
+    const {plugins,dispatch} = this.props
 
     return (
       <div style={{position: 'relative'}}>
         <div className="container">
           <div className="row">
             <div className="column column__content">
+
+              <div className="button-group">
+                <button type="button" className="button-clear button--dropdown" onClick={() => {}}>
+                  <span>Sort:</span>
+                  <span>{plugins.sort.split(':')[0]}</span>
+                </button>
+                <ul className={"dropdown__menu is-visible"}>
+                  <li onClick={() => dispatch(catalogSortBy('score:desc'))}>
+                    <span>Most Popular</span>
+                  </li>
+                  <li onClick={() => dispatch(catalogSortBy('created_at:desc'))}>
+                    <span>Newest</span>
+                  </li>
+                  <li onClick={() => dispatch(catalogSortBy('updated_at:desc'))}>
+                    <span>Recently Updated</span>
+                  </li>
+                  <li onClick={() => dispatch(catalogSortBy('title:asc'))}>
+                    <span>Name</span>
+                  </li>
+                  <li onClick={() => dispatch(catalogSortBy('compatible_version:desc'))}>
+                    <span>Supported Sketch Version</span>
+                  </li>
+                </ul>
+              </div>
+
               <PluginList
                 plugins={plugins}
               />

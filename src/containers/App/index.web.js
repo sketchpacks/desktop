@@ -31,7 +31,7 @@ class App extends Component {
               <h3>Discover and manage Sketch plugins right from your menu bar</h3>
 
               <Link
-                to="https://sketchpacks-releases.herokuapp.com/download"
+                to="https://sketchpacks-releases.herokuapp.com/download/channel/beta"
                 className="button"
               >
                 Download Sketchpacks

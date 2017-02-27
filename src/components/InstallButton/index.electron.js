@@ -29,13 +29,15 @@ const Connect = ComposedComponent =>
     handleClick () {
       const { dispatch, plugin } = this.props
 
-      if (!plugin.installed) {
-        dispatch(installPluginRequest(this.props.plugin))
+      const installed = isInstalled(this.props.state, plugin.id)
+
+      if (!installed) {
+        dispatch(installPluginRequest(plugin))
         this.setState({ activity: 'installing' })
       }
 
-      if (plugin.installed) {
-        dispatch(uninstallPluginRequest(this.props.plugin))
+      if (installed) {
+        dispatch(uninstallPluginRequest(plugin))
         this.setState({ activity: 'removing' })
       }
     }

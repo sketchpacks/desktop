@@ -7,9 +7,9 @@ const sanitizeSemVer = (semver) => {
 
   const x = semver.split('.')
 
-  const major = x[0] || 0
-  const minor = x[1] || 0
-  const patch = x[2] || 0
+  const major = parseInt(x[0]) || 0
+  const minor = parseInt(x[1]) || 0
+  const patch = parseInt(x[2]) || 0
 
   return [major,minor,patch].join('.')
 }

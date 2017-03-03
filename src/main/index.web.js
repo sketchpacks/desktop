@@ -22,7 +22,7 @@ export const render = () => {
     <Provider store={store}>
       <Router history={browserHistory}>
         <Route path="/" component={App}>
-          <IndexRoute component={BrowsePlugins} />
+          <IndexRoute component={FrontPage} />
           <Route path="browse" component={BrowsePlugins} />
           <Route path="search" component={SearchResults} />
 

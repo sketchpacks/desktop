@@ -3,7 +3,7 @@ import LazyLoad from 'react-lazyload'
 
 const Avatar = ({ handle, width, height }) => (
   <div>
-    <LazyLoad height={height} offset={200} once>
+    <LazyLoad height={height} offset={200} unmountIfInvisible debounce={500}>
       <img className="image is-maker"
         src={`https://github.com/${handle}.png`}
         role="presentation"

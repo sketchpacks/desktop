@@ -2,14 +2,33 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
+import {map,includes} from 'lodash'
+
 import PluginList from 'components/PluginList'
+import ConnectedPluginList from 'hoc/ConnectedPluginList'
+const EnhancedPluginList = ConnectedPluginList(PluginList)
 
 class SearchResultsContainer extends Component {
+  constructor (props) {
+    super(props)
+  }
+
+  renderLoading () {
+    return (
+      <div className="container">
+        <div className="row">
+          <h4>Fetching installed plugins...</h4>
+        </div>
+      </div>
+    )
+  }
+
   render () {
-    const { plugins, keyword } = this.props
+    const {keyword,plugins} = this.props
 
     return (
-      <div>
+      <div style={{position: 'relative'}}>
+
         <div className="container">
           <div className="row">
             <div className="column">
@@ -20,7 +39,12 @@ class SearchResultsContainer extends Component {
           </div>
         </div>
 
-        <PluginList plugins={plugins} />
+        <EnhancedPluginList
+          plugins={plugins}
+          location={this.props.location}
+          installedPluginIds={map(this.props.library.items, 'id')}
+          dispatch={this.props.dispatch}
+        />
       </div>
     )
   }
@@ -33,11 +57,13 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const {search} = state
+  const {search,library} = state
 
   return {
-    keyword: search.keyword,
+    keyword: search.keyword || "",
     plugins: search,
+    library,
+    location: state.routing.locationBeforeTransitions,
   }
 }
 

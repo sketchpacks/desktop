@@ -1,6 +1,4 @@
-const { ipcRenderer, remote } = require('electron')
-const ms = require('ms')
-const notifier = require('node-notifier')
+const { ipcRenderer } = require('electron')
 
 const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
 

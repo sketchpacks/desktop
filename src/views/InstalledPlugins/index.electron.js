@@ -2,30 +2,38 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
+import {map,includes} from 'lodash'
+
 import PluginList from 'components/PluginList'
+import ConnectedPluginList from 'hoc/ConnectedPluginList'
+const EnhancedPluginList = ConnectedPluginList(PluginList)
 
 class InstalledPluginsContainer extends Component {
-  renderList () {
-    const { plugins } = this.props
+  constructor (props) {
+    super(props)
+  }
 
-    if (plugins.isLoading) return (<div>Loading plugins...</div>)
-
-    if (plugins.items.length === 0) return (
-      <div className="empty-state--expanded">
-        <h4>No installed plugins found</h4>
-        <p>Your installed plugins will be shown here</p>
+  renderLoading () {
+    return (
+      <div className="container">
+        <div className="row">
+          <h4>Fetching more plugins...</h4>
+        </div>
       </div>
     )
-
-    return (<PluginList plugins={plugins} />)
   }
 
   render () {
-    const { plugins } = this.props
+    const {plugins} = this.props
 
     return (
-      <div>
-        { this.renderList() }
+      <div style={{position: 'relative'}}>
+        <EnhancedPluginList
+          plugins={plugins}
+          location={this.props.location}
+          installedPluginIds={map(this.props.plugins.items, 'id')}
+          dispatch={this.props.dispatch}
+        />
       </div>
     )
   }
@@ -42,7 +50,8 @@ function mapStateToProps(state, ownProps) {
 
   return {
     state,
-    plugins: library
+    plugins: library,
+    location: state.routing.locationBeforeTransitions,
   }
 }
 

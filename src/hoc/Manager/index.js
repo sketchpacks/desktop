@@ -1,7 +1,9 @@
 import React from 'react'
 
 import {
-  toggleVersionLockRequest
+  installPluginRequest,
+  uninstallPluginRequest,
+  toggleVersionLockRequest,
 } from 'actions/plugin_manager'
 
 const PluginManagerHOC = ComposedComponent =>
@@ -18,12 +20,18 @@ const PluginManagerHOC = ComposedComponent =>
       dispatch(toggleVersionLockRequest(id,locked))
     }
 
+    componentWillReceiveProps (nextProps) {
+      console.log(nextProps)
+    }
+
     handlePluginEvent ({ type, plugin }) {
+      const {dispatch} = this.props
+
       switch (type) {
         case "install":
-          return console.log(type, plugin)
+          return dispatch(installPluginRequest(plugin))
         case "remove":
-          return console.log(type, plugin)
+          return dispatch(uninstallPluginRequest(plugin))
         case "update":
           return console.log(type, plugin)
         case "lock":
@@ -38,10 +46,9 @@ const PluginManagerHOC = ComposedComponent =>
     render () {
       return (
         <ComposedComponent
-          plugin={this.props.plugin}
-          state={this.props.state}
-          dispatch={this.props.dispatch}
-          handlePluginEvent={this.handlePluginEvent} />
+          {...this.props}
+          handlePluginEvent={this.handlePluginEvent}
+          dispatch={this.props.dispatch} />
       )
     }
   }

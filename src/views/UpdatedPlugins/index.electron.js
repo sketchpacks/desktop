@@ -2,32 +2,39 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
+import {map,includes} from 'lodash'
 import { getUpdatedPlugins } from 'selectors'
 
 import PluginList from 'components/PluginList'
+import ConnectedPluginList from 'hoc/ConnectedPluginList'
+const EnhancedPluginList = ConnectedPluginList(PluginList)
 
 class UpdatedPluginsContainer extends Component {
-  renderList () {
-    const { plugins } = this.props
+  constructor (props) {
+    super(props)
+  }
 
-    if (plugins.isLoading) return (<div>Loading plugins...</div>)
-
-    if (plugins.length === 0) return (
-      <div className="empty-state--expanded">
-        <h4>No updates found</h4>
-        <p>Available plugin updates are listed here. 🔒 a plugin to prevent future updates from being applied.</p>
+  renderLoading () {
+    return (
+      <div className="container">
+        <div className="row">
+          <h4>Fetching more plugins...</h4>
+        </div>
       </div>
     )
-
-    return (<PluginList plugins={plugins.items} />)
   }
 
   render () {
-    const { plugins } = this.props
+    const {plugins} = this.props
 
     return (
-      <div>
-        { this.renderList() }
+      <div style={{position: 'relative'}}>
+        <EnhancedPluginList
+          plugins={plugins}
+          location={this.props.location}
+          installedPluginIds={map(this.props.plugins.items, 'id')}
+          dispatch={this.props.dispatch}
+        />
       </div>
     )
   }
@@ -40,11 +47,10 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { library } = state
-
   return {
     state,
-    plugins: getUpdatedPlugins(state)
+    plugins: {items:getUpdatedPlugins(state)},
+    location: state.routing.locationBeforeTransitions,
   }
 }
 

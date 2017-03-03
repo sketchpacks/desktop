@@ -15,7 +15,20 @@
     "build": "NODE_ENV=production webpack -p --progress --profile --colors --config webpack.config.electron.prod.js",
     "pack": "npm run build && build --dir",
     "pack:dev": "npm run build && build --dir",
-    "dist": "npm run build && build"
+    "dist": "npm run build && build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "setupFiles": ["<rootDir>/jestsetup.js"],
+    "snapshotSerializers": [
+      "<rootDir>/node_modules/enzyme-to-json/serializer"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/__mocks__/fileMock.js",
+      "\\.(css|less)$": "<rootDir>/src/__mocks__/styleMock.js"
+    }
   },
   "author": "Adam Kirkwood <hello@adamkirkwood.com>",
   "license": "ISC",
@@ -37,6 +50,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.20.0",
+    "babel-jest": "^19.0.0",
     "babel-loader": "^6.2.10",
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",
     "babel-plugin-transform-runtime": "^6.15.0",
@@ -51,12 +65,16 @@
     "electron-builder": "^10.6.1",
     "electron-packager": "^8.4.0",
     "electron-prebuilt": "^1.4.11",
+    "enzyme": "^2.7.1",
+    "enzyme-to-json": "^1.5.0",
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^2.1.1",
     "extract-text-webpack-plugin": "^2.0.0-beta.4",
     "file-loader": "^0.10.0",
     "html-webpack-plugin": "^2.24.1",
+    "jest": "^19.0.2",
     "node-sass": "^4.1.1",
+    "react-addons-test-utils": "^15.4.2",
     "react-hot-loader": "^3.0.0-beta.6",
     "sass-loader": "^4.1.1",
     "style-loader": "^0.13.1",
@@ -97,14 +115,14 @@
     "react-lazyload": "^2.2.4",
     "react-markdown": "^2.4.3",
     "react-pagify": "^2.1.1",
-    "react-redux": "^4.4.6",
+    "react-redux": "^5.0.0-rc.2",
     "react-router": "^3.0.0",
     "react-router-redux": "^4.0.7",
     "react-virtualized": "^8.11.4",
     "react-waypoint": "^5.1.0",
     "redux": "^3.6.0",
     "redux-logger": "^2.7.4",
-    "redux-thunk": "^2.1.0",
+    "redux-thunk": "^2.2.0",
     "request": "^2.79.0",
     "reselect": "^2.5.4",
     "segmentize": "^0.4.1",

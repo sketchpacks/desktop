@@ -8,23 +8,17 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-import LazyLoad from 'react-lazyload'
-
-import PluginManagerHOC from 'hoc/Manager'
 import {sanitizeSemVer} from 'lib/utils'
 
-
+import Button from 'components/Button'
 import Nameplate from 'components/Nameplate'
-import InstallButton from 'components/InstallButton'
-import UpdateButton from 'components/UpdateButton'
 import PluginMetric from 'components/PluginMetric'
 
-
 import {
+  installPluginRequest,
+  uninstallPluginRequest,
   toggleVersionLockRequest
 } from 'actions/plugin_manager'
-
-import moment from 'moment'
 
 import './plugin_media.scss'
 
@@ -32,68 +26,52 @@ class PluginMedia extends Component {
   constructor (props) {
     super(props)
 
-    this.renderPreview = this.renderPreview.bind(this)
+    // Sub-renders
     this.renderVersion = this.renderVersion.bind(this)
-    this.renderScore = this.renderScore.bind(this)
     this.renderButton = this.renderButton.bind(this)
     this.renderVersionLock = this.renderVersionLock.bind(this)
 
+    // Click events
+    this.handleClickLock = this.handleClickLock.bind(this)
+    this.handleClickInstall = this.handleClickInstall.bind(this)
+    this.handleClickRemove = this.handleClickRemove.bind(this)
+    this.handleClickUpdate = this.handleClickUpdate.bind(this)
+
     this.state = {
-      hidePreview: false,
+      hidePreview: props.thumbnail_url === "",
+      isInstalled: props.isInstalled,
     }
   }
 
-  renderPreview () {
-    if (this.state.hidePreview) return
-
-    const { thumbnail_url } = this.props.plugin
-
-    if (thumbnail_url === null) {
-      this.setState({ hidePreview: true })
-      return
-    }
-
-    if (thumbnail_url === undefined) {
-      this.setState({ hidePreview: true })
-      return
-    }
-
-    return (
-      <div className="o-media__right u-mar-left-large">
-        <div className="o-plugin__thumbnail">
-          <LazyLoad height={120} offset={400} overflow once>
-            <img src={thumbnail_url} role="presentation" onError={() => this.setState({ hidePreview: true })} />
-          </LazyLoad>
-        </div>
-      </div>
-    )
+  handleClickLock () {
+    const {plugin} = this.props
+    this.props.handlePluginEvent({ type: 'lock', plugin: plugin })
   }
 
-  renderScore () {
-    return
-    const {location} = this.props.state.app
+  handleClickInstall () {
+    const {plugin} = this.props
+    this.props.handlePluginEvent({ type: 'install', plugin: plugin })
+  }
 
-    if (location === '/library/updates') return
+  handleClickRemove () {
+    const {plugin} = this.props
+    this.props.handlePluginEvent({ type: 'remove', plugin: plugin })
+  }
 
-    const { score } = this.props.plugin
-
-    if (score === 0)
-      return
-
-    return (
-      <span>{parseFloat(score).toFixed(1)}/5.0</span>
-    )
+  handleClickUpdate () {
+    const {plugin} = this.props
+    this.props.handlePluginEvent({ type: 'install', plugin: plugin })
   }
 
   renderVersion () {
     const { version, installed_version } = this.props.plugin
-    const {location} = this.props.state.app
+    const {location} = this.props
 
-    const value = (location === '/library/updates')
+    const value = (location.pathname === '/library/installed')
       ? installed_version
       : version
 
-    const tooltip = (location === '/library/updates')
+    const tooltip = (location.pathname === '/library/installed')
       ? 'Installed version'
       : 'Latest version'
 
@@ -105,22 +83,36 @@ class PluginMedia extends Component {
   }
 
   renderButton () {
+    const {location,handlePluginEvent} = this.props
+    const {isInstalled} = this.props
 
-    const {location} = this.props.state.app
+    return <Button
+      onClick={() => !isInstalled
+        ? this.handleClickInstall
+        : (location.pathname === '/library/updates')
+          ? this.handleClickInstall
+          : this.handleClickRemove}
+      actionVerb={!isInstalled
+        ? 'Install'
+        : (location.pathname === '/library/updates')
+          ? 'Update'
+          : 'Remove'}
+      className={!isInstalled
+        ? 'button'
+        : (location.pathname === '/library/updates')
+          ? 'button'
+          : 'button button-installed'} />
 
-    return (location === '/library/updates')
-      ? <UpdateButton {...this.props} />
-      : <InstallButton {...this.props} />
   }
 
   renderVersionLock () {
-    const {plugin,handlePluginEvent} = this.props
-    const {location} = this.props.state.app
-    if (location !== '/library/installed') return
+    const {plugin,location} = this.props
+
+    if (location.pathname !== '/library/installed') return
 
     return (
       <div
-        onClick={() => handlePluginEvent({ type: 'lock', plugin })}
+        onClick={this.handleClickLock}
         className="tooltipped tooltipped-n"
         aria-label={plugin.locked
           ? 'Enable auto-updates'
@@ -147,7 +139,7 @@ class PluginMedia extends Component {
   render () {
     const { name, description, owner, version, score, handleCTAClick, title } = this.props.plugin
     const title_or_name = title || name
-    const isInstalled = this.props.plugin || false
+    const isInstalled = this.state.isInstalled || false
 
     return (
         <article className="o-plugin">
@@ -168,8 +160,6 @@ class PluginMedia extends Component {
                 {description}
               </p>
             </div>
-
-            { this.renderPreview() }
           </div>
 
           <div className="o-plugin__footer">
@@ -185,8 +175,6 @@ class PluginMedia extends Component {
 
             { this.renderAutoupdates() }
 
-            { this.renderScore() }
-
             { this.renderVersionLock() }
 
             { this.renderButton() }
@@ -196,16 +184,10 @@ class PluginMedia extends Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    dispatch
-  }
+PluginMedia.propTypes = {
+  isInstalled: React.PropTypes.bool,
+  plugin: React.PropTypes.object,
+  handlePluginEvent: React.PropTypes.func,
 }
 
-function mapStateToProps(state, ownProps) {
-  return {
-    state
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)( PluginManagerHOC(PluginMedia) )
+export default PluginMedia

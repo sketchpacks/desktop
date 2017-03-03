@@ -76,10 +76,10 @@ menuBar.on('ready', () => {
 })
 
 menuBar.on('after-show', () => {
-  if (__DEVELOPMENT__) {
+  // if (__DEVELOPMENT__) {
     // require('devtron').install()
     menuBar.window.openDevTools({ mode: 'detach' })
-  }
+  // }
 })
 
 menuBar.on('after-create-window', () => {
@@ -88,6 +88,7 @@ menuBar.on('after-create-window', () => {
 })
 
 app.on('ready', () => {
+  console.log('READY!')
   if (__PRODUCTION__ && __ELECTRON__) {
     updater = require('./src/main/updater')
     updater.init()

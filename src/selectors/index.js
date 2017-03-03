@@ -3,7 +3,6 @@ import { createSelector } from 'reselect'
 const {filter} = require('lodash')
 import {sanitizeSemVer} from 'lib/utils'
 
-
 const getList = (state) => state.app.location
 const getPlugins = (state) => state.plugins.items
 const getLibrary = (state) => state.library.items

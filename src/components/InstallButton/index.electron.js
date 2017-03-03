@@ -1,51 +1,45 @@
 import React from 'react'
 import Button from 'components/Button'
 
-import {map,includes} from 'lodash'
-
 import {
   installPluginRequest,
   uninstallPluginRequest
 } from 'actions/plugin_manager'
-
-const isInstalled = (state, pluginId) => {
-  return includes(map(state.library.items, 'id'), pluginId)
-}
 
 const Connect = ComposedComponent =>
   class extends React.Component {
     constructor (props) {
       super(props)
 
-      this.handleClick = this.handleClick.bind(this)
+      console.log(props)
+
+      // this.handleClick = this.handleClick.bind(this)
 
       this.state = {
-        activity: isInstalled(props.state, props.plugin.id)
+        activity: props.isInstalled
           ? 'installed'
           : 'idle'
       }
     }
 
-    handleClick () {
-      const { dispatch, plugin } = this.props
-
-      const installed = isInstalled(this.props.state, plugin.id)
-
-      if (!installed) {
-        dispatch(installPluginRequest(plugin))
-        this.setState({ activity: 'installing' })
-      }
-
-      if (installed) {
-        dispatch(uninstallPluginRequest(plugin))
-        this.setState({ activity: 'removing' })
-      }
-    }
+    // handleClick () {
+    //   const { dispatch, plugin, isInstalled } = this.props
+    //
+    //   if (!isInstalled) {
+    //     dispatch(installPluginRequest(plugin))
+    //     this.setState({ activity: 'installing' })
+    //   }
+    //
+    //   if (isInstalled) {
+    //     dispatch(uninstallPluginRequest(plugin))
+    //     this.setState({ activity: 'removing' })
+    //   }
+    // }
 
     componentWillReceiveProps (nextProps) {
-      const { plugin } = nextProps
+      const { plugin, isInstalled } = nextProps
       this.setState({
-        activity: isInstalled(nextProps.state, plugin.id)
+        activity: isInstalled
           ? 'installed'
           : 'idle'
       })
@@ -67,13 +61,14 @@ const Connect = ComposedComponent =>
     }
 
     render () {
+      const {plugin,isInstalled} = this.props
+      const buttonLabel = isInstalled ? 'remove' : 'install'
+
       return (
         <ComposedComponent
           {...this.props}
           className={this.state.activity === 'installed' ? 'button button-installed' : 'button'}
           actionVerb={this.renderButtonText()}
-          onClick={this.handleClick}
-
         />
       )
     }

@@ -123,7 +123,7 @@ class FrontPageContainer extends Component {
               &nbsp;
               <a href="https://twitter.com/adamkirkwood">@adamkirkwood</a>
               &nbsp;&amp;&nbsp;
-              <a href="https://twitter.com/willdavis">@willdavis</a>
+              <a href="https://twitter.com/willdavis84">@willdavis84</a>
               &nbsp;&mdash;
               <span className="emoji">🖖🏽</span>
             </p>

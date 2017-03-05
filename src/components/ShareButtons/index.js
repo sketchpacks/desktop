@@ -1,5 +1,6 @@
 import React from 'react'
 
+// Facebook Like Button
 export const LikeButton = ({ href, layout, action, size, showFaces, share }) => (
   <div
     className="fb-like"
@@ -20,4 +21,26 @@ LikeButton.propTypes = {
   size: React.PropTypes.oneOf(['small', 'large']),
   width: React.PropTypes.number,
   share: React.PropTypes.bool
+}
+
+// Twitter Tweet Button
+export const TweetButton = ({ text, url, via, related, showCount }) => (
+  <a href="https://twitter.com/share"
+    className="twitter-share-button"
+    data-text={text}
+    data-url={url}
+    data-via={via}
+    data-related={related}
+    data-show-count={showCount}
+  >
+    Tweet
+  </a>
+)
+
+TweetButton.propTypes = {
+  text: React.PropTypes.string,
+  url: React.PropTypes.string,
+  via: React.PropTypes.string,
+  related: React.PropTypes.string,
+  showCount: React.PropTypes.bool,
 }

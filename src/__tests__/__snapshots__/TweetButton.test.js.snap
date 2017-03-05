@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TweetButton should render a Twitter Tweet button 1`] = `
+<a
+  className="twitter-share-button"
+  data-related="adamkirkwood"
+  data-show-count={true}
+  data-text="Sketchpacks for macOS — Manage your Sketch plugins from the menu bar"
+  data-url="https://sketchpacks.com"
+  data-via="sketchpacks"
+  href="https://twitter.com/share"
+>
+  Tweet
+</a>
+`;

@@ -26,6 +26,11 @@ $padding: 2rem;
   padding-bottom: $padding * 2;
   padding-left: $padding * 2;
   padding-right: $padding * 2;
+  font-size: 1.3rem;
+
+  a {
+    color: #ffffff;
+  }
 
   .footer-section {
     flex-grow: 1;
@@ -33,5 +38,9 @@ $padding: 2rem;
 
   .footer-section + .footer-section {
     margin-left: $padding;
+  }
+
+  .emoji {
+    font-size: 1.5rem;
   }
 }

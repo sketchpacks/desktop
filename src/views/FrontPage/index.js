@@ -119,20 +119,36 @@ class FrontPageContainer extends Component {
 
         <footer className="footer--registry">
           <div className="footer-section">
-            <SVGIcon
-              icon={'brand'}
-              shape={'path'}
-              size={'5em'}
-              viewBox={'0 0 48 48'}
-              fill={'#FFFFFF'}
-            />
-
-            <p>
-              Discover and manage your Sketch plugins from the menu bar.
-            </p>
+            Made with love by
+            &nbsp;
+            <a href="https://twitter.com/adamkirkwood">@adamkirkwood</a>
+            &nbsp;&amp;&nbsp;
+            <a href="https://twitter.com/willdavis">@willdavis</a>
+            &nbsp;&mdash;
+            <span className="emoji">🖖🏽</span>
           </div>
+
           <div className="footer-section">
             <em>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</em>
+          </div>
+
+          <div className="footer-section">
+            <div className="o-shelf o-shelf__social-buttons o-shelf--recto">
+              <TweetButton
+                url="https://sketchpacks.com"
+                text="Sketchpacks for macOS — Manage your Sketch plugins from the menu bar"
+                via="sketchpacks"
+                related="adamkirkwood"
+                showCount />
+
+              <LikeButton
+                href="https://sketchpacks.com"
+                layout={"button_count"}
+                action={"like"}
+                size={"small"}
+                showFaces={"false"}
+                share />
+            </div>
           </div>
         </footer>
 

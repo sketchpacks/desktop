@@ -93,14 +93,13 @@ class FrontPageContainer extends Component {
 
         <div className="container container--xl l-benefits">
           <div className="row">
-            <div className="column">
-              <h2></h2>
-              <h5>Never worry about accidental breaks in your toolchain.</h5>
+            <div className="column" style={{textAlign: 'center'}}>
+              <h2>Hassle&ndash;free plugin management</h2>
             </div>
           </div>
           <div className="row">
             <div className="column">
-              <h3>⚡️ Auto-updates</h3>
+              <h3>⚡️ Auto&ndash;updates</h3>
               <p>Keep your plugins up to date with the latest release served by the Sketchpacks Registry.</p>
             </div>
 
@@ -111,7 +110,7 @@ class FrontPageContainer extends Component {
 
             <div className="column">
               <h3>We ❤️ Sketch Developers</h3>
-              <p>Focus on developing plugins. Serve plugin updates from your github with <a href="https://github.com/integration/sketchpacks-relay">Sketchpacks Relay</a>.</p>
+              <p>Focus on developing plugins. Serve plugin updates from your github with <a href="https://github.com/integration/sketchpacks-relay" target="_blank">Sketchpacks Relay</a>.</p>
             </div>
           </div>
         </div>
@@ -119,17 +118,19 @@ class FrontPageContainer extends Component {
 
         <footer className="footer--registry">
           <div className="footer-section">
-            Made with love by
-            &nbsp;
-            <a href="https://twitter.com/adamkirkwood">@adamkirkwood</a>
-            &nbsp;&amp;&nbsp;
-            <a href="https://twitter.com/willdavis">@willdavis</a>
-            &nbsp;&mdash;
-            <span className="emoji">🖖🏽</span>
-          </div>
+            <p>
+              Made with love by
+              &nbsp;
+              <a href="https://twitter.com/adamkirkwood">@adamkirkwood</a>
+              &nbsp;&amp;&nbsp;
+              <a href="https://twitter.com/willdavis">@willdavis</a>
+              &nbsp;&mdash;
+              <span className="emoji">🖖🏽</span>
+            </p>
 
-          <div className="footer-section">
-            <em>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</em>
+            <p>
+              <em>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</em>
+            </p>
           </div>
 
           <div className="footer-section">

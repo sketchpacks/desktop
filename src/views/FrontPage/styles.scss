@@ -1,0 +1,37 @@
+$padding: 2rem;
+
+.l-benefits {
+  padding-bottom: 3.2rem;
+  padding-top: 3.2rem;
+
+  h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+
+  p {
+    font-size: 1.4rem;
+  }
+}
+
+
+.footer--registry {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  color: rgba(173,181,189,1.0);
+  background-color: #282833;
+  padding-top: $padding * 2;
+  padding-bottom: $padding * 2;
+  padding-left: $padding * 2;
+  padding-right: $padding * 2;
+
+  .footer-section {
+    flex-grow: 1;
+  }
+
+  .footer-section + .footer-section {
+    margin-left: $padding;
+  }
+}

@@ -34,6 +34,7 @@ class App extends Component {
                       icon={'brand'}
                       shape={'path'}
                       size={'1.1em'}
+                      fill={'#ffffff'}
                       viewBox={'0 0 48 48'}
                     />
                     <strong>Sketchpacks</strong>

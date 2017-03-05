@@ -19,10 +19,18 @@ $height: 24vh;
   &--promo {
     overflow: hidden;
     box-shadow: none;
-    border-bottom: 1px solid rgba(50,58,73,0.10);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background-image: linear-gradient(140deg, #34A9D9 0%, #5B45B9 100%);
+    padding-top: 10rem;
+
+    .button {
+      background-color: #53DD6C;
+      border: 0.1rem solid #53DD6C;
+    }
 
     .column {
       text-align: center;
+      color: #ffffff;
     }
 
     .container {
@@ -37,13 +45,15 @@ $height: 24vh;
       font-size: 3.2rem;
       margin-bottom: 1rem;
       font-weight: bold;
-      color: rgba(#343a40, 1.0);
+      color: rgba(#ffffff, 1.0);
+      letter-spacing: normal;
     }
 
     h3 {
       font-size: 2.2rem;
       margin-right: 2rem;
-      color: rgba(#343a40, 0.6);
+      color: rgba(#ffffff, 0.6);
+      letter-spacing: normal;
     }
 
     img {

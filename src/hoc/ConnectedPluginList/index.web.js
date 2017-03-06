@@ -15,12 +15,15 @@ const ConnectedPluginList = ComposedComponent =>
     constructor (props) {
       super(props)
 
-      console.log('ConnectedPluginList#constructor', props)
-
       this.fetchData = this.fetchData.bind(this)
       this.renderLoading = this.renderLoading.bind(this)
 
+      this.handleInstall = this.handleInstall.bind(this)
       this.handlePluginEvent = this.handlePluginEvent.bind(this)
+    }
+
+    handleInstall (plugin) {
+      window.location = `sketchpacks://install/${plugin.id}`
     }
 
     handlePluginEvent ({ type, plugin }) {
@@ -28,7 +31,7 @@ const ConnectedPluginList = ComposedComponent =>
 
       switch (type) {
         case "install":
-          return console.log('Installing...')
+          return this.handleInstall(plugin)
         case "favorite":
           return console.log(type, plugin)
         case "collect":

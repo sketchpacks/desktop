@@ -10,12 +10,10 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
 import Nameplate from 'components/Nameplate'
-import InstallButton from 'components/InstallButton'
+import Button from 'components/Button'
 import PluginMetric from 'components/PluginMetric'
 
 import {sanitizeSemVer} from 'lib/utils'
-
-import moment from 'moment'
 
 import './plugin_media.scss'
 
@@ -25,14 +23,19 @@ class PluginMedia extends Component {
 
     this.renderPreview = this.renderPreview.bind(this)
     this.renderVersion = this.renderVersion.bind(this)
-    this.renderScore = this.renderScore.bind(this)
-    this.renderUpdateTimestamp = this.renderUpdateTimestamp.bind(this)
     this.renderButton = this.renderButton.bind(this)
     this.renderStargazerCount = this.renderStargazerCount.bind(this)
+
+    this.handleClickInstall = this.handleClickInstall.bind(this)
 
     this.state = {
       hidePreview: false
     }
+  }
+
+  handleClickInstall () {
+    const {plugin} = this.props
+    this.props.handlePluginEvent({ type: 'install', plugin: plugin })
   }
 
   renderPreview () {
@@ -59,34 +62,6 @@ class PluginMedia extends Component {
     )
   }
 
-  renderScore () {
-    return
-    const {location} = this.props.state.app
-
-    const { score } = this.props.plugin
-
-    if (score === 0)
-      return
-
-    return (
-      <span>{parseFloat(score).toFixed(1)}/5.0</span>
-    )
-  }
-
-  renderUpdateTimestamp () {
-    return // todo: How might this be more informative?
-
-    const { updated_at } = this.props.plugin
-    const relativeDateTime = moment(updated_at).fromNow()
-
-    if (updated_at === undefined)
-      return
-
-    return (
-      <span>Released {relativeDateTime}</span>
-    )
-  }
-
   renderStargazerCount () {
     const { stargazers_count } = this.props.plugin
 
@@ -105,7 +80,10 @@ class PluginMedia extends Component {
     const {location} = this.props.state.app
     const {plugin,dispatch} = this.props
 
-    return <InstallButton plugin={plugin} dispatch={dispatch} />
+    return <Button
+      onClick={this.handleClickInstall}
+      actionVerb={'Install'}
+      className={'button'} />
   }
 
   renderAutoupdates () {
@@ -161,10 +139,6 @@ class PluginMedia extends Component {
             { this.renderVersion() }
 
             { this.renderAutoupdates() }
-
-            { this.renderUpdateTimestamp() }
-
-            { this.renderScore() }
 
             { this.renderStargazerCount() }
 

@@ -21,8 +21,6 @@ const ConnectedPluginList = ComposedComponent =>
     constructor (props) {
       super(props)
 
-      console.log('ConnectedPluginList#constructor', props)
-
       this.fetchData = this.fetchData.bind(this)
       this.renderLoading = this.renderLoading.bind(this)
 

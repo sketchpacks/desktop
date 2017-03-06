@@ -8,6 +8,7 @@ import './registry.scss'
 
 import SVGIcon from 'components/SVGIcon'
 import SearchBar from 'components/SearchBar'
+import {LikeButton,TweetButton} from 'components/ShareButtons'
 
 class App extends Component {
   constructor (props) {
@@ -54,27 +55,59 @@ class App extends Component {
 
         {this.props.children}
 
-        <footer className="registry-footer">
-          <div className="container">
-            <div className="row">
-              <div className="column registry-footer__branding">
-                <SVGIcon
-                  icon={'brand'}
-                  shape={'path'}
-                  size={'5em'}
-                  viewBox={'0 0 48 48'}
-                  fill={'#FFFFFF'}
-                />
+        <footer className="footer--registry">
+          <div className="footer-section">
+            <p>
+              <SVGIcon
+                icon={'brand'}
+                shape={'path'}
+                size={'1.1em'}
+                fill={'#ffffff'}
+                viewBox={'0 0 48 48'}
+              />
+              &nbsp;
+              Made with love by
+              &nbsp;
+              <a href="https://github.com/adamkirkwood" target="_blank">@adamkirkwood</a>
+              &nbsp;&amp;&nbsp;
+              <a href="https://github.com/willdavis" target="_blank">@willdavis</a>
+            </p>
 
-                <p>
-                  Discover and manage your Sketch plugins from the menu bar.
-                </p>
+            <p>
+              <small>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</small>
+            </p>
+          </div>
 
-                <em>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</em>
-              </div>
+          <div className="footer-section">
+            <a href="https://medium.com/building-sketchpacks" target="_blank">Blog</a>
+            &nbsp;&bull;&nbsp;
+            <a href="https://medium.com/building-sketchpacks/release-notes/home" target="_blank">Release Notes</a>
+            &nbsp;&bull;&nbsp;
+            <a href="https://github.com/sketchpacks/bug-reports" target="_blank">Report a bug</a>
+            &nbsp;&bull;&nbsp;
+            <a href="https://github.com/sketchpacks/feedback" target="_blank">Give us feedback</a>
+          </div>
+
+          <div className="footer-section">
+            <div className="o-shelf o-shelf__social-buttons o-shelf--recto">
+              <TweetButton
+                url="https://sketchpacks.com"
+                text="Sketchpacks for macOS — Manage your Sketch plugins from the menu bar"
+                via="sketchpacks"
+                related="adamkirkwood"
+                showCount />
+
+              <LikeButton
+                href="https://sketchpacks.com"
+                layout={"button_count"}
+                action={"like"}
+                size={"small"}
+                showFaces={"false"}
+                share />
             </div>
           </div>
         </footer>
+
       </div>
     )
   }

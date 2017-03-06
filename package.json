@@ -64,7 +64,6 @@
     "css-loader": "^0.26.1",
     "electron-builder": "^10.6.1",
     "electron-packager": "^8.4.0",
-    "electron-prebuilt": "^1.4.11",
     "enzyme": "^2.7.1",
     "enzyme-to-json": "^1.5.0",
     "eslint": "^1.10.3",
@@ -114,20 +113,16 @@
     "react-dom": "^15.4.1",
     "react-lazyload": "^2.2.4",
     "react-markdown": "^2.4.3",
-    "react-pagify": "^2.1.1",
     "react-redux": "^5.0.0-rc.2",
     "react-router": "^3.0.0",
     "react-router-redux": "^4.0.7",
-    "react-virtualized": "^8.11.4",
     "react-waypoint": "^5.1.0",
     "redux": "^3.6.0",
     "redux-logger": "^2.7.4",
     "redux-thunk": "^2.2.0",
     "request": "^2.79.0",
     "reselect": "^2.5.4",
-    "segmentize": "^0.4.1",
     "semver": "^5.3.0",
-    "url": "^0.11.0",
-    "whatwg-fetch": "^2.0.1"
+    "url": "^0.11.0"
   }
 }

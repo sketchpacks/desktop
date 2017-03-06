@@ -94,7 +94,7 @@ class FrontPageContainer extends Component {
         <div className="container container--xl l-benefits">
           <div className="row">
             <div className="column" style={{textAlign: 'center'}}>
-              <h2>Hassle&ndash;free plugin management</h2>
+              <h2>Powerful plugin management without the complexity</h2>
             </div>
           </div>
           <div className="row">
@@ -129,7 +129,7 @@ class FrontPageContainer extends Component {
             </p>
 
             <p>
-              <em>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</em>
+              <small>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</small>
             </p>
           </div>
 

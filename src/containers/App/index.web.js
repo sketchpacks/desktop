@@ -88,9 +88,11 @@ const mapDispatchToProps = (dispatch) => {
 
 function mapStateToProps(state, ownProps) {
   const { catalog } = state
+  const { location } = ownProps
 
   return {
-    plugins: catalog
+    plugins: catalog,
+    location: location
   }
 }
 

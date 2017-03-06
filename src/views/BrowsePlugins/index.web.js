@@ -39,12 +39,12 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { catalog,search,location } = state
+  const { catalog,search } = state
 
   return {
     plugins: catalog,
     search,
-    location: state.routing.locationBeforeTransitions
+    location: ownProps.location
   }
 }
 

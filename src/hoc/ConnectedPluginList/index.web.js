@@ -3,7 +3,6 @@ import React from 'react'
 import qs from 'qs'
 import {SketchpacksApi} from 'api'
 
-
 import Waypoint from 'react-waypoint'
 
 import {
@@ -43,23 +42,23 @@ const ConnectedPluginList = ComposedComponent =>
       this.fetchData({
         page: 1,
         append: false,
-        q: '',
-        sort: 'score:desc',
+        q: this.props.location.query.q || '',
+        sort: this.props.location.query.sort || 'score:desc',
       })
     }
 
-    // componentWillReceiveProps (nextProps) {
-    //   if (this.props.plugins.isLoading === true) return
-    //
-    //   if (this.props.location.query.sort !== nextProps.location.query.sort) {
-    //     this.fetchData({
-    //       page: 1,
-    //       sort: nextProps.location.query.sort || 'score:desc',
-    //       append: false,
-    //       q: nextProps.location.query.q || '',
-    //     })
-    //   }
-    // }
+    componentWillReceiveProps (nextProps) {
+      if (this.props.plugins.isLoading === true) return
+
+      if (this.props.location.query.sort !== nextProps.location.query.sort) {
+        this.fetchData({
+          page: 1,
+          sort: nextProps.location.query.sort || 'score:desc',
+          append: false,
+          q: nextProps.location.query.q || '',
+        })
+      }
+    }
 
     fetchData ({ sort, page, append, q }) {
       const {dispatch,plugins} = this.props

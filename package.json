@@ -64,6 +64,7 @@
     "css-loader": "^0.26.1",
     "electron-builder": "^10.6.1",
     "electron-packager": "^8.4.0",
+    "electron-prebuilt": "^1.4.11",
     "enzyme": "^2.7.1",
     "enzyme-to-json": "^1.5.0",
     "eslint": "^1.10.3",

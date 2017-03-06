@@ -2,8 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
-import {map,includes} from 'lodash'
-
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'
 const EnhancedPluginList = ConnectedPluginList(PluginList)
@@ -18,11 +16,17 @@ class BrowsePluginsContainer extends Component {
 
     return (
       <div style={{position: 'relative'}}>
-        <EnhancedPluginList
-          plugins={plugins}
-          location={this.props.location}
-          dispatch={this.props.dispatch}
-        />
+        <div className="container">
+          <div className="row">
+            <div className="column column__content">
+              <EnhancedPluginList
+                plugins={plugins}
+                location={this.props.location}
+                dispatch={this.props.dispatch}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

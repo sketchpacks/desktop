@@ -3,7 +3,6 @@ $height: 24vh;
 .hero {
   background-color: #ffffff;
   min-height: $height;
-  margin-bottom: 3.2rem;
   border-bottom: 1px solid rgba(50,58,73,0.10);
 
   img {
@@ -19,9 +18,9 @@ $height: 24vh;
   &--promo {
     overflow: hidden;
     box-shadow: none;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
     background-image: linear-gradient(140deg, #34A9D9 0%, #5B45B9 100%);
     padding-top: 10rem;
+    border-bottom: 1px solid rgba(255,255,255,1);
 
     .button {
       background-color: #53DD6C;

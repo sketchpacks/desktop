@@ -116,6 +116,14 @@ class FrontPageContainer extends Component {
         <footer className="footer--registry">
           <div className="footer-section">
             <p>
+              <SVGIcon
+                icon={'brand'}
+                shape={'path'}
+                size={'1.1em'}
+                fill={'#ffffff'}
+                viewBox={'0 0 48 48'}
+              />
+              &nbsp;
               Made with love by
               &nbsp;
               <a href="https://github.com/adamkirkwood" target="_blank">@adamkirkwood</a>

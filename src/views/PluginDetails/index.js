@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
+import {sanitizeSemVer} from 'lib/utils'
 import {SketchpacksApi} from 'api'
 
 import Nameplate from 'components/Nameplate'
@@ -35,7 +36,8 @@ class PluginDetailsContainer extends Component {
       stargazers_count,
       watchers_count,
       score,
-      source_url
+      source_url,
+      auto_updates,
     } = this.props.pluginDetails
 
     const title_or_name = title || name
@@ -75,26 +77,26 @@ class PluginDetailsContainer extends Component {
 
                 <div className="o-shelf o-shelf--outlined">
 
-                  { version && (version !== "0") && <PluginMetric
+                  { version && <PluginMetric
                       icon={'versions'}
-                      value={version}
+                      value={sanitizeSemVer(version)}
                       tooltip={'Latest version'}
                       /> }
 
-                  { version && (version !== "0") && <PluginMetric
+                  { auto_updates && <PluginMetric
                     icon={'autoupdates'}
                     value={'Enabled'}
                     shape={'polygon'}
                     tooltip={'Automatic plugin updates'}
                   /> }
 
-                  { compatible_version && (compatible_version !== "0") && <PluginMetric
+                  { compatible_version && <PluginMetric
                     icon={'compatible_version'}
-                    value={compatible_version}
+                    value={sanitizeSemVer(compatible_version)}
                     tooltip={'Compatible Sketch.app version'}
                   /> }
 
-                  { stargazers_count && parseInt(stargazers_count) && <PluginMetric
+                  { stargazers_count && <PluginMetric
                     icon={'stargazers'}
                     value={stargazers_count}
                     shape={'polygon'}

@@ -26,6 +26,20 @@ body {
   }
 }
 
+.nav-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: top;
+
+  a {
+    color: #5F7DC9;
+    font-weight: bold;
+    line-height: 2rem;
+  }
+  justify-content: center;
+}
+
 .branding {
   font-size: 2.0rem;
   line-height: 1;

@@ -33,8 +33,6 @@ class FrontPageContainer extends Component {
                   </Link>
 
                   <div className="nav-group">
-                    <Link to="/browse" className="nav__item">Browse</Link>
-
                     <div className="o-shelf o-shelf__social-buttons">
                       <TweetButton
                         url="https://sketchpacks.com"
@@ -51,7 +49,6 @@ class FrontPageContainer extends Component {
                         showFaces={"false"}
                         share />
                     </div>
-
                   </div>
                 </nav>
 
@@ -121,16 +118,24 @@ class FrontPageContainer extends Component {
             <p>
               Made with love by
               &nbsp;
-              <a href="https://twitter.com/adamkirkwood">@adamkirkwood</a>
+              <a href="https://github.com/adamkirkwood" target="_blank">@adamkirkwood</a>
               &nbsp;&amp;&nbsp;
-              <a href="https://twitter.com/willdavis84">@willdavis84</a>
-              &nbsp;&mdash;
-              <span className="emoji">🖖🏽</span>
+              <a href="https://github.com/willdavis" target="_blank">@willdavis</a>
             </p>
 
             <p>
               <small>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</small>
             </p>
+          </div>
+
+          <div className="footer-section">
+            <a href="https://medium.com/building-sketchpacks" target="_blank">Blog</a>
+            &nbsp;&bull;&nbsp;
+            <a href="https://medium.com/building-sketchpacks/release-notes/home" target="_blank">Release Notes</a>
+            &nbsp;&bull;&nbsp;
+            <a href="https://github.com/sketchpacks/bug-reports" target="_blank">Report a bug</a>
+            &nbsp;&bull;&nbsp;
+            <a href="https://github.com/sketchpacks/feedback" target="_blank">Give us feedback</a>
           </div>
 
           <div className="footer-section">

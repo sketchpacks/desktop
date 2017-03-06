@@ -14,8 +14,6 @@ class PluginList extends Component {
   constructor (props) {
     super(props)
 
-    console.log('PluginList#constructor', props)
-
     this.renderLoadingState = this.renderLoadingState.bind(this)
     this.renderZeroState = this.renderZeroState.bind(this)
   }
@@ -23,8 +21,7 @@ class PluginList extends Component {
   renderZeroState () {
     return (
       <div className="empty-state--expanded">
-        <h4>Couldnt find the catalog</h4>
-        <p>Please check your network connection and try again.</p>
+        <h4>Fetchin plugins...</h4>
       </div>
     )
   }

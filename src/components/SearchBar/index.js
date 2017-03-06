@@ -14,13 +14,7 @@ import linkHeader from 'parse-link-header'
 import {SketchpacksApi} from 'api'
 
 import {
-  pluginsRequest,
-  pluginsReceived,
-  pluginsPaginate,
-  fetchSearchRequest,
-  fetchSearchReceived,
-  fetchSearchError,
-  fetchSearch
+  fetchCatalog
 } from 'actions'
 
 import './styles.scss'
@@ -30,13 +24,18 @@ class SearchBar extends Component {
     super(props)
 
     this.handleEnterKey = this.handleEnterKey.bind(this)
-    this.fetchPage = this.fetchPage.bind(this)
+    this.fetchData = this.fetchData.bind(this)
   }
 
-  fetchPage = ({page = 1, text, sort = 'score'}) => {
-    const {dispatch} = this.props
-    dispatch(fetchSearch(text))
-    browserHistory.push(`/search?q=${text}`)
+  fetchData ({ sort, page, append, q }) {
+    const {dispatch,plugins} = this.props
+
+    const queryParams = qs.stringify({
+      text: q,
+    })
+
+    dispatch(fetchCatalog(queryParams, false))
+    browserHistory.push(`/search?q=${q}`)
   }
 
   handleEnterKey (e) {
@@ -47,7 +46,7 @@ class SearchBar extends Component {
     const {dispatch} = this.props
     const keyword = e.target.value
 
-    this.fetchPage({ text: keyword })
+    this.fetchData({ q: keyword })
   }
 
   render () {

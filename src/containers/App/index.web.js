@@ -43,7 +43,7 @@ class App extends Component {
                   <SearchBar location={this.props.location} classNames={'searchBar'} />
 
                   <div className="nav-group">
-                    <Link to="/browse" className="nav__item">Browse</Link>
+                    <a href="/browse" className="nav__item">Browse</a>
                   </div>
                 </nav>
 

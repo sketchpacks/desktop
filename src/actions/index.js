@@ -203,7 +203,7 @@ export function catalogSortBy (sort) {
 
 export function fetchSearch (keyword) {
   return (dispatch, getState, {api}) => {
-    dispatch(fetchSearchRequest(keyword))
+    dispatch(fetchCatalogRequest(keyword))
 
     api.getCatalog({query: `text=${keyword}`})
       .then(response => {
@@ -211,9 +211,9 @@ export function fetchSearch (keyword) {
 
         if (pageMeta) dispatch(pluginsPaginate(pageMeta))
 
-        dispatch(fetchSearchReceived(response.data))
+        dispatch(fetchCatalogReceived(response.data))
       })
-      .catch(error => dispatch(fetchSearchError(error)))
+      .catch(error => dispatch(fetchCatalogError(error)))
   }
 }
 

@@ -69,7 +69,7 @@ const ConnectedPluginList = ComposedComponent =>
         page: page || parseInt(plugins.nextPage),
         per_page: 10,
         sort: sort || plugins.sort,
-        text: q || null
+        text: q || plugins.q
       })
 
       dispatch(fetchCatalog(queryParams, append))

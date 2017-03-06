@@ -27,7 +27,7 @@ export const render = () => {
 
           <Route component={App}>
             <Route path="browse" component={BrowsePlugins} />
-            <Route path="search" component={SearchResults} />
+            <Route path="search" component={BrowsePlugins} />
 
             <Route path="@:owner" component={UserProfile}>
               <IndexRedirect to="plugins" />

@@ -11,9 +11,9 @@ module.exports = {
   API_URL: 'https://sketchpacks-api.herokuapp.com',
 
   CATALOG_FETCH_DELAY: '30s',
-  CATALOG_FETCH_INTERVAL: process.env.NODE_ENV === 'development' ? '5m' : '30m',
+  CATALOG_FETCH_INTERVAL: process.env.NODE_ENV === 'development' ? '5m' : '4h',
 
-  UPDATER_INTERVAL: process.env.NODE_ENV === 'development' ? '30s' : '30m',
+  UPDATER_INTERVAL: '4h',
 
   MIXPANEL_TOKEN: process.env.NODE_ENV === 'development'
     ? '83ca491fc0b9796233bffce9e2d7593c'

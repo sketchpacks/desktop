@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
+import {sanitizeSemVer} from 'lib/utils'
 import {SketchpacksApi} from 'api'
 
 import Nameplate from 'components/Nameplate'
 import ReadmeDocument from 'components/ReadmeDocument'
-import InstallButton from 'components/InstallButton'
+import Button from 'components/Button'
 import SVGIcon from 'components/SVGIcon'
 import PluginMetric from 'components/PluginMetric'
 
@@ -16,6 +17,16 @@ import {
 } from 'actions'
 
 class PluginDetailsContainer extends Component {
+  constructor (props) {
+    super(props)
+
+    this.handleClickInstall = this.handleClickInstall.bind(this)
+  }
+
+  handleClickInstall () {
+    window.location = `sketchpacks://install/${this.props.pluginDetails.id}`
+  }
+
   componentDidMount () {
     const { dispatch } = this.props
     const { owner, id } = this.props.params
@@ -35,7 +46,8 @@ class PluginDetailsContainer extends Component {
       stargazers_count,
       watchers_count,
       score,
-      source_url
+      source_url,
+      auto_updates,
     } = this.props.pluginDetails
 
     const title_or_name = title || name
@@ -75,33 +87,37 @@ class PluginDetailsContainer extends Component {
 
                 <div className="o-shelf o-shelf--outlined">
 
-                  { version && (version !== "0") && <PluginMetric
+                  { version
+                    && <PluginMetric
                       icon={'versions'}
-                      value={version}
-                      tooltip={'Latest version'}
-                      /> }
+                      value={sanitizeSemVer(version)}
+                      tooltip={'Latest version'} /> }
 
-                  { version && (version !== "0") && <PluginMetric
-                    icon={'autoupdates'}
-                    value={'Enabled'}
-                    shape={'polygon'}
-                    tooltip={'Automatic plugin updates'}
-                  /> }
+                  { auto_updates
+                    && <PluginMetric
+                      icon={'autoupdates'}
+                      value={'Enabled'}
+                      shape={'polygon'}
+                      tooltip={'Automatic plugin updates'} /> }
 
-                  { compatible_version && (compatible_version !== "0") && <PluginMetric
-                    icon={'compatible_version'}
-                    value={compatible_version}
-                    tooltip={'Compatible Sketch.app version'}
-                  /> }
+                  { compatible_version
+                    && <PluginMetric
+                      icon={'compatible_version'}
+                      value={sanitizeSemVer(compatible_version)}
+                      tooltip={'Compatible Sketch.app version'} /> }
 
-                  { stargazers_count && parseInt(stargazers_count) && <PluginMetric
-                    icon={'stargazers'}
-                    value={stargazers_count}
-                    shape={'polygon'}
-                    tooltip={'Stargazers on Github'}
-                  /> }
+                  { stargazers_count
+                    && <PluginMetric
+                      icon={'stargazers'}
+                      value={stargazers_count}
+                      shape={'polygon'}
+                      tooltip={'Stargazers on Github'} /> }
 
-                  <InstallButton plugin={this.props.pluginDetails} dispatch={this.props.dispatch} />
+                  <Button
+                    onClick={this.handleClickInstall}
+                    actionVerb={'Install'}
+                    className={'button'} />
+
                 </div>
 
               </div>

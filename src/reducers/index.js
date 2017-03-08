@@ -8,6 +8,7 @@ const initialListState = {
   nextPage: 1,
   lastPage: 1,
   sort: 'score:desc',
+  total: 0,
 }
 
 
@@ -27,11 +28,20 @@ function catalog (state = initialListState, action) {
         items: action.append ? state.items : [],
       }
 
+    case actions.FETCH_SEARCH_REQUEST:
+      return {
+        ...state,
+        items: [],
+        keyword: action.payload.keyword,
+        isLoading: true
+      }
+
     case actions.FETCH_CATALOG_RECEIVED:
       return {
         ...state,
         isLoading: false,
         items: action.append ? state.items.concat(action.payload) : action.payload,
+        total: action.total,
       }
 
     case actions.FETCH_CATALOG_ERROR:
@@ -52,6 +62,7 @@ function catalog (state = initialListState, action) {
         lastPage: 1,
         nextPage: 1,
         prevPage: 1,
+        total: 0,
       }
 
       const pageInfo = {...defaults}

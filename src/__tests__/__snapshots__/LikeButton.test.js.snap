@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LikeButton should render a Facebook Like button 1`] = `
+<div
+  className="fb-like"
+  data-action="like"
+  data-href="https://sketchpacks.com"
+  data-layout="button_count"
+  data-share={true}
+  data-show-faces="false"
+  data-size="small"
+/>
+`;

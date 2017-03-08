@@ -3,22 +3,28 @@ import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
 import PluginList from 'components/PluginList'
+import ConnectedPluginList from 'hoc/ConnectedPluginList'
+const EnhancedPluginList = ConnectedPluginList(PluginList)
 
 class SearchResultsContainer extends Component {
+  constructor (props) {
+    super(props)
+  }
+
   render () {
-    const { plugins, keyword } = this.props
+    const {plugins} = this.props
 
     return (
-      <div className="container">
-        <div className="row">
-          <div className="column column__content">
-            <h5 className="page-title">
-              Showing { plugins.items.length } results for { keyword }
-            </h5>
-
-            <PluginList
-              plugins={plugins}
-            />
+      <div style={{position: 'relative'}}>
+        <div className="container">
+          <div className="row">
+            <div className="column column__content">
+              <EnhancedPluginList
+                plugins={plugins}
+                location={this.props.location}
+                dispatch={this.props.dispatch}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -33,11 +39,12 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const {search} = state
+  const {catalog} = state
 
   return {
     keyword: search.keyword,
-    plugins: search,
+    plugins: catalog,
+    location: ownProps.location
   }
 }
 

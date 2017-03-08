@@ -1,0 +1,58 @@
+$padding: 2rem;
+
+.l-benefits {
+  padding-bottom: 6.4rem;
+  padding-top: 6.4rem;
+
+  h2 {
+    font-size: 2.8rem;
+    letter-spacing: normal;
+    margin-bottom: 3.2rem;
+  }
+
+  h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+  }
+
+  p {
+    font-size: 1.4rem;
+  }
+
+  a {
+    text-decoration: underline;
+    font-weight: 600;
+  }
+}
+
+
+.footer--registry {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  color: rgba(173,181,189,1.0);
+  background-color: #282833;
+  padding-top: $padding * 2;
+  padding-bottom: $padding * 2;
+  padding-left: $padding * 2;
+  padding-right: $padding * 2;
+  font-size: 1.3rem;
+
+  a {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+
+  .footer-section {
+    flex-grow: 1;
+  }
+
+  .footer-section + .footer-section {
+    margin-left: $padding;
+  }
+
+  .emoji {
+    font-size: 1.5rem;
+  }
+}

@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
 
 import App from 'containers/App'
+import Skeleton from 'layouts/Skeleton'
 
 import FrontPage from 'views/FrontPage'
 import BrowsePlugins from 'views/BrowsePlugins'
@@ -21,17 +22,20 @@ export const render = () => {
   ReactDOM.render(
     <Provider store={store}>
       <Router history={browserHistory}>
-        <Route path="/" component={App}>
-          <IndexRoute component={BrowsePlugins} />
-          <Route path="browse" component={BrowsePlugins} />
-          <Route path="search" component={SearchResults} />
+        <Route path="/" component={Skeleton}>
+          <IndexRoute component={FrontPage} />
 
-          <Route path="@:owner" component={UserProfile}>
-            <IndexRedirect to="plugins" />
-            <Route path="plugins" component={UserPlugins} />
+          <Route component={App}>
+            <Route path="browse" component={BrowsePlugins} />
+            <Route path="search" component={BrowsePlugins} />
+
+            <Route path="@:owner" component={UserProfile}>
+              <IndexRedirect to="plugins" />
+              <Route path="plugins" component={UserPlugins} />
+            </Route>
+
+            <Route path=":owner/:id" component={PluginDetails} />
           </Route>
-
-          <Route path=":owner/:id" component={PluginDetails} />
 
         </Route>
       </Router>

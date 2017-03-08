@@ -12,6 +12,7 @@ import {
 
 import {
   installPluginRequest,
+  updatePluginRequest,
   uninstallPluginRequest,
   toggleVersionLockRequest,
 } from 'actions/plugin_manager'

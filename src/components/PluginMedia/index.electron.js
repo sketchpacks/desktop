@@ -60,7 +60,7 @@ class PluginMedia extends Component {
 
   handleClickUpdate () {
     const {plugin} = this.props
-    this.props.handlePluginEvent({ type: 'install', plugin: plugin })
+    this.props.handlePluginEvent({ type: 'update', plugin: plugin })
   }
 
   renderVersion () {
@@ -90,7 +90,7 @@ class PluginMedia extends Component {
       onClick={!isInstalled
         ? this.handleClickInstall
         : (location.pathname === '/library/updates')
-          ? this.handleClickInstall
+          ? this.handleClickUpdate
           : this.handleClickRemove}
       actionVerb={!isInstalled
         ? 'Install'

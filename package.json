@@ -21,7 +21,9 @@
     "test:coverage": "jest --coverage"
   },
   "jest": {
-    "setupFiles": ["<rootDir>/jestsetup.js"],
+    "setupFiles": [
+      "<rootDir>/jestsetup.js"
+    ],
     "snapshotSerializers": [
       "<rootDir>/node_modules/enzyme-to-json/serializer"
     ],
@@ -122,6 +124,7 @@
     "redux": "^3.6.0",
     "redux-logger": "^2.7.4",
     "redux-thunk": "^2.2.0",
+    "remimi": "^1.1.0",
     "request": "^2.79.0",
     "reselect": "^2.5.4",
     "semver": "^5.3.0",

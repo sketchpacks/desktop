@@ -37,6 +37,9 @@ const {
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
+  UPDATE_PLUGIN_REQUEST,
+  UPDATE_PLUGIN_SUCCESS,
+  UPDATE_PLUGIN_ERROR,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_ERROR,
@@ -119,6 +122,13 @@ ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.install(event, arg)
     .then((plugin) => {
       mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
+    })
+})
+
+ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
+  PluginManager.install(event, arg)
+    .then((plugin) => {
+      mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, plugin)
     })
 })
 

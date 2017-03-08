@@ -69,7 +69,7 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   return {
     state,
-    plugins: {items:getUpdatedPlugins(state)},
+    plugins: {items: getUpdatedPlugins(state)},
     location: state.routing.locationBeforeTransitions,
   }
 }

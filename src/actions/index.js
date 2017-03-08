@@ -19,6 +19,8 @@ const VALID_KEYS = [
   'download_url',
   'owner',
   'locked',
+  'installed_version',
+  'installed',
 ]
 
 const prunePluginData = (plugins) => plugins.map(p => pick(p, VALID_KEYS))
@@ -229,7 +231,17 @@ export const FETCH_SEARCH_REQUEST = 'search/FETCH_REQUEST'
 export function fetchSearchRequest (payload) {
   return {
     type: FETCH_SEARCH_REQUEST,
-    payload
+    payload,
+    meta: {
+      mixpanel: {
+        eventName: 'Registry',
+        type: 'Search',
+        props: {
+          source: 'desktop',
+          keyword: payload.keyword,
+        },
+      },
+    },
   }
 }
 

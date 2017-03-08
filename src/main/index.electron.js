@@ -42,6 +42,13 @@ import {
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
 
+  updatePluginRequest,
+  updatePluginSuccess,
+  updatePluginError,
+  UPDATE_PLUGIN_REQUEST,
+  UPDATE_PLUGIN_SUCCESS,
+  UPDATE_PLUGIN_ERROR,
+
   uninstallPluginSuccess,
   uninstallPluginError,
   UNINSTALL_PLUGIN_REQUEST,
@@ -135,6 +142,15 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
       store.dispatch(installPluginSuccess(plugin))
+      Catalog.getInstalledPlugins()
+        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
+    })
+})
+
+ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
+  Catalog.pluginInstalled(plugin)
+    .then((plugin) => {
+      store.dispatch(updatePluginSuccess(plugin))
       Catalog.getInstalledPlugins()
         .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
     })

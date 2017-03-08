@@ -25,7 +25,7 @@ class BrowsePluginsContainer extends Component {
   renderLoadingState () {
     return (
       <div className="empty-state--expanded">
-        <h4>Loading</h4>
+        <h4>Loading plugins</h4>
       </div>
     )
   }
@@ -44,7 +44,7 @@ class BrowsePluginsContainer extends Component {
 
               { (parseInt(plugins.total) === 0)
                 && this.renderEmptyState() }
-                
+
               <EnhancedPluginList
                 plugins={plugins}
                 location={this.props.location}

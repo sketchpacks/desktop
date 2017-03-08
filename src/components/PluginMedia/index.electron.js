@@ -14,12 +14,6 @@ import Button from 'components/Button'
 import Nameplate from 'components/Nameplate'
 import PluginMetric from 'components/PluginMetric'
 
-import {
-  installPluginRequest,
-  uninstallPluginRequest,
-  toggleVersionLockRequest
-} from 'actions/plugin_manager'
-
 import './plugin_media.scss'
 
 class PluginMedia extends Component {
@@ -60,7 +54,7 @@ class PluginMedia extends Component {
 
   handleClickUpdate () {
     const {plugin} = this.props
-    this.props.handlePluginEvent({ type: 'install', plugin: plugin })
+    this.props.handlePluginEvent({ type: 'update', plugin: plugin })
   }
 
   renderVersion () {
@@ -90,7 +84,7 @@ class PluginMedia extends Component {
       onClick={!isInstalled
         ? this.handleClickInstall
         : (location.pathname === '/library/updates')
-          ? this.handleClickInstall
+          ? this.handleClickUpdate
           : this.handleClickRemove}
       actionVerb={!isInstalled
         ? 'Install'

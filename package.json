@@ -3,7 +3,7 @@
   "productName": "Sketchpacks",
   "companyName": "Sketchpacks",
   "description": "Discover and manage Sketch Plugins from the menu bar",
-  "version": "0.3.13",
+  "version": "0.3.14",
   "main": "index.js",
   "scripts": {
     "postinstall": "install-app-deps",
@@ -21,7 +21,9 @@
     "test:coverage": "jest --coverage"
   },
   "jest": {
-    "setupFiles": ["<rootDir>/jestsetup.js"],
+    "setupFiles": [
+      "<rootDir>/jestsetup.js"
+    ],
     "snapshotSerializers": [
       "<rootDir>/node_modules/enzyme-to-json/serializer"
     ],
@@ -90,6 +92,7 @@
     "content-disposition": "^0.5.2",
     "electron-log": "^1.2.2",
     "express": "^4.14.0",
+    "first-run": "^1.2.0",
     "fs": "0.0.1-security",
     "is-electron-renderer": "^2.0.0",
     "is-there": "^4.3.6",
@@ -122,6 +125,7 @@
     "redux": "^3.6.0",
     "redux-logger": "^2.7.4",
     "redux-thunk": "^2.2.0",
+    "remimi": "^1.1.0",
     "request": "^2.79.0",
     "reselect": "^2.5.4",
     "semver": "^5.3.0",

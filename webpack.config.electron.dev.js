@@ -83,7 +83,7 @@ let options = {
   ],
 
   resolve: {
-    extensions: ['.js', '.scss', '.css', '.electron.js'],
+    extensions: ['.js', '.scss', '.css', '.electron.js', '.json'],
     modules: [path.resolve(__dirname, "src"), "node_modules"]
   }
 }

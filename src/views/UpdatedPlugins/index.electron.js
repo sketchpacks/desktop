@@ -20,7 +20,12 @@ class UpdatedPluginsContainer extends Component {
   renderEmptyState () {
     return (
       <div className="empty-state--expanded">
-        <h4>Your outdated plugins will appear here</h4>
+        <span className="o-emoji o-emoji--xl">🖖🏽</span>
+
+        <h4>No updates available</h4>
+
+        <p>Your outdated plugins will appear here. 🔒 a plugin to prevent future
+        updates from being applied.</p>
       </div>
     )
   }
@@ -64,7 +69,7 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   return {
     state,
-    plugins: {items:getUpdatedPlugins(state)},
+    plugins: {items: getUpdatedPlugins(state)},
     location: state.routing.locationBeforeTransitions,
   }
 }

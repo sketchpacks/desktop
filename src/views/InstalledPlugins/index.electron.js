@@ -19,7 +19,10 @@ class InstalledPluginsContainer extends Component {
   renderEmptyState () {
     return (
       <div className="empty-state--expanded">
-        <h4>Your installed plugins will appear here</h4>
+        <span className="o-emoji o-emoji--xl">😐</span>
+        <h4>No installed plugins</h4>
+
+        <p>Plugins you install via Sketchpacks will appear here.</p>
       </div>
     )
   }
@@ -27,7 +30,7 @@ class InstalledPluginsContainer extends Component {
   renderLoadingState () {
     return (
       <div className="empty-state--expanded">
-        <h4>Loading</h4>
+        <h4>Loading library</h4>
       </div>
     )
   }

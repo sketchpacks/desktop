@@ -1,3 +1,5 @@
+import pkg from '../../package'
+
 import { remote } from 'electron'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -9,6 +11,7 @@ import { ipcRenderer, ipcMain } from 'electron'
 import waterfall from 'async/waterfall'
 import Promsie from 'promise'
 import log from 'electron-log'
+import firstRun from 'first-run'
 
 import App from 'containers/App'
 
@@ -24,6 +27,8 @@ import UserRecommends from 'views/UserRecommends'
 import UserPlugins from 'views/UserPlugins'
 
 import {
+  appInstall,
+
   pluginsRequest,
   pluginsReceived,
 
@@ -41,6 +46,13 @@ import {
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
+
+  updatePluginRequest,
+  updatePluginSuccess,
+  updatePluginError,
+  UPDATE_PLUGIN_REQUEST,
+  UPDATE_PLUGIN_SUCCESS,
+  UPDATE_PLUGIN_ERROR,
 
   uninstallPluginSuccess,
   uninstallPluginError,
@@ -140,6 +152,15 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
     })
 })
 
+ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
+  Catalog.pluginInstalled(plugin)
+    .then((plugin) => {
+      store.dispatch(updatePluginSuccess(plugin))
+      Catalog.getInstalledPlugins()
+        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
+    })
+})
+
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginRemoved(plugin)
     .then((plugin) => {
@@ -162,3 +183,9 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
 ipcRenderer.on('CHECK_FOR_CATALOG_UPDATES', (evt) => {
   Catalog.update()
 })
+
+
+
+if (firstRun({name: `${pkg.name}-${pkg.version}`})) {
+  store.dispatch(appInstall(`v${pkg.version}`))
+}

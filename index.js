@@ -37,6 +37,9 @@ const {
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
+  UPDATE_PLUGIN_REQUEST,
+  UPDATE_PLUGIN_SUCCESS,
+  UPDATE_PLUGIN_ERROR,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_ERROR,
@@ -52,7 +55,7 @@ const opts = {
   height: 540,
   index: `http://localhost:${SERVER_PORT}/`,
   resizable: false,
-  alwaysOnTop: true,
+  alwaysOnTop: false,
   showOnAllWorkspaces: true,
   preloadWindow: true,
   tooltip: `Sketchpacks v${pkg.version}`,
@@ -76,10 +79,10 @@ menuBar.on('ready', () => {
 })
 
 menuBar.on('after-show', () => {
-  // if (__DEVELOPMENT__) {
+  if (__DEVELOPMENT__) {
     // require('devtron').install()
     menuBar.window.openDevTools({ mode: 'detach' })
-  // }
+  }
 })
 
 menuBar.on('after-create-window', () => {
@@ -88,7 +91,6 @@ menuBar.on('after-create-window', () => {
 })
 
 app.on('ready', () => {
-  console.log('READY!')
   if (__PRODUCTION__ && __ELECTRON__) {
     updater = require('./src/main/updater')
     updater.init()
@@ -119,6 +121,13 @@ ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.install(event, arg)
     .then((plugin) => {
       mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
+    })
+})
+
+ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
+  PluginManager.install(event, arg)
+    .then((plugin) => {
+      mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, plugin)
     })
 })
 

@@ -1,0 +1,11 @@
+@import "Tokens";
+@import "Utility";
+
+.o-emoji {
+  display: inline-block;
+
+  &--xl {
+    font-size: getSize('x-large');
+    line-height: 1.2;
+  }
+}

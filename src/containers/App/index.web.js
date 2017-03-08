@@ -30,7 +30,7 @@ class App extends Component {
               <div className="column">
 
                 <nav>
-                  <Link to="/" className="branding">
+                  <a href="/" className="branding">
                     <SVGIcon
                       icon={'brand'}
                       shape={'path'}
@@ -39,7 +39,7 @@ class App extends Component {
                       viewBox={'0 0 48 48'}
                     />
                     <strong>Sketchpacks</strong>
-                  </Link>
+                  </a>
 
                   <SearchBar location={this.props.location} classNames={'searchBar'} />
 

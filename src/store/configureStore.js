@@ -1,3 +1,5 @@
+import {MIXPANEL_TOKEN} from '../config'
+
 import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import createLogger from 'redux-logger'
@@ -14,7 +16,7 @@ const enhancer = composeEnhancers(
   applyMiddleware(
     thunk.withExtraArgument({api: SketchpacksApi}),
     logger,
-    mixpanelMiddleware('83ca491fc0b9796233bffce9e2d7593c'),
+    mixpanelMiddleware(MIXPANEL_TOKEN),
   )
 )
 

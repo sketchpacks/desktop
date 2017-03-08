@@ -15,6 +15,10 @@ module.exports = {
 
   UPDATER_INTERVAL: process.env.NODE_ENV === 'development' ? '30s' : '30m',
 
+  MIXPANEL_TOKEN: process.env.NODE_ENV === 'development'
+    ? '83ca491fc0b9796233bffce9e2d7593c'
+    : 'e33958b9ef89db7377e9efed5c7e8a64',
+
   HOME_PATH: process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE,
   PLUGIN_PATHS: [
     "/Library/Application Support/com.bohemiancoding.sketch3/Plugins/", // Sketch 3

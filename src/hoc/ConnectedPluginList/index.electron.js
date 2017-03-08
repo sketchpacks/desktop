@@ -114,11 +114,9 @@ const ConnectedPluginList = ComposedComponent =>
           />
 
           { !this.props.plugins.isLoading
-            && this.props.plugins.items.length > 0
-            && parseInt(this.props.plugins.nextPage) !== 1
-            && parseInt(this.props.plugins.lastPage) >= parseInt(this.props.plugins.nextPage)
+            && this.props.plugins.total >= 11
             && <Waypoint
-            onEnter={() => this.fetchData({ sort: this.props.plugins.sort })} /> }
+              onEnter={() => this.fetchData({ sort: this.props.plugins.sort })} /> }
         </div>
       )
     }

@@ -14,7 +14,7 @@ import linkHeader from 'parse-link-header'
 import {SketchpacksApi} from 'api'
 
 import {
-  fetchCatalog
+  fetchSearch
 } from 'actions'
 
 import './styles.scss'
@@ -28,13 +28,9 @@ class SearchBar extends Component {
   }
 
   fetchData ({ sort, page, append, q }) {
-    const {dispatch,plugins} = this.props
+    const {dispatch} = this.props
 
-    const queryParams = qs.stringify({
-      text: q,
-    })
-
-    dispatch(fetchCatalog(queryParams, false))
+    dispatch(fetchSearch(q, false))
     browserHistory.push(`/search?q=${q}`)
   }
 

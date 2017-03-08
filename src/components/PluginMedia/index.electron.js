@@ -87,7 +87,7 @@ class PluginMedia extends Component {
     const {isInstalled} = this.props
 
     return <Button
-      onClick={() => !isInstalled
+      onClick={!isInstalled
         ? this.handleClickInstall
         : (location.pathname === '/library/updates')
           ? this.handleClickInstall

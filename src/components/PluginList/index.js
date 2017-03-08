@@ -13,28 +13,6 @@ const isInstalled = (library, pluginId) => {
 class PluginList extends Component {
   constructor (props) {
     super(props)
-
-    console.log('PluginList#constructor', props)
-
-    this.renderLoadingState = this.renderLoadingState.bind(this)
-    this.renderZeroState = this.renderZeroState.bind(this)
-  }
-
-  renderZeroState () {
-    return (
-      <div className="empty-state--expanded">
-        <h4>Couldnt find the catalog</h4>
-        <p>Please check your network connection and try again.</p>
-      </div>
-    )
-  }
-
-  renderLoadingState () {
-    return (
-      <div className="o-shelf">
-        <h4>Loading plugins</h4>
-      </div>
-    )
   }
 
   render () {
@@ -47,11 +25,6 @@ class PluginList extends Component {
       handlePluginEvent,
       fetchData
     } = this.props
-
-    // if ((plugins.items.length === 0) && plugins.isLoading) return this.renderZeroState()
-
-    if (plugins.isLoading) return this.renderLoadingState()
-    if (plugins.items.length === 0) return this.renderZeroState()
 
     return (
       <div className="o-plugin-list">

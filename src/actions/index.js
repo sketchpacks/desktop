@@ -1,6 +1,28 @@
 import linkHeader from 'parse-link-header'
 import qs from 'qs'
 
+import {pick} from 'lodash'
+
+const VALID_KEYS = [
+  'id',
+  'name',
+  'title',
+  'description',
+  'version',
+  'compatible_version',
+  'score',
+  'watchers_count',
+  'stargazers_count',
+  'auto_updates',
+  'source_url',
+  'thumbnail_url',
+  'download_url',
+  'owner',
+  'locked',
+]
+
+const prunePluginData = (plugins) => plugins.map(p => pick(p, VALID_KEYS))
+
 export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE'
 
 export const PLUGINS_SORT_BY = 'plugins/SORT_BY'
@@ -35,7 +57,7 @@ export const PLUGINS_RECEIVED = 'PLUGINS_RECEIVED'
 export function pluginsReceived (payload) {
   return {
     type: PLUGINS_RECEIVED,
-    payload: payload
+    payload: prunePluginData(payload)
   }
 }
 
@@ -45,7 +67,7 @@ export const PLUGINS_FETCH_RECEIVED = 'plugins/FETCH_RECEIVED'
 export function fetchPluginsReceived (payload) {
   return {
     type: PLUGINS_FETCH_RECEIVED,
-    payload: payload
+    payload: prunePluginData(payload)
   }
 }
 
@@ -104,7 +126,8 @@ export function fetchCatalog (query, append=true) {
 
         dispatch(fetchCatalogReceived({
           payload: response.data,
-          append: append
+          append: append,
+          total: response.headers.total,
         }))
       })
       .catch(error => dispatch(fetchCatalogError(error)))
@@ -128,11 +151,12 @@ export function fetchCatalogRequest ({payload, append}) {
 
 export const FETCH_CATALOG_RECEIVED = 'catalog/FETCH_RECEIVED'
 
-export function fetchCatalogReceived ({payload, append}) {
+export function fetchCatalogReceived ({payload, append, total}) {
   return {
     type: FETCH_CATALOG_RECEIVED,
-    payload: payload,
-    append
+    payload: prunePluginData(payload),
+    total: total,
+    append,
   }
 }
 
@@ -163,7 +187,7 @@ export function catalogSortBy (sort) {
     q: '',
     sort: sort
   })
-  
+
   return (dispatch, getState, {api}) => {
 
     dispatch(fetchCatalog(queryParams, false))
@@ -180,9 +204,9 @@ export function catalogSortBy (sort) {
 // SEARCH
 //
 
-export function fetchSearch (keyword) {
+export function fetchSearch (keyword, append=false) {
   return (dispatch, getState, {api}) => {
-    dispatch(fetchSearchRequest(keyword))
+    dispatch(fetchSearchRequest({keyword: keyword}))
 
     api.getCatalog({query: `text=${keyword}`})
       .then(response => {
@@ -190,9 +214,13 @@ export function fetchSearch (keyword) {
 
         if (pageMeta) dispatch(pluginsPaginate(pageMeta))
 
-        dispatch(fetchSearchReceived(response.data))
+        dispatch(fetchCatalogReceived({
+          payload: response.data,
+          append: append,
+          total: response.headers.total,
+        }))
       })
-      .catch(error => dispatch(fetchSearchError(error)))
+      .catch(error => dispatch(fetchCatalogError(error)))
   }
 }
 
@@ -242,7 +270,7 @@ export const FETCH_LIBRARY_RECEIVED = 'library/FETCH_RECEIVED'
 export function fetchLibraryReceived (payload) {
   return {
     type: FETCH_LIBRARY_RECEIVED,
-    payload: payload
+    payload: prunePluginData(payload)
   }
 }
 
@@ -304,7 +332,7 @@ export const FETCH_USER_PLUGINS_RECEIVED = 'user/FETCH_PLUGINS_RECEIVED'
 export function fetchUserPluginsReceived (plugins) {
   return {
     type: FETCH_USER_PLUGINS_RECEIVED,
-    payload: plugins
+    payload: prunePluginData(plugins)
   }
 }
 
@@ -323,7 +351,10 @@ export function fetchUserPlugins (endpoint) {
       .then(response => {
         dispatch(fetchUserPluginsReceived(response.data))
       })
-      .catch(error => dispatch(fetchUserPluginsError(error)))
+      .catch(error => {
+        dispatch(fetchUserPluginsError(error))
+
+      })
   }
 }
 
@@ -338,7 +369,6 @@ export function fetchPluginDetails ({userId, pluginId}) {
 
     api.getPlugin({userId, pluginId})
       .then(response => {
-
         dispatch(fetchPluginDetailsReceived(response.data))
         dispatch(fetchPluginReadme(response.data.readme_url))
       })

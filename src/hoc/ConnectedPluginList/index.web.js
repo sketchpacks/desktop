@@ -3,36 +3,26 @@ import React from 'react'
 import qs from 'qs'
 import {SketchpacksApi} from 'api'
 
-
 import Waypoint from 'react-waypoint'
 
 import {
   fetchCatalog
 } from 'actions'
 
-import {
-  installPluginRequest,
-  uninstallPluginRequest,
-  toggleVersionLockRequest,
-} from 'actions/plugin_manager'
-
 const ConnectedPluginList = ComposedComponent =>
   class extends React.Component {
     constructor (props) {
       super(props)
 
-      console.log('ConnectedPluginList#constructor', props)
-
       this.fetchData = this.fetchData.bind(this)
       this.renderLoading = this.renderLoading.bind(this)
 
+      this.handleInstall = this.handleInstall.bind(this)
       this.handlePluginEvent = this.handlePluginEvent.bind(this)
     }
 
-    toggleLock ({ id, locked }) {
-      const {dispatch} = this.props
-
-      dispatch(toggleVersionLockRequest(id,locked))
+    handleInstall (plugin) {
+      window.location = `sketchpacks://install/${plugin.id}`
     }
 
     handlePluginEvent ({ type, plugin }) {
@@ -40,13 +30,7 @@ const ConnectedPluginList = ComposedComponent =>
 
       switch (type) {
         case "install":
-          return dispatch(installPluginRequest(plugin))
-        case "remove":
-          return dispatch(uninstallPluginRequest(plugin))
-        case "update":
-          return dispatch(updatePluginRequest(plugin))
-        case "lock":
-          return this.toggleLock(plugin)
+          return this.handleInstall(plugin)
         case "favorite":
           return console.log(type, plugin)
         case "collect":
@@ -58,8 +42,8 @@ const ConnectedPluginList = ComposedComponent =>
       this.fetchData({
         page: 1,
         append: false,
-        q: this.props.location.query.q,
-        sort: this.props.location.query.sort,
+        q: this.props.location.query.q || '',
+        sort: this.props.location.query.sort || 'score:desc',
       })
     }
 
@@ -69,9 +53,9 @@ const ConnectedPluginList = ComposedComponent =>
       if (this.props.location.query.sort !== nextProps.location.query.sort) {
         this.fetchData({
           page: 1,
-          sort: nextProps.location.query.sort,
+          sort: nextProps.location.query.sort || 'score:desc',
           append: false,
-          q: nextProps.location.query.q,
+          q: nextProps.location.query.q || '',
         })
       }
     }
@@ -85,7 +69,7 @@ const ConnectedPluginList = ComposedComponent =>
         page: page || parseInt(plugins.nextPage),
         per_page: 10,
         sort: sort || plugins.sort,
-        text: q || null
+        text: q || plugins.q
       })
 
       dispatch(fetchCatalog(queryParams, append))
@@ -112,7 +96,6 @@ const ConnectedPluginList = ComposedComponent =>
             state={this.props.state}
             location={this.props.location}
             dispatch={this.props.dispatch}
-            installedPluginIds={this.props.installedPluginIds}
           />
 
           { !this.props.plugins.isLoading

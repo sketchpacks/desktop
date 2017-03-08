@@ -8,50 +8,15 @@ import './registry.scss'
 
 import SVGIcon from 'components/SVGIcon'
 import SearchBar from 'components/SearchBar'
+import {LikeButton,TweetButton} from 'components/ShareButtons'
 
 class App extends Component {
   constructor (props) {
     super(props)
-
-    this.renderPromo = this.renderPromo.bind(this)
   }
 
   componentDidMount () {
     const { dispatch } = this.props
-  }
-
-  renderPromo () {
-    return (
-      <div className="hero hero--promo">
-        <div className="container">
-          <div className="row">
-
-            <div className="column">
-              <h1>Get Sketchpacks for macOS</h1>
-              <h3>Discover and manage Sketch plugins right from your menu bar</h3>
-
-              <a
-                href="https://sketchpacks-releases.herokuapp.com/download"
-                className="button"
-              >
-                Download Sketchpacks
-              </a>
-
-              <small>
-                 macOS 10.10 or above required &bull; Sketch 40 or above required
-              </small>
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="column">
-              <img src={require('static/images/promo-screenshot.png')} />
-            </div>
-          </div>
-
-        </div>
-      </div>
-    )
   }
 
   render () {
@@ -65,20 +30,21 @@ class App extends Component {
               <div className="column">
 
                 <nav>
-                  <Link to="/" className="branding">
+                  <a href="/" className="branding">
                     <SVGIcon
                       icon={'brand'}
                       shape={'path'}
                       size={'1.1em'}
+                      fill={'#000000'}
                       viewBox={'0 0 48 48'}
                     />
                     <strong>Sketchpacks</strong>
-                  </Link>
+                  </a>
 
                   <SearchBar location={this.props.location} classNames={'searchBar'} />
 
                   <div className="nav-group">
-                    <Link to="/browse" className="nav__item">Browse</Link>
+                    <a href="/browse" className="nav__item">Browse</a>
                   </div>
                 </nav>
 
@@ -87,32 +53,61 @@ class App extends Component {
           </div>
         </div>
 
-        { this.props.location.pathname === '/'
-          && this.renderPromo() }
-
         {this.props.children}
 
-        <footer className="registry-footer">
-          <div className="container">
-            <div className="row">
-              <div className="column registry-footer__branding">
-                <SVGIcon
-                  icon={'brand'}
-                  shape={'path'}
-                  size={'5em'}
-                  viewBox={'0 0 48 48'}
-                  fill={'#FFFFFF'}
-                />
+        <footer className="footer--registry">
+          <div className="footer-section">
+            <p>
+              <SVGIcon
+                icon={'brand'}
+                shape={'path'}
+                size={'1.1em'}
+                fill={'#ffffff'}
+                viewBox={'0 0 48 48'}
+              />
+              &nbsp;
+              Made with love by
+              &nbsp;
+              <a href="https://github.com/adamkirkwood" target="_blank">@adamkirkwood</a>
+              &nbsp;&amp;&nbsp;
+              <a href="https://github.com/willdavis" target="_blank">@willdavis</a>
+            </p>
 
-                <p>
-                  Discover and manage your Sketch plugins from the menu bar.
-                </p>
+            <p>
+              <small>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</small>
+            </p>
+          </div>
 
-                <em>&copy; 2017 Sketchpacks. All plugins are owned by their respective authors.</em>
-              </div>
+          <div className="footer-section">
+            <a href="https://medium.com/building-sketchpacks" target="_blank">Blog</a>
+            &nbsp;&bull;&nbsp;
+            <a href="https://medium.com/building-sketchpacks/release-notes/home" target="_blank">Release Notes</a>
+            &nbsp;&bull;&nbsp;
+            <a href="https://github.com/sketchpacks/bug-reports" target="_blank">Report a bug</a>
+            &nbsp;&bull;&nbsp;
+            <a href="https://github.com/sketchpacks/feedback" target="_blank">Give us feedback</a>
+          </div>
+
+          <div className="footer-section">
+            <div className="o-shelf o-shelf__social-buttons o-shelf--recto">
+              <TweetButton
+                url="https://sketchpacks.com"
+                text="Sketchpacks for macOS — Manage your Sketch plugins from the menu bar"
+                via="sketchpacks"
+                related="adamkirkwood"
+                showCount />
+
+              <LikeButton
+                href="https://sketchpacks.com"
+                layout={"button_count"}
+                action={"like"}
+                size={"small"}
+                showFaces={"false"}
+                share />
             </div>
           </div>
         </footer>
+
       </div>
     )
   }
@@ -126,9 +121,11 @@ const mapDispatchToProps = (dispatch) => {
 
 function mapStateToProps(state, ownProps) {
   const { catalog } = state
+  const { location } = ownProps
 
   return {
-    plugins: catalog
+    plugins: catalog,
+    location: location
   }
 }
 

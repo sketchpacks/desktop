@@ -8,6 +8,14 @@
   padding: 0 2rem;
   position: relative;
   width: 100%;
+
+  &--sm {
+    max-width: 66rem;
+  }
+
+  &--xl {
+    max-width: 96rem;
+  }
 }
 
 // Using flexbox for the grid, inspired by Philip Walton:

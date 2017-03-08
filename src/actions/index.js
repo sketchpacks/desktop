@@ -111,7 +111,16 @@ export function catalogSortBy (sort) {
 
     return {
       type: CATALOG_SORT_BY,
-      sort
+      sort,
+      meta: {
+        mixpanel: {
+          eventName: 'Registry',
+          type: 'Sort',
+          props: {
+            sortKey: sort,
+          },
+        },
+      },
     }
   }
 }

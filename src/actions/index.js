@@ -379,3 +379,23 @@ export function fetchPluginReadmeError (error) {
     error
   }
 }
+
+
+
+export const APP_INSTALL = 'app/INSTALL'
+
+export function appInstall (payload) {
+  return {
+    type: APP_INSTALL,
+    payload,
+    meta: {
+      mixpanel: {
+        eventName: 'App',
+        type: 'Install',
+        props: {
+          version: payload,
+        },
+      },
+    },
+  }
+}

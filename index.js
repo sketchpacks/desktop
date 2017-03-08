@@ -91,7 +91,6 @@ menuBar.on('after-create-window', () => {
 })
 
 app.on('ready', () => {
-  console.log('READY!')
   if (__PRODUCTION__ && __ELECTRON__) {
     updater = require('./src/main/updater')
     updater.init()

@@ -14,12 +14,6 @@ import Button from 'components/Button'
 import Nameplate from 'components/Nameplate'
 import PluginMetric from 'components/PluginMetric'
 
-import {
-  installPluginRequest,
-  uninstallPluginRequest,
-  toggleVersionLockRequest
-} from 'actions/plugin_manager'
-
 import './plugin_media.scss'
 
 class PluginMedia extends Component {

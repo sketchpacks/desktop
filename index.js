@@ -79,10 +79,10 @@ menuBar.on('ready', () => {
 })
 
 menuBar.on('after-show', () => {
-  // if (__DEVELOPMENT__) {
+  if (__DEVELOPMENT__) {
     // require('devtron').install()
     menuBar.window.openDevTools({ mode: 'detach' })
-  // }
+  }
 })
 
 menuBar.on('after-create-window', () => {

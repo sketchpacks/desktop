@@ -55,7 +55,7 @@ const opts = {
   height: 540,
   index: `http://localhost:${SERVER_PORT}/`,
   resizable: false,
-  alwaysOnTop: true,
+  alwaysOnTop: false,
   showOnAllWorkspaces: true,
   preloadWindow: true,
   tooltip: `Sketchpacks v${pkg.version}`,

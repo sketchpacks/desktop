@@ -22,7 +22,6 @@ const ConnectedPluginList = ComposedComponent =>
       super(props)
 
       this.fetchData = this.fetchData.bind(this)
-      this.renderLoading = this.renderLoading.bind(this)
 
       this.handlePluginEvent = this.handlePluginEvent.bind(this)
     }
@@ -87,16 +86,6 @@ const ConnectedPluginList = ComposedComponent =>
       })
 
       dispatch(fetchCatalog(queryParams, append))
-    }
-
-    renderLoading () {
-      return (
-        <div className="container">
-          <div className="row">
-            <h4>Fetching more plugins...</h4>
-          </div>
-        </div>
-      )
     }
 
     render () {

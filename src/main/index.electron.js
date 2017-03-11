@@ -23,7 +23,6 @@ import PluginDetails from 'views/PluginDetails'
 import SearchResults from 'views/SearchResults'
 
 import UserProfile from 'views/UserProfile'
-import UserRecommends from 'views/UserRecommends'
 import UserPlugins from 'views/UserPlugins'
 
 import {

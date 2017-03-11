@@ -275,55 +275,6 @@ function authorPlugins (state = initialListState, action) {
 }
 
 
-function search (state = {...initialListState, keyword: ''}, action) {
-  switch (action.type) {
-    case actions.FETCH_SEARCH_REQUEST:
-      return {
-        ...state,
-        items: [],
-        keyword: action.payload,
-        isLoading: true
-      }
-
-    case actions.FETCH_SEARCH_RECEIVED:
-      return {
-        ...state,
-        items: state.items.concat(action.payload),
-        isLoading: false
-      }
-
-    case actions.FETCH_SEARCH_ERROR:
-      return {
-        ...state,
-        isLoading: false
-      }
-
-    case 'manager/UNINSTALL_SUCCESS':
-      return {
-        ...state,
-        items: updateObjectInArray(state.items, action)
-      }
-
-    case 'manager/INSTALL_SUCCESS':
-      return {
-        ...state,
-        items: updateObjectInArray(state.items, action)
-      }
-
-    default:
-      if (typeof state === undefined) {
-        return {
-          ...state,
-          keyword: '',
-          items: []
-        }
-      }
-      else {
-        return state
-      }
-  }
-}
-
 const rootReducer = combineReducers({
   routing: routerReducer,
   catalog,
@@ -332,7 +283,6 @@ const rootReducer = combineReducers({
   app,
   authorDetails,
   authorPlugins,
-  search,
 })
 
 export default rootReducer

@@ -33,7 +33,9 @@ class FrontPageContainer extends Component {
                     />
                   </Link>
 
-                  <SearchBar location={this.props.location} classNames={'searchBar searchBar--frontPage'} />
+                  <SearchBar
+                    location={this.props.location}
+                    classNames={'searchBar searchBar--frontPage'} />
 
                   <div className="nav-group">
                     <div className="o-shelf o-shelf__social-buttons">

@@ -41,7 +41,9 @@ class App extends Component {
                     <strong>Sketchpacks</strong>
                   </a>
 
-                  <SearchBar location={this.props.location} classNames={'searchBar'} />
+                  <SearchBar
+                    location={this.props.location}
+                    classNames={'searchBar'} />
 
                   <div className="nav-group">
                     <a href="/browse" className="nav__item">Browse</a>

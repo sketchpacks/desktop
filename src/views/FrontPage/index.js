@@ -41,7 +41,7 @@ class FrontPageContainer extends Component {
                     <div className="o-shelf o-shelf__social-buttons">
                       <TweetButton
                         url="https://sketchpacks.com"
-                        text="Sketchpacks for macOS — Manage your Sketch plugins from the menu bar"
+                        text="Sketchpacks for macOS — Browse, manage, and auto-update Sketch plugins from your menu bar"
                         via="sketchpacks"
                         related="adamkirkwood"
                         showCount />

@@ -136,6 +136,14 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
 ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
   Catalog.toggleVersionLock({id: args.id, locked: args.locked})
     .then((plugin) => {
+
+      const result = args.locked ? 'unlocked' : 'locked'
+
+      const notif = new window.Notification(`${plugin.name} ${result}`, {
+        body: `${plugin.name} ${result} at ${plugin.installed_version}`,
+        silent: true
+      })
+
       store.dispatch(toggleVersionLockSuccess(plugin))
       Catalog.getInstalledPlugins()
         .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
@@ -145,6 +153,11 @@ ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
+      const notif = new window.Notification(`${plugin.name} installed`, {
+        body: `${plugin.installed_version} was installed`,
+        silent: true
+      })
+
       store.dispatch(installPluginSuccess(plugin))
       Catalog.getInstalledPlugins()
         .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
@@ -154,6 +167,11 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
+      const notif = new window.Notification(`${plugin.name} updated`, {
+        body: `${plugin.name} was updated to ${plugin.installed_version}`,
+        silent: true
+      })
+
       store.dispatch(updatePluginSuccess(plugin))
       Catalog.getInstalledPlugins()
         .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
@@ -163,6 +181,11 @@ ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginRemoved(plugin)
     .then((plugin) => {
+      const notif = new window.Notification(`${plugin.name} uninstalled`, {
+        body: `${plugin.name} was uninstalled`,
+        silent: true
+      })
+
       store.dispatch(uninstallPluginSuccess(plugin))
       Catalog.getInstalledPlugins()
         .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))

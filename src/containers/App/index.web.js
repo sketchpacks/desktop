@@ -25,7 +25,7 @@ class App extends Component {
     return (
       <div className="registry">
         <div className="mainNav">
-          <div className="container">
+          <div className="container container--xl">
             <div className="row">
               <div className="column">
 
@@ -34,11 +34,10 @@ class App extends Component {
                     <SVGIcon
                       icon={'brand'}
                       shape={'path'}
-                      size={'1.1em'}
+                      size={'1.6em'}
                       fill={'#000000'}
                       viewBox={'0 0 48 48'}
                     />
-                    <strong>Sketchpacks</strong>
                   </a>
 
                   <SearchBar
@@ -48,7 +47,13 @@ class App extends Component {
                   <div className="nav-group">
                     <a href="/browse" className="nav__item">Browse</a>
 
-                    <a href="https://github.com/integration/sketchpacks-relay" className="nav__item" target="_blank">Submit Plugins</a>
+                    <a
+                      href="https://github.com/integration/sketchpacks-relay"
+                      className="nav__item"
+                      target="_blank"
+                    >
+                      Submit Plugins
+                    </a>
                   </div>
                 </nav>
 

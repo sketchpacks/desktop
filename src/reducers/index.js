@@ -142,33 +142,6 @@ function library (state = initialListState, action) {
   }
 }
 
-function recommends (state = initialListState, action) {
-  switch (action.type) {
-    case actions.RECOMMENDS_REQUEST:
-      return {
-        ...state,
-        items: [],
-        isLoading: true
-      }
-
-    case actions.RECOMMENDS_RECEIVED:
-      return {
-        ...state,
-        items: action.payload,
-        isLoading: false
-      }
-
-    case actions.RECOMMENDS_ERROR:
-      return {
-        ...state,
-        isLoading: false
-      }
-
-    default:
-      return state
-  }
-}
-
 function pluginDetails (state, action) {
   switch (action.type) {
     case actions.PLUGIN_DETAILS_REQUEST:

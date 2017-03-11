@@ -13,7 +13,6 @@ import SearchResults from 'views/SearchResults'
 import PluginDetails from 'views/PluginDetails'
 
 import UserProfile from 'views/UserProfile'
-import UserRecommends from 'views/UserRecommends'
 import UserPlugins from 'views/UserPlugins'
 
 let store = configureStore()

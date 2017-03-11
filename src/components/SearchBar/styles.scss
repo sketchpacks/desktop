@@ -44,3 +44,30 @@ input.searchBar {
     color: $placeholder-color;
   }
 }
+
+input.searchBar--frontPage {
+  background: rgba(0,0,0,0.1);
+  color: rgba(#ffffff,1.0);
+
+  $placeholdertwo-color: rgba(#ffffff,0.60);
+
+  &:focus {
+    border-color: rgba(#ffffff,1.0);
+  }
+
+  &::-webkit-input-placeholder {
+    color: $placeholdertwo-color;
+  }
+
+  &:-moz-placeholder {
+    color: $placeholdertwo-color;
+  }
+
+  &::-moz-placeholder {
+    color: $placeholdertwo-color;
+  }
+
+  &:-ms-input-placeholder {
+    color: $placeholdertwo-color;
+  }
+}

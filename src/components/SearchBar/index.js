@@ -51,7 +51,12 @@ class SearchBar extends Component {
         <input
           className={this.props.classNames}
           type="text"
-          placeholder="Search all plugins"
+          placeholder={this.props.location.query.q
+            ? this.props.location.query.q
+            : "Search all plugins"}
+          defaultValue={this.props.location.query.q
+            ? this.props.location.query.q
+            : ""}
           onKeyUp={this.handleEnterKey}
         />
         <SVGIcon

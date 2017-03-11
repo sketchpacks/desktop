@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
 import SVGIcon from 'components/SVGIcon'
+import SearchBar from 'components/SearchBar'
 import {LikeButton,TweetButton} from 'components/ShareButtons'
 
 import 'normalize.css'
@@ -31,6 +32,8 @@ class FrontPageContainer extends Component {
                       viewBox={'0 0 48 48'}
                     />
                   </Link>
+
+                  <SearchBar location={this.props.location} classNames={'searchBar searchBar--frontPage'} />
 
                   <div className="nav-group">
                     <div className="o-shelf o-shelf__social-buttons">

@@ -139,8 +139,8 @@ ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
 
       const result = args.locked ? 'unlocked' : 'locked'
 
-      const notif = new window.Notification(`${plugin.name} ${result}`, {
-        body: `${plugin.name} ${result} at ${plugin.installed_version}`,
+      const notif = new window.Notification(`${plugin.title} ${result}`, {
+        body: `${plugin.title} ${result} at ${plugin.installed_version}`,
         silent: true
       })
 
@@ -153,7 +153,7 @@ ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
-      const notif = new window.Notification(`${plugin.name} installed`, {
+      const notif = new window.Notification(`${plugin.title} installed`, {
         body: `${plugin.installed_version} was installed`,
         silent: true
       })
@@ -167,8 +167,8 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
-      const notif = new window.Notification(`${plugin.name} updated`, {
-        body: `${plugin.name} was updated to ${plugin.installed_version}`,
+      const notif = new window.Notification(`${plugin.title} updated`, {
+        body: `${plugin.title} was updated to ${plugin.installed_version}`,
         silent: true
       })
 
@@ -181,8 +181,8 @@ ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginRemoved(plugin)
     .then((plugin) => {
-      const notif = new window.Notification(`${plugin.name} uninstalled`, {
-        body: `${plugin.name} was uninstalled`,
+      const notif = new window.Notification(`${plugin.title} uninstalled`, {
+        body: `${plugin.title} was uninstalled`,
         silent: true
       })
 

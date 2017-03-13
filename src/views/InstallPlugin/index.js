@@ -23,8 +23,12 @@ class InstallPluginContainer extends Component {
     const { owner, id } = this.props.params
 
     dispatch(fetchPluginDetails({ pluginId: id, userId: owner }))
+  }
 
-    setTimeout(this.initiateDownload, 5000)
+  componentDidUpdate () {
+    if (!this.props.pluginDetails.isLoading) {
+      setTimeout(this.initiateDownload, 5000)
+    }
   }
 
   initiateDownload () {
@@ -33,7 +37,7 @@ class InstallPluginContainer extends Component {
   }
 
   render () {
-    const {title, name, download_url} = this.props.pluginDetails
+    const {title, name, download_url, isLoading} = this.props.pluginDetails
 
     return (
       <div className="billboard">
@@ -41,9 +45,15 @@ class InstallPluginContainer extends Component {
         <section>
           <img src={require('static/images/icon.png')} width="132" />
 
-          <h1>Installing {title || name || '...'}</h1>
+          <div
+            className={!isLoading
+              ? 'billboard-content billboard-content--show'
+              : 'billboard-content'}
+          >
+            <h1>Installing {title || name || '...'}</h1>
 
-          <p>If the installation does not start after 5 seconds, make sure <a href="https://sketchpacks-releases.herokuapp.com/download/latest/osx">Sketchpacks for macOS</a> is installed. Or, <a href={download_url}>download the plugin</a> manually.</p>
+            <p>If the installation does not start after 5 seconds, make sure <a href="https://sketchpacks-releases.herokuapp.com/download/latest/osx">Sketchpacks for macOS</a> is installed. Or, <a href={download_url}>download the plugin</a> manually.</p>
+          </div>
         </section>
 
 

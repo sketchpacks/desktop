@@ -5,16 +5,17 @@
   align-items: center;
   height: 100vh;
 
-  p {
-    text-align: center;
-  }
-
   img {
     margin-bottom: 2.4rem;
   }
 
   h1 {
     font-size: 3.2rem;
+    text-align: center;
+  }  
+
+  p {
+    text-align: center;
   }
 
   section {
@@ -25,6 +26,18 @@
     justify-content: center;
     align-items: center;
     width: 60rem;
+  }
+
+  .billboard-content {
+    transition: all 1s ease-in-out;
+    opacity: 0;
+    bottom: -4rem;
+    position: relative;
+  }
+
+  .billboard-content--show {
+    opacity: 1;
+    bottom: 0;
   }
 
   footer {

@@ -171,14 +171,15 @@ function pluginDetails (state, action) {
     case actions.PLUGIN_DETAILS_RECEIVED:
       return {
         ...state,
-        ...action.payload
+        isLoading: false,
+        ...action.payload,
       }
 
     case actions.PLUGIN_README_RECEIVED:
       return {
         ...state,
         isLoading: false,
-        readme: action.payload
+        readme: action.payload,
       }
 
     default:

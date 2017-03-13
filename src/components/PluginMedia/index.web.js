@@ -26,16 +26,9 @@ class PluginMedia extends Component {
     this.renderButton = this.renderButton.bind(this)
     this.renderStargazerCount = this.renderStargazerCount.bind(this)
 
-    this.handleClickInstall = this.handleClickInstall.bind(this)
-
     this.state = {
       hidePreview: false
     }
-  }
-
-  handleClickInstall () {
-    const {plugin} = this.props
-    this.props.handlePluginEvent({ type: 'install', plugin: plugin })
   }
 
   renderPreview () {
@@ -77,13 +70,17 @@ class PluginMedia extends Component {
   }
 
   renderButton () {
-    const {location} = this.props.state.app
-    const {plugin,dispatch} = this.props
+    const {plugin} = this.props
 
-    return <Button
-      onClick={this.handleClickInstall}
-      actionVerb={'Install'}
-      className={'button'} />
+    return (
+      <a
+        href={`/${plugin.owner.handle}/${plugin.name}/install`}
+        className={'button'}
+        target={"_blank"}
+        >
+        {'Install'}
+      </a>
+    )
   }
 
   renderAutoupdates () {

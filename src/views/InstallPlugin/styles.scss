@@ -1,0 +1,34 @@
+.billboard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;;
+  align-items: center;
+  height: 100vh;
+
+  p {
+    text-align: center;
+  }
+
+  img {
+    margin-bottom: 2.4rem;
+  }
+
+  h1 {
+    font-size: 3.2rem;
+  }
+
+  section {
+    padding-top: 12rem;
+    padding-bottom: 12rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 60rem;
+  }
+
+  footer {
+    padding-top: 6.4rem;
+    padding-bottom: 6.4rem;
+  }
+}

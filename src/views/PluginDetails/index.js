@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
 import {sanitizeSemVer} from 'lib/utils'
-import {SketchpacksApi} from 'api'
 
 import Nameplate from 'components/Nameplate'
 import ReadmeDocument from 'components/ReadmeDocument'

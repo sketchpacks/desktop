@@ -12,6 +12,7 @@ import waterfall from 'async/waterfall'
 import Promsie from 'promise'
 import log from 'electron-log'
 import firstRun from 'first-run'
+import path from 'path'
 
 import App from 'containers/App'
 
@@ -139,9 +140,10 @@ ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
 
       const result = args.locked ? 'unlocked' : 'locked'
 
-      const notif = new window.Notification(`${plugin.title} ${result}`, {
-        body: `${plugin.title} ${result} at ${plugin.installed_version}`,
-        silent: true
+      const notif = new window.Notification('Sketchpacks', {
+        body: `${plugin.title} v${plugin.installed_version} ${result}`,
+        silent: true,
+        icon: path.join(__dirname, 'src/static/images/icon.png'),
       })
 
       store.dispatch(toggleVersionLockSuccess(plugin))
@@ -153,9 +155,10 @@ ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
-      const notif = new window.Notification(`${plugin.title} installed`, {
-        body: `${plugin.installed_version} was installed`,
-        silent: true
+      const notif = new window.Notification('Sketchpacks', {
+        body: `${plugin.title} v${plugin.installed_version} installed`,
+        silent: true,
+        icon: path.join(__dirname, 'src/static/images/icon.png'),
       })
 
       store.dispatch(installPluginSuccess(plugin))
@@ -167,9 +170,10 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
-      const notif = new window.Notification(`${plugin.title} updated`, {
-        body: `${plugin.title} was updated to ${plugin.installed_version}`,
-        silent: true
+      const notif = new window.Notification('Sketchpacks', {
+        body: `${plugin.title} updated to v${plugin.installed_version}`,
+        silent: true,
+        icon: path.join(__dirname, 'src/static/images/icon.png'),
       })
 
       store.dispatch(updatePluginSuccess(plugin))
@@ -181,9 +185,10 @@ ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginRemoved(plugin)
     .then((plugin) => {
-      const notif = new window.Notification(`${plugin.title} uninstalled`, {
-        body: `${plugin.title} was uninstalled`,
-        silent: true
+      const notif = new window.Notification('Sketchpacks', {
+        body: `${plugin.title} uninstalled`,
+        silent: true,
+        icon: path.join(__dirname, 'src/static/images/icon.png'),
       })
 
       store.dispatch(uninstallPluginSuccess(plugin))

@@ -47,6 +47,7 @@ class PluginDetailsContainer extends Component {
       score,
       source_url,
       auto_updates,
+      download_url
     } = this.props.pluginDetails
 
     const title_or_name = title || name
@@ -112,10 +113,13 @@ class PluginDetailsContainer extends Component {
                       shape={'polygon'}
                       tooltip={'Stargazers on Github'} /> }
 
-                  <Button
-                    onClick={this.handleClickInstall}
-                    actionVerb={'Install'}
-                    className={'button'} />
+                  <a
+                    href={`/${this.props.params.owner}/${this.props.params.id}/install`}
+                    className={'button'}
+                    target={"_blank"}
+                  >
+                    {'Install'}
+                  </a>
 
                 </div>
 
@@ -130,8 +134,12 @@ class PluginDetailsContainer extends Component {
                     View on Github
                   </Link>
 
-                  <Link to={`${source_url}/issues/new`} className="link--small" target="_blank">
+                  <Link to={`${source_url}/issues/new`} className="link--small u-mar-right-medium" target="_blank">
                     Report a Bug
+                  </Link>
+
+                  <Link to={download_url} className="link--small">
+                    Download this plugin
                   </Link>
                 </div>
 

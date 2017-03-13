@@ -142,33 +142,6 @@ function library (state = initialListState, action) {
   }
 }
 
-function recommends (state = initialListState, action) {
-  switch (action.type) {
-    case actions.RECOMMENDS_REQUEST:
-      return {
-        ...state,
-        items: [],
-        isLoading: true
-      }
-
-    case actions.RECOMMENDS_RECEIVED:
-      return {
-        ...state,
-        items: action.payload,
-        isLoading: false
-      }
-
-    case actions.RECOMMENDS_ERROR:
-      return {
-        ...state,
-        isLoading: false
-      }
-
-    default:
-      return state
-  }
-}
-
 function pluginDetails (state, action) {
   switch (action.type) {
     case actions.PLUGIN_DETAILS_REQUEST:
@@ -198,14 +171,15 @@ function pluginDetails (state, action) {
     case actions.PLUGIN_DETAILS_RECEIVED:
       return {
         ...state,
-        ...action.payload
+        isLoading: false,
+        ...action.payload,
       }
 
     case actions.PLUGIN_README_RECEIVED:
       return {
         ...state,
         isLoading: false,
-        readme: action.payload
+        readme: action.payload,
       }
 
     default:
@@ -302,55 +276,6 @@ function authorPlugins (state = initialListState, action) {
 }
 
 
-function search (state = {...initialListState, keyword: ''}, action) {
-  switch (action.type) {
-    case actions.FETCH_SEARCH_REQUEST:
-      return {
-        ...state,
-        items: [],
-        keyword: action.payload,
-        isLoading: true
-      }
-
-    case actions.FETCH_SEARCH_RECEIVED:
-      return {
-        ...state,
-        items: state.items.concat(action.payload),
-        isLoading: false
-      }
-
-    case actions.FETCH_SEARCH_ERROR:
-      return {
-        ...state,
-        isLoading: false
-      }
-
-    case 'manager/UNINSTALL_SUCCESS':
-      return {
-        ...state,
-        items: updateObjectInArray(state.items, action)
-      }
-
-    case 'manager/INSTALL_SUCCESS':
-      return {
-        ...state,
-        items: updateObjectInArray(state.items, action)
-      }
-
-    default:
-      if (typeof state === undefined) {
-        return {
-          ...state,
-          keyword: '',
-          items: []
-        }
-      }
-      else {
-        return state
-      }
-  }
-}
-
 const rootReducer = combineReducers({
   routing: routerReducer,
   catalog,
@@ -359,7 +284,6 @@ const rootReducer = combineReducers({
   app,
   authorDetails,
   authorPlugins,
-  search,
 })
 
 export default rootReducer

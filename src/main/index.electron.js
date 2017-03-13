@@ -12,6 +12,7 @@ import waterfall from 'async/waterfall'
 import Promsie from 'promise'
 import log from 'electron-log'
 import firstRun from 'first-run'
+import path from 'path'
 
 import App from 'containers/App'
 
@@ -23,7 +24,6 @@ import PluginDetails from 'views/PluginDetails'
 import SearchResults from 'views/SearchResults'
 
 import UserProfile from 'views/UserProfile'
-import UserRecommends from 'views/UserRecommends'
 import UserPlugins from 'views/UserPlugins'
 
 import {
@@ -137,6 +137,15 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
 ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
   Catalog.toggleVersionLock({id: args.id, locked: args.locked})
     .then((plugin) => {
+
+      const result = args.locked ? 'unlocked' : 'locked'
+
+      const notif = new window.Notification('Sketchpacks', {
+        body: `${plugin.title} v${plugin.installed_version} ${result}`,
+        silent: true,
+        icon: path.join(__dirname, 'src/static/images/icon.png'),
+      })
+
       store.dispatch(toggleVersionLockSuccess(plugin))
       Catalog.getInstalledPlugins()
         .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
@@ -146,6 +155,12 @@ ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
+      const notif = new window.Notification('Sketchpacks', {
+        body: `${plugin.title} v${plugin.installed_version} installed`,
+        silent: true,
+        icon: path.join(__dirname, 'src/static/images/icon.png'),
+      })
+
       store.dispatch(installPluginSuccess(plugin))
       Catalog.getInstalledPlugins()
         .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
@@ -155,6 +170,12 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginInstalled(plugin)
     .then((plugin) => {
+      const notif = new window.Notification('Sketchpacks', {
+        body: `${plugin.title} updated to v${plugin.installed_version}`,
+        silent: true,
+        icon: path.join(__dirname, 'src/static/images/icon.png'),
+      })
+
       store.dispatch(updatePluginSuccess(plugin))
       Catalog.getInstalledPlugins()
         .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
@@ -164,6 +185,12 @@ ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   Catalog.pluginRemoved(plugin)
     .then((plugin) => {
+      const notif = new window.Notification('Sketchpacks', {
+        body: `${plugin.title} uninstalled`,
+        silent: true,
+        icon: path.join(__dirname, 'src/static/images/icon.png'),
+      })
+
       store.dispatch(uninstallPluginSuccess(plugin))
       Catalog.getInstalledPlugins()
         .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))

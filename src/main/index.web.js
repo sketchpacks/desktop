@@ -8,12 +8,12 @@ import App from 'containers/App'
 import Skeleton from 'layouts/Skeleton'
 
 import FrontPage from 'views/FrontPage'
+import InstallPluginContainer from 'views/InstallPlugin'
 import BrowsePlugins from 'views/BrowsePlugins'
 import SearchResults from 'views/SearchResults'
 import PluginDetails from 'views/PluginDetails'
 
 import UserProfile from 'views/UserProfile'
-import UserRecommends from 'views/UserRecommends'
 import UserPlugins from 'views/UserPlugins'
 
 let store = configureStore()
@@ -24,6 +24,7 @@ export const render = () => {
       <Router history={browserHistory}>
         <Route path="/" component={Skeleton}>
           <IndexRoute component={FrontPage} />
+          <Route path=":owner/:id/install" component={InstallPluginContainer} />
 
           <Route component={App}>
             <Route path="browse" component={BrowsePlugins} />

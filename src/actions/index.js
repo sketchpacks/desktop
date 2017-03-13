@@ -138,7 +138,7 @@ export function fetchSearch (keyword, append=false) {
       .then(response => {
         const pageMeta = linkHeader(response.headers.link)
 
-        if (pageMeta) dispatch(pluginsPaginate(pageMeta))
+        if (pageMeta) dispatch(catalogPaginate(pageMeta))
 
         dispatch(fetchCatalogReceived({
           payload: response.data,

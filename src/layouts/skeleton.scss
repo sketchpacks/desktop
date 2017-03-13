@@ -10,7 +10,6 @@ $padding: 2rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: baseline;
     max-height: 10.8rem;
     width: 100%;
     padding-top: $padding;
@@ -30,7 +29,6 @@ $padding: 2rem;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: top;
 
     a {
       line-height: 2rem;

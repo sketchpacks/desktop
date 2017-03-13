@@ -13,6 +13,7 @@ import {sanitizeSemVer} from 'lib/utils'
 import Button from 'components/Button'
 import Nameplate from 'components/Nameplate'
 import PluginMetric from 'components/PluginMetric'
+import BeatLoader from 'respinner/lib/BeatLoader'
 
 import './plugin_media.scss'
 
@@ -34,6 +35,7 @@ class PluginMedia extends Component {
     this.state = {
       hidePreview: props.thumbnail_url === "",
       isInstalled: props.isInstalled,
+      clicked: false,
     }
   }
 
@@ -45,11 +47,17 @@ class PluginMedia extends Component {
   handleClickInstall () {
     const {plugin} = this.props
     this.props.handlePluginEvent({ type: 'install', plugin: plugin })
+    this.setState({
+      clicked: true
+    })
   }
 
   handleClickRemove () {
     const {plugin} = this.props
     this.props.handlePluginEvent({ type: 'remove', plugin: plugin })
+    this.setState({
+      clicked: true
+    })
   }
 
   handleClickUpdate () {
@@ -80,6 +88,8 @@ class PluginMedia extends Component {
     const {location,handlePluginEvent} = this.props
     const {isInstalled} = this.props
 
+    if (this.state.clicked) return <button className='button'><BeatLoader fill="#ffffff" count={3} /></button>
+
     return <Button
       onClick={!isInstalled
         ? this.handleClickInstall
@@ -96,7 +106,14 @@ class PluginMedia extends Component {
         : (location.pathname === '/library/updates')
           ? 'button'
           : 'button button-installed'} />
+  }
 
+  componentWillReceiveProps (nextProps) {
+    if (this.props.isInstalled !== nextProps.isInstalled) {
+      this.setState({
+        clicked: false
+      })
+    }
   }
 
   renderVersionLock () {

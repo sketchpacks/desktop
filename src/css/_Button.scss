@@ -23,6 +23,8 @@ input[type='submit'] {
   text-transform: uppercase;
   white-space: nowrap;
 
+  transition: all 0.35s;
+
   &:focus,
   &:hover {
     background-color: $color-blue-light;

@@ -1,6 +1,5 @@
 import pkg from '../../package'
 
-import { remote } from 'electron'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, Route, IndexRoute, IndexRedirect, browserHistory } from 'react-router'

@@ -1,8 +1,14 @@
+import {
+  __ELECTRON__,
+  WEB_URL,
+  API_URL
+} from 'config'
+
+import {remote} from 'electron'
 import React from 'react'
 
 import qs from 'qs'
 import {SketchpacksApi} from 'api'
-
 
 import Waypoint from 'react-waypoint'
 
@@ -33,7 +39,7 @@ const ConnectedPluginList = ComposedComponent =>
       dispatch(toggleVersionLockRequest(id,locked))
     }
 
-    handlePluginEvent ({ type, plugin }) {
+    handlePluginEvent ({ type, plugin, author }) {
       const {dispatch} = this.props
 
       switch (type) {
@@ -49,6 +55,10 @@ const ConnectedPluginList = ComposedComponent =>
           return console.log(type, plugin)
         case "collect":
           return console.log(type, plugin)
+        case "info":
+          return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}`)
+        case "author":
+          return remote.shell.openExternal(`${WEB_URL}/@${plugin.owner.handle}`)
       }
     }
 

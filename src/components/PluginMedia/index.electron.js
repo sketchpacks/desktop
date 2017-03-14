@@ -31,6 +31,8 @@ class PluginMedia extends Component {
     this.handleClickInstall = this.handleClickInstall.bind(this)
     this.handleClickRemove = this.handleClickRemove.bind(this)
     this.handleClickUpdate = this.handleClickUpdate.bind(this)
+    this.handleClickPluginName = this.handleClickPluginName.bind(this)
+    this.handleClickAuthorName = this.handleClickAuthorName.bind(this)
 
     this.state = {
       hidePreview: props.thumbnail_url === "",
@@ -63,6 +65,16 @@ class PluginMedia extends Component {
   handleClickUpdate () {
     const {plugin} = this.props
     this.props.handlePluginEvent({ type: 'update', plugin: plugin })
+  }
+
+  handleClickPluginName () {
+    const {plugin} = this.props
+    this.props.handlePluginEvent({ type: 'info', plugin: plugin })
+  }
+
+  handleClickAuthorName () {
+    const {plugin} = this.props
+    this.props.handlePluginEvent({ type: 'author', plugin: plugin })
   }
 
   renderVersion () {
@@ -148,7 +160,15 @@ class PluginMedia extends Component {
   }
 
   render () {
-    const { name, description, owner, version, score, handleCTAClick, title } = this.props.plugin
+    const {
+      name,
+      description,
+      owner,
+      version,
+      score,
+      handleCTAClick,
+      title
+    } = this.props.plugin
     const title_or_name = title || name
     const isInstalled = this.state.isInstalled || false
 
@@ -157,15 +177,9 @@ class PluginMedia extends Component {
           <div className="o-media">
             <div className="o-media__content">
               <h3 className="o-plugin__name">
-                { __ELECTRON__ ? (
-                  <span onClick={() => require('electron').remote.shell.openExternal(`${WEB_URL}/${owner.handle}/${name}`)}>
-                    {title_or_name}
-                  </span>
-                ) : (
-                  <Link to={`/${owner.handle}/${name}`}>
-                    {title_or_name}
-                  </Link>
-                ) }
+                <span onClick={this.handleClickPluginName}>
+                  {title_or_name}
+                </span>
               </h3>
               <p className="o-plugin__logline">
                 {description}
@@ -180,6 +194,7 @@ class PluginMedia extends Component {
               name={owner.name}
               height={24}
               width={24}
+              onClick={this.handleClickAuthorName}
             />
 
             { this.renderVersion() }

@@ -105,15 +105,9 @@ class PluginMedia extends Component {
           <div className="o-media">
             <div className="o-media__content">
               <h3 className="o-plugin__name">
-                { __ELECTRON__ ? (
-                  <a href={`${WEB_URL}/${owner.handle}/${name}`}>
-                    {title_or_name}
-                  </a>
-                ) : (
-                  <Link to={`/${owner.handle}/${name}`}>
-                    {title_or_name}
-                  </Link>
-                ) }
+                <Link to={`/${owner.handle}/${name}`}>
+                  {title_or_name}
+                </Link>
               </h3>
 
               <p className="o-plugin__logline">

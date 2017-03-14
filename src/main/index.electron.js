@@ -1,6 +1,5 @@
 import pkg from '../../package'
 
-import { remote } from 'electron'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, Route, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
@@ -131,7 +130,15 @@ catalogCheck()
 
 ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
   Catalog.getPluginById(pluginId)
-    .then((plugin) => store.dispatch(installPluginRequest(plugin)))
+    .then((plugin) => {
+      store.dispatch(installPluginRequest(plugin))
+
+      const notif = new window.Notification('Sketchpacks', {
+        body: `Installing ${plugin.title} v${plugin.installed_version}...`,
+        silent: true,
+        icon: path.join(__dirname, 'src/static/images/icon.png'),
+      })
+    })
 })
 
 ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {

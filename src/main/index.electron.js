@@ -1,8 +1,13 @@
+import {
+  __PRODUCTION__,
+  __ELECTRON__
+} from 'config'
+
 import pkg from '../../package'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Router, Route, IndexRoute, IndexRedirect, browserHistory } from 'react-router'
+import { Router, Route, IndexRoute, IndexRedirect, browserHistory, hashHistory } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
 import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
@@ -66,7 +71,7 @@ import {
 } from 'actions/plugin_manager'
 
 let store = configureStore()
-const history = syncHistoryWithStore(browserHistory, store)
+const history = syncHistoryWithStore((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory, store)
 
 export const render = () => {
   ReactDOM.render(

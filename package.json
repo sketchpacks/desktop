@@ -91,7 +91,6 @@
     "axios": "^0.15.3",
     "content-disposition": "^0.5.2",
     "electron-log": "^1.2.2",
-    "express": "^4.14.0",
     "first-run": "^1.2.0",
     "fs": "0.0.1-security",
     "is-electron-renderer": "^2.0.0",

@@ -175,7 +175,7 @@ const installQueue = (plugins) => new Promise((resolve, reject) => {
     }), (error, results) => console.log(results))
 })
 
-ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
+const importFromSketchToolbox = () => {
   const homepath = os.homedir()
   const db = dblite(path.join(homepath, SKETCH_TOOLBOX_DB_PATH))
 
@@ -186,5 +186,16 @@ ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
         db.close()
       })
   })
+}
 
+ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
+  dialog.showMessageBox(null, {
+    buttons: ['Cancel', 'Import plugins'],
+    defaultId: 1,
+    cancelId: 0,
+    message: '🚚 Import from Sketch Toolbox',
+    detail: 'Find and install the latest versions of all plugins from Sketch Toolbox found within Sketchpacks Registry',
+  }, (response, checkboxChecked) => {
+    if (response) importFromSketchToolbox()
+  })
 })

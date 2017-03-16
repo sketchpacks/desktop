@@ -166,7 +166,7 @@ const pluginData = (owner,slug) => new Promise((resolve,reject) => {
     })
 })
 
-const installQueue = (plugins) => new Promise((resolve, reject) => {
+const installQueue = (plugins) => {
   async.series(plugins.map(plugin => (callback) => {
       PluginManager.install(null, plugin)
         .then((result) => {
@@ -174,11 +174,12 @@ const installQueue = (plugins) => new Promise((resolve, reject) => {
           callback(null, result)
         })
     }), (error, results) => console.log(results))
-})
+}
 
 const importFromSketchToolbox = (dbPath) => {
   const db = dblite(dbPath)
 
+  mainWindow.webContents.send('IMPORT_START')
   db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
     Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
       .then(data => {

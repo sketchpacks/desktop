@@ -209,18 +209,7 @@ ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
       defaultId: 0,
       cancelId: 0,
       message: '🤔 Import Failed',
-      detail: 'We had trouble finding the location of your Sketch Toolbox. No plugins were imported.',
+      detail: 'We had trouble finding the location of Sketch Toolbox. No plugins were imported.',
     }, (response, checkboxChecked) => {})
   }
-
-ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
-  dialog.showMessageBox(null, {
-    buttons: ['Cancel', 'Import plugins'],
-    defaultId: 1,
-    cancelId: 0,
-    message: '🚚 Import from Sketch Toolbox',
-    detail: 'Find and install the latest versions of all plugins from Sketch Toolbox found within Sketchpacks Registry',
-  }, (response, checkboxChecked) => {
-    if (response) importFromSketchToolbox()
-  })
 })

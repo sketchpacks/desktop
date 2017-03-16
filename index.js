@@ -2,8 +2,10 @@
 'use strict';
 
 const {
+  API_URL,
   APP_VERSION,
   SERVER_PORT,
+  SKETCH_TOOLBOX_DB_PATH,
   __PRODUCTION__,
   __DEVELOPMENT__,
   __ELECTRON__
@@ -25,6 +27,9 @@ const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
 const Database = require('nedb')
+const dblite = require('dblite')
+const axios = require('axios')
+const async = require('async')
 
 const PluginManager = require('./src/main/plugin_manager')
 const Catalog = require('./src/lib/catalog')
@@ -154,4 +159,38 @@ ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
 ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
   const { confirm } = arg
   updater.checkForUpdates(confirm)
+})
+
+const pluginData = (owner,slug) => new Promise((resolve,reject) => {
+  axios.get(`${API_URL}/v1/users/${owner}/plugins/${slug.toLowerCase()}`)
+    .then(response => {
+      resolve(response.data)
+    })
+    .catch(response => {
+      reject({})
+    })
+})
+
+const installQueue = (plugins) => new Promise((resolve, reject) => {
+  async.series(plugins.map(plugin => (callback) => {
+      PluginManager.install(null, plugin)
+        .then((result) => {
+          mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
+          callback(null, result)
+        })
+    }), (error, results) => console.log(results))
+})
+
+ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
+  const homepath = os.homedir()
+  const db = dblite(path.join(homepath, SKETCH_TOOLBOX_DB_PATH))
+
+  db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
+    Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
+      .then(data => {
+        installQueue(data)
+        db.close()
+      })
+  })
+
 })

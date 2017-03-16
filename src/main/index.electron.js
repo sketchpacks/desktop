@@ -128,6 +128,11 @@ const catalogCheck = () => {
 }
 catalogCheck()
 
+ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, pluginId) => {
+  browserHistory.push('library/installed')
+  ipcRenderer.send('IMPORT_FROM_SKETCH_TOOLBOX')
+})
+
 ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
   Catalog.getPluginById(pluginId)
     .then((plugin) => {

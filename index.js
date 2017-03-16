@@ -162,7 +162,7 @@ const pluginData = (owner,slug) => new Promise((resolve,reject) => {
       resolve(response.data)
     })
     .catch(response => {
-      reject({})
+      resolve({})
     })
 })
 
@@ -200,7 +200,7 @@ ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
       message: '🚚 Import from Sketch Toolbox',
       detail: 'Import installed plugins from Sketch Toolbox. Plugins not found in the Sketchpacks Registry will be excluded.',
     }, (response, checkboxChecked) => {
-      if (response) importFromSketchToolbox()
+      if (response) importFromSketchToolbox(dbPath)
     })
   }
   else {

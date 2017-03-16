@@ -15,6 +15,7 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const ms = require('ms')
+const fs = require('fs')
 const {forEach} = require('lodash')
 const electron = require('electron')
 const app = electron.app
@@ -181,9 +182,8 @@ const installQueue = (plugins) => new Promise((resolve, reject) => {
     }), (error, results) => console.log(results))
 })
 
-const importFromSketchToolbox = () => {
-  const homepath = os.homedir()
-  const db = dblite(path.join(homepath, SKETCH_TOOLBOX_DB_PATH))
+const importFromSketchToolbox = (dbPath) => {
+  const db = dblite(dbPath)
 
   db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
     Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
@@ -195,13 +195,28 @@ const importFromSketchToolbox = () => {
 }
 
 ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
-  dialog.showMessageBox(null, {
-    buttons: ['Cancel', 'Import plugins'],
-    defaultId: 1,
-    cancelId: 0,
-    message: '🚚 Import from Sketch Toolbox',
-    detail: 'Find and install the latest versions of all plugins from Sketch Toolbox found within Sketchpacks Registry',
-  }, (response, checkboxChecked) => {
-    if (response) importFromSketchToolbox()
-  })
+  const homepath = os.homedir()
+  const dbPath = path.join(homepath, SKETCH_TOOLBOX_DB_PATH)
+
+  if (fs.existsSync(dbPath)) {
+    dialog.showMessageBox(null, {
+      buttons: ['Cancel', 'Import plugins'],
+      defaultId: 1,
+      cancelId: 0,
+      message: '🚚 Import from Sketch Toolbox',
+      detail: 'Import installed plugins from Sketch Toolbox. Plugins not found in the Sketchpacks Registry will be excluded.',
+    }, (response, checkboxChecked) => {
+      if (response) importFromSketchToolbox()
+    })
+  }
+  else {
+    dialog.showMessageBox(null, {
+      buttons: ['Ok'],
+      defaultId: 0,
+      cancelId: 0,
+      message: '🤔 Import Failed',
+      detail: 'We had trouble finding the location of your Sketch Toolbox. No plugins were imported.',
+    }, (response, checkboxChecked) => {})
+  }
+
 })

@@ -27,5 +27,6 @@ module.exports = {
     "/Library/Containers/com.bohemiancoding.sketch/Data/Library/Application Support/sketch/Plugins/", // Sketch 2 (MAS)
     "/Library/Application Support/sketch/Plugins/", // Sketch 2
     "/Downloads/" // Fallback
-  ]
+  ],
+  SKETCH_TOOLBOX_DB_PATH: '/Library/Application\ Support/Sketch\ Toolbox/Sketch\ Toolbox.sqlite'
 }

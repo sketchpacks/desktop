@@ -2,7 +2,10 @@
 'use strict';
 
 const {
+  API_URL,
   APP_VERSION,
+  SERVER_PORT,
+  SKETCH_TOOLBOX_DB_PATH,
   __PRODUCTION__,
   __DEVELOPMENT__,
   __ELECTRON__
@@ -12,6 +15,7 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const ms = require('ms')
+const fs = require('fs')
 const {forEach} = require('lodash')
 const electron = require('electron')
 const app = electron.app
@@ -24,6 +28,9 @@ const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
 const Database = require('nedb')
+const dblite = require('dblite')
+const axios = require('axios')
+const async = require('async')
 
 const PluginManager = require('./src/main/plugin_manager')
 const Catalog = require('./src/lib/catalog')
@@ -147,4 +154,63 @@ ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
 ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
   const { confirm } = arg
   updater.checkForUpdates(confirm)
+})
+
+const pluginData = (owner,slug) => new Promise((resolve,reject) => {
+  axios.get(`${API_URL}/v1/users/${owner}/plugins/${slug.toLowerCase()}`)
+    .then(response => {
+      resolve(response.data)
+    })
+    .catch(response => {
+      resolve({})
+    })
+})
+
+const installQueue = (plugins) => {
+  async.series(plugins.map(plugin => (callback) => {
+      PluginManager.install(null, plugin)
+        .then((result) => {
+          mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
+          callback(null, result)
+        })
+    }), (error, results) => console.log(results))
+}
+
+const importFromSketchToolbox = (dbPath) => {
+  const db = dblite(dbPath)
+
+  mainWindow.webContents.send('IMPORT_START')
+  db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
+    Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
+      .then(data => {
+        installQueue(data)
+        db.close()
+      })
+  })
+}
+
+ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
+  const homepath = os.homedir()
+  const dbPath = path.join(homepath, SKETCH_TOOLBOX_DB_PATH)
+
+  if (fs.existsSync(dbPath)) {
+    dialog.showMessageBox(null, {
+      buttons: ['Cancel', 'Import plugins'],
+      defaultId: 1,
+      cancelId: 0,
+      message: '🚚 Import from Sketch Toolbox',
+      detail: 'Import installed plugins from Sketch Toolbox. Plugins not found in the Sketchpacks Registry will be excluded.',
+    }, (response, checkboxChecked) => {
+      if (response) importFromSketchToolbox(dbPath)
+    })
+  }
+  else {
+    dialog.showMessageBox(null, {
+      buttons: ['Ok'],
+      defaultId: 0,
+      cancelId: 0,
+      message: '🤔 Import Failed',
+      detail: 'We had trouble finding the location of Sketch Toolbox. No plugins were imported.',
+    }, (response, checkboxChecked) => {})
+  }
 })

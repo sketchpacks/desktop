@@ -213,4 +213,14 @@ ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
     }, (response, checkboxChecked) => {})
   }
 
+ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
+  dialog.showMessageBox(null, {
+    buttons: ['Cancel', 'Import plugins'],
+    defaultId: 1,
+    cancelId: 0,
+    message: '🚚 Import from Sketch Toolbox',
+    detail: 'Find and install the latest versions of all plugins from Sketch Toolbox found within Sketchpacks Registry',
+  }, (response, checkboxChecked) => {
+    if (response) importFromSketchToolbox()
+  })
 })

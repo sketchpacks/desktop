@@ -134,7 +134,7 @@ function library (state = initialListState, action) {
     case 'manager/INSTALL_SUCCESS':
       return {
         ...state,
-        items: updateObjectInArray(state.items, action)
+        items: state.items.concat(action.plugin)
       }
 
     default:

@@ -64,14 +64,10 @@ const install = (event, plugin) => {
 
           extractionPath = new AdmZip(savePath).getEntries()[0].entryName
 
-          resolve({
-            id: id,
-            name: name,
-            download_url: download_url,
-            filename: filename,
+          resolve(Object.assign(plugin, {
             install_path: path.join(getInstallPath(), extractionPath),
-            version: version
-          })
+            version: version,
+          }))
         })
 
         response.pipe(archiveFileStream)

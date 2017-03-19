@@ -18,6 +18,9 @@ import log from 'electron-log'
 import firstRun from 'first-run'
 import path from 'path'
 
+import os from 'os'
+import jsonfile from 'jsonfile'
+
 import App from 'containers/App'
 
 import BrowsePlugins from 'views/BrowsePlugins'
@@ -97,41 +100,13 @@ export const render = () => {
   ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
 }
 
-const catalogCheck = () => {
-  if (window.Catalog === undefined) {
-    setTimeout(catalogCheck, 100)
-  }
-  else {
-    Catalog.getInstalledPlugins()
-      .then(plugins => {
-        store.dispatch(fetchLibraryReceived(plugins))
+const loadLibrary = () => {
+  const libraryPath = `${os.homedir()}/Desktop/sketchpack.json`
 
-        Catalog.enableAutoUpdate()
-      })
-        // else {
-        //   waterfall([
-        //     (callback) => {
-        //       Catalog.setStore(store)
-        //       Catalog.update().then(plugins => callback(null, plugins))
-        //     },
-        //     (plugins, callback) => {
-        //       Catalog.upsert(plugins)
-        //       callback(null)
-        //     },
-        //     (callback) => {
-        //       Catalog.getInstalledPlugins().then(plugins => callback(null, plugins))
-        //     }
-        //   ], (err, result) => {
-        //
-        //     store.dispatch(pluginsRequest())
-        //     store.dispatch(fetchLibraryReceived(result))
-        //   })
-        // }
-
-
-  }
+  const data = jsonfile.readFileSync(libraryPath)
+  store.dispatch(fetchLibraryReceived(data.plugins))
 }
-catalogCheck()
+loadLibrary()
 
 ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, pluginId) => {
   browserHistory.push('library/installed')
@@ -164,24 +139,17 @@ ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
       })
 
       store.dispatch(toggleVersionLockSuccess(plugin))
-      Catalog.getInstalledPlugins()
-        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
     })
 })
 
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  Catalog.pluginInstalled(plugin)
-    .then((plugin) => {
-      const notif = new window.Notification('Sketchpacks', {
-        body: `${plugin.title} v${plugin.installed_version} installed`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
+  const notif = new window.Notification('Sketchpacks', {
+    body: `${plugin.title} v${plugin.installed_version} installed`,
+    silent: true,
+    icon: path.join(__dirname, 'src/static/images/icon.png'),
+  })
 
-      store.dispatch(installPluginSuccess(plugin))
-      Catalog.getInstalledPlugins()
-        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
-    })
+  store.dispatch(installPluginSuccess(plugin))
 })
 
 ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
@@ -194,8 +162,6 @@ ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
       })
 
       store.dispatch(updatePluginSuccess(plugin))
-      Catalog.getInstalledPlugins()
-        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
     })
 })
 
@@ -209,8 +175,6 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
       })
 
       store.dispatch(uninstallPluginSuccess(plugin))
-      Catalog.getInstalledPlugins()
-        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
     })
 })
 

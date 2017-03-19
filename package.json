@@ -96,6 +96,7 @@
     "fs": "0.0.1-security",
     "is-electron-renderer": "^2.0.0",
     "is-there": "^4.3.6",
+    "jsonfile": "^2.4.0",
     "jwt-simple": "^0.5.1",
     "lodash": "^4.17.2",
     "marky-markdown": "^9.0.1",

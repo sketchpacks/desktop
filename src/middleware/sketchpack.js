@@ -19,7 +19,6 @@ const WATCHED_ACTIONS = {
 const {fetchLibraryReceived} = require('../actions/index')
 
 const sketchpackMiddleware = store => next => action => {
-  // console.log(values(WATCHED_ACTIONS),action.type,includes(values(WATCHED_ACTIONS),action.type))
   const prevState = store.getState().library.items
   next(action)
   const nextState = store.getState().library.items

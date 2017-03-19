@@ -89,12 +89,7 @@ const uninstall = (event, plugin) => {
       console.log(`stderr: ${stderr}`)
     })
 
-    resolve({
-      id: id,
-      name: name,
-      install_path: null,
-      installed_version: null
-    })
+    resolve(plugin)
   })
 }
 

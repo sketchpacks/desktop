@@ -49,23 +49,18 @@ import {
 import {
   installPluginRequest,
   installPluginSuccess,
-  installPluginError,
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
-  INSTALL_PLUGIN_ERROR,
 
   updatePluginRequest,
   updatePluginSuccess,
-  updatePluginError,
   UPDATE_PLUGIN_REQUEST,
   UPDATE_PLUGIN_SUCCESS,
-  UPDATE_PLUGIN_ERROR,
 
+  uninstallPluginRequest,
   uninstallPluginSuccess,
-  uninstallPluginError,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
-  UNINSTALL_PLUGIN_ERROR,
 
   toggleVersionLockRequest,
   toggleVersionLockSuccess,
@@ -166,16 +161,13 @@ ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
 })
 
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  Catalog.pluginRemoved(plugin)
-    .then((plugin) => {
-      const notif = new window.Notification('Sketchpacks', {
-        body: `${plugin.title} uninstalled`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
+  const notif = new window.Notification('Sketchpacks', {
+    body: `${plugin.title} TEST`,
+    silent: true,
+    icon: path.join(__dirname, 'src/static/images/icon.png'),
+  })
 
-      store.dispatch(uninstallPluginSuccess(plugin))
-    })
+  store.dispatch(uninstallPluginSuccess(plugin))
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {

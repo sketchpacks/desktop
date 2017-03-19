@@ -27,7 +27,6 @@ const querystring = require('querystring')
 const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
-const Database = require('nedb')
 const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')

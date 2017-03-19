@@ -32,7 +32,6 @@ const axios = require('axios')
 const async = require('async')
 
 const PluginManager = require('./src/main/plugin_manager')
-const Catalog = require('./src/lib/catalog')
 const {
   CATALOG_FETCH_DELAY,
   CATALOG_FETCH_INTERVAL

@@ -94,6 +94,7 @@
     "electron-log": "^1.2.2",
     "first-run": "^1.2.0",
     "fs": "0.0.1-security",
+    "immutability-helper": "^2.1.2",
     "is-electron-renderer": "^2.0.0",
     "is-there": "^4.3.6",
     "jsonfile": "^2.4.0",

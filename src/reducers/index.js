@@ -2,6 +2,11 @@ import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 import * as actions from 'actions'
 
+import sanitizeSemVer from 'lib/utils'
+
+import semver from 'semver'
+import update from 'immutability-helper'
+
 import {
   installPluginRequest,
   installPluginSuccess,
@@ -29,7 +34,7 @@ import {
   TOGGLE_VERSION_LOCK_SUCCESS
 } from 'actions/plugin_manager'
 
-import {filter} from 'lodash'
+import {filter,findIndex} from 'lodash'
 
 const initialListState = {
   items: [],
@@ -156,6 +161,22 @@ function library (state = initialListState, action) {
       return {
         ...state,
         isLoading: false
+      }
+
+    case TOGGLE_VERSION_LOCK_SUCCESS:
+      const pos = findIndex(state.items, ['id', action.plugin.id])
+
+      const newVersion = (action.plugin.version.indexOf('^') > -1)
+        ? `${action.plugin.version.slice(1)}`
+        : `^${action.plugin.version}`
+
+      return {
+        ...state,
+        items: update(state.items, {
+          [pos]: {
+            version: { $set: newVersion }
+          }
+        })
       }
 
     case 'manager/UNINSTALL_SUCCESS':

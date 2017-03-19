@@ -131,6 +131,8 @@ class PluginMedia extends Component {
   renderVersionLock () {
     const {plugin,location} = this.props
 
+    const isLocked = plugin.version.indexOf('^') === -1
+
     if (location.pathname !== '/library/installed') return
 
     return (
@@ -141,7 +143,7 @@ class PluginMedia extends Component {
           ? 'Enable auto-updates'
           : `Lock this version at v${sanitizeSemVer(plugin.installed_version)}` }
       >
-        {plugin.locked ? '🔒' : '🔓'}
+        {isLocked ? '🔒' : '🔓'}
       </div>
     )
   }

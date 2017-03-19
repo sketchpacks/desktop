@@ -1,10 +1,11 @@
 const { ipcRenderer } = require('electron')
+const semver = require('semver')
 
 const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
 
-function toggleVersionLockRequest (id, locked) {
+function toggleVersionLockRequest (plugin) {
   return (dispatch, getState) => {
-    ipcRenderer.send(TOGGLE_VERSION_LOCK_REQUEST, {id: id, locked: locked || false} )
+    dispatch(toggleVersionLockSuccess(plugin))
   }
 }
 
@@ -12,13 +13,15 @@ function toggleVersionLockRequest (id, locked) {
 const TOGGLE_VERSION_LOCK_SUCCESS = 'manager/TOGGLE_VERSION_LOCK_SUCCESS'
 
 function toggleVersionLockSuccess (plugin) {
+  const isLocked = plugin.version.indexOf('^') === -1
+
   return {
     type: TOGGLE_VERSION_LOCK_SUCCESS,
     plugin,
     meta: {
       mixpanel: {
         eventName: 'Manage',
-        type: plugin.locked ? 'Lock Plugin Version' : 'Unlock Plugin Version',
+        type: isLocked ? 'Lock Plugin Version' : 'Unlock Plugin Version',
         props: {
           source: 'desktop',
           pluginId: plugin.id,

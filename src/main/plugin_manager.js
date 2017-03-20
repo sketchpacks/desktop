@@ -95,6 +95,5 @@ const uninstall = (event, plugin) => {
 
 module.exports = {
   install,
-  uninstall,
-  update
+  uninstall
 }

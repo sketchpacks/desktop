@@ -93,10 +93,6 @@ const uninstall = (event, plugin) => {
   })
 }
 
-const update = (event, plugin) => {
-  event.sender.send('manager/UPDATE_SUCCESS', plugin)
-}
-
 module.exports = {
   install,
   uninstall,

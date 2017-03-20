@@ -1,5 +1,13 @@
+const {
+  API_URL
+} = require('../config')
+
 const { ipcRenderer } = require('electron')
+
+const axios = require('axios')
 const semver = require('semver')
+
+const {sanitizeSemVer} = require('../lib/utils')
 
 const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
 
@@ -87,8 +95,20 @@ function installPluginError (error, plugin) {
 const UPDATE_PLUGIN_REQUEST = 'manager/UPDATE_REQUEST'
 
 function updatePluginRequest (plugin) {
-  return (dispatch, getState) => {
-    ipcRenderer.send(UPDATE_PLUGIN_REQUEST, plugin)
+  return (dispatch, getState, {api}) => {
+    api.getPluginUpdate({ pluginId: plugin.id, version: plugin.version })
+      .then(response => {
+        if (response.status === 204) return
+
+        const update = response.data[0]
+
+        const updatedPlugin = Object.assign(plugin, {
+          version: sanitizeSemVer(update.version),
+          download_url: update.download_url
+        })
+
+        ipcRenderer.send(UPDATE_PLUGIN_REQUEST, updatedPlugin)
+      })
   }
 }
 
@@ -163,6 +183,31 @@ function uninstallPluginError (error, plugin) {
   }
 }
 
+const pluginData = (owner,slug) => new Promise((resolve,reject) => {
+  axios.get(`${API_URL}/v1/users/${owner}/plugins/${slug.toLowerCase()}`)
+    .then(response => {
+      resolve(response.data)
+    })
+    .catch(response => {
+      resolve({})
+    })
+})
+
+function updateAvailable (remote,local) {
+  let remoteVersion = sanitizeSemVer(plugin.version)
+  let localVersion = sanitizeSemVer(plugin.installed_version)
+
+  return semver.lt(localVersion,remoteVersion)
+}
+
+function autoUpdatePluginsRequest () {
+  return (dispatch, getState, {api}) => {
+    const plugins = getState().library.items
+
+    plugins.forEach(plugin => dispatch(updatePluginRequest(plugin)))
+  }
+}
+
 
 module.exports = {
   installPluginRequest,
@@ -195,5 +240,7 @@ module.exports = {
 
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
-  UNINSTALL_PLUGIN_ERROR
+  UNINSTALL_PLUGIN_ERROR,
+
+  autoUpdatePluginsRequest
 }

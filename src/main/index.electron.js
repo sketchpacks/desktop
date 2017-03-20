@@ -65,7 +65,9 @@ import {
   toggleVersionLockRequest,
   toggleVersionLockSuccess,
   TOGGLE_VERSION_LOCK_REQUEST,
-  TOGGLE_VERSION_LOCK_SUCCESS
+  TOGGLE_VERSION_LOCK_SUCCESS,
+
+  autoUpdatePluginsRequest
 } from 'actions/plugin_manager'
 
 let store = configureStore()
@@ -95,11 +97,15 @@ export const render = () => {
   ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
 }
 
+const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest())
+
 const loadLibrary = () => {
   const libraryPath = `${os.homedir()}/Desktop/sketchpack.json`
 
   const data = jsonfile.readFileSync(libraryPath)
   store.dispatch(fetchLibraryReceived(data.plugins))
+
+  setTimeout(autoUpdatePlugins, (1000 * 30)) // check for plugin updates after 30s
 }
 loadLibrary()
 
@@ -122,24 +128,12 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
 })
 
 ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
-  Catalog.toggleVersionLock({id: args.id, locked: args.locked})
-    .then((plugin) => {
-
-      const result = args.locked ? 'unlocked' : 'locked'
-
-      const notif = new window.Notification('Sketchpacks', {
-        body: `${plugin.title} v${plugin.installed_version} ${result}`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
-
-      store.dispatch(toggleVersionLockSuccess(plugin))
-    })
+  store.dispatch(toggleVersionLockSuccess(args))
 })
 
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} v${plugin.installed_version} installed`,
+    body: `${plugin.title} v${plugin.version} installed`,
     silent: true,
     icon: path.join(__dirname, 'src/static/images/icon.png'),
   })
@@ -148,16 +142,13 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
 })
 
 ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
-  Catalog.pluginInstalled(plugin)
-    .then((plugin) => {
-      const notif = new window.Notification('Sketchpacks', {
-        body: `${plugin.title} updated to v${plugin.installed_version}`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
+  const notif = new window.Notification('Sketchpacks', {
+    body: `${plugin.title} updated to v${plugin.version}`,
+    silent: true,
+    icon: path.join(__dirname, 'src/static/images/icon.png'),
+  })
 
-      store.dispatch(updatePluginSuccess(plugin))
-    })
+  store.dispatch(updatePluginSuccess(plugin))
 })
 
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
@@ -171,9 +162,7 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
-  log.info('CHECK_FOR_PLUGIN_UPDATES')
-  Catalog.update()
-    .then(plugins => Catalog.autoUpdatePlugins())
+  store.dispatch(autoUpdatePluginsRequest())
 })
 
 ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {

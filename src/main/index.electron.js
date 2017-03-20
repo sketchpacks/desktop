@@ -117,6 +117,7 @@ ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, pluginId) => {
 
 ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
   store.dispatch(webInstallPluginRequest(pluginId))
+  browserHistory.push('library/installed')
 
   const notif = new window.Notification('Sketchpacks', {
     body: `Starting install...`,

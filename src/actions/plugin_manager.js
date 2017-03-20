@@ -1,13 +1,18 @@
 const {
-  API_URL
+  API_URL,
+  PLUGIN_AUTOUPDATE_DELAY
 } = require('../config')
 
 const { ipcRenderer } = require('electron')
 
+const ms = require('ms')
 const axios = require('axios')
 const semver = require('semver')
+const {filter} = require('lodash')
 
 const {sanitizeSemVer} = require('../lib/utils')
+
+
 
 const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
 
@@ -103,7 +108,7 @@ const UPDATE_PLUGIN_REQUEST = 'manager/UPDATE_REQUEST'
 
 function updatePluginRequest (plugin) {
   return (dispatch, getState, {api}) => {
-    api.getPluginUpdate({ pluginId: plugin.id, version: plugin.version })
+    api.getPluginUpdate({ pluginId: plugin.id, version: sanitizeSemVer(plugin.version) })
       .then(response => {
         if (response.status === 204) return
 
@@ -207,11 +212,21 @@ function updateAvailable (remote,local) {
   return semver.lt(localVersion,remoteVersion)
 }
 
+const AUTOUPDATE_PLUGINS_REQUEST = 'manager/AUTOUPDATE_PLUGINS'
+
 function autoUpdatePluginsRequest () {
   return (dispatch, getState, {api}) => {
     const plugins = getState().library.items
+    const unlockedPlugins = filter(plugins, (p) => p.version.indexOf('^') > -1)
 
-    plugins.forEach(plugin => dispatch(updatePluginRequest(plugin)))
+    unlockedPlugins.forEach(plugin => dispatch(updatePluginRequest(plugin)))
+
+    setTimeout(() => dispatch(autoUpdatePluginsRequest()), ms(PLUGIN_AUTOUPDATE_DELAY))
+
+    return {
+      type: AUTOUPDATE_PLUGINS_REQUEST,
+      payload: plugins
+    }
   }
 }
 

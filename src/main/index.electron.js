@@ -12,7 +12,7 @@ import { Router, Route, IndexRoute, IndexRedirect, browserHistory, hashHistory }
 import { syncHistoryWithStore } from 'react-router-redux'
 import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
-import { ipcRenderer, ipcMain } from 'electron'
+import { ipcRenderer, ipcMain, remote } from 'electron'
 import log from 'electron-log'
 import firstRun from 'first-run'
 import path from 'path'
@@ -101,7 +101,7 @@ export const render = () => {
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest())
 
 const loadLibrary = () => {
-  const libraryPath = `${os.homedir()}/Desktop/sketchpack.json`
+  const libraryPath = path.join(remote.app.getPath('userData'), 'sketchpack.json')
 
   const data = jsonfile.readFileSync(libraryPath)
   store.dispatch(fetchLibraryReceived(data.plugins))

@@ -180,11 +180,6 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
 
-ipcRenderer.on('CHECK_FOR_CATALOG_UPDATES', (evt) => {
-  Catalog.update()
-})
-
-
 
 if (firstRun({name: `${pkg.name}-${pkg.version}`})) {
   store.dispatch(appInstall(`v${pkg.version}`))

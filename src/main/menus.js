@@ -44,13 +44,6 @@ const settingsMenu = [
       window.webContents.send('CHECK_FOR_PLUGIN_UPDATES', null)
     },
   },
-  {
-    label: 'Check for Catalog Updates',
-    accelerator: 'Cmd+R',
-    click(item, window, event) {
-      window.webContents.send('CHECK_FOR_CATALOG_UPDATES', null)
-    },
-  },
 
   {
     type: 'separator'

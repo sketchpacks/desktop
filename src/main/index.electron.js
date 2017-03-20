@@ -67,7 +67,8 @@ import {
   TOGGLE_VERSION_LOCK_REQUEST,
   TOGGLE_VERSION_LOCK_SUCCESS,
 
-  autoUpdatePluginsRequest
+  autoUpdatePluginsRequest,
+  webInstallPluginRequest
 } from 'actions/plugin_manager'
 
 let store = configureStore()
@@ -115,17 +116,15 @@ ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, pluginId) => {
 })
 
 ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
-  Catalog.getPluginById(pluginId)
-    .then((plugin) => {
-      store.dispatch(installPluginRequest(plugin))
+  store.dispatch(webInstallPluginRequest(pluginId))
 
-      const notif = new window.Notification('Sketchpacks', {
-        body: `Installing ${plugin.title} v${plugin.installed_version}...`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
-    })
+  const notif = new window.Notification('Sketchpacks', {
+    body: `Starting install...`,
+    silent: true,
+    icon: path.join(__dirname, 'src/static/images/icon.png'),
+  })
 })
+
 
 ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
   store.dispatch(toggleVersionLockSuccess(args))

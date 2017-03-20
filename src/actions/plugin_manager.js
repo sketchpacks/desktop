@@ -59,6 +59,13 @@ function installPluginRequest (plugin) {
   }
 }
 
+function webInstallPluginRequest (pluginId) {
+  return (dispatch, getState, {api}) => {
+    api.getPluginById({ pluginId })
+      .then(response => dispatch(installPluginRequest(response.data)))
+  }
+}
+
 
 const INSTALL_PLUGIN_SUCCESS = 'manager/INSTALL_SUCCESS'
 
@@ -242,5 +249,6 @@ module.exports = {
   UNINSTALL_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_ERROR,
 
-  autoUpdatePluginsRequest
+  autoUpdatePluginsRequest,
+  webInstallPluginRequest
 }

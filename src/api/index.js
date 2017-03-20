@@ -26,6 +26,10 @@ class Sketchpacks {
     return client.get(`/users/${userId}/plugins/${pluginId}`)
   }
 
+  getPluginById ({pluginId}) {
+    return client.get(`/plugins/${pluginId}`)
+  }
+
   getPluginReadme (endpoint) {
     return axios.request({ url: endpoint, method: 'get', timeout: DEFAULT_TIMEOUT })
   }

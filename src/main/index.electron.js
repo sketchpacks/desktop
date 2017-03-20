@@ -162,7 +162,7 @@ ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
 
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} TEST`,
+    body: `${plugin.title} uninstalled`,
     silent: true,
     icon: path.join(__dirname, 'src/static/images/icon.png'),
   })

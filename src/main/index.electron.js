@@ -1,6 +1,7 @@
 import {
   __PRODUCTION__,
-  __ELECTRON__
+  __ELECTRON__,
+  PLUGIN_AUTOUPDATE_INTERVAL
 } from 'config'
 
 import pkg from '../../package'
@@ -12,12 +13,11 @@ import { syncHistoryWithStore } from 'react-router-redux'
 import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
 import { ipcRenderer, ipcMain } from 'electron'
-import waterfall from 'async/waterfall'
-import Promsie from 'promise'
 import log from 'electron-log'
 import firstRun from 'first-run'
 import path from 'path'
 
+import ms from 'ms'
 import os from 'os'
 import jsonfile from 'jsonfile'
 
@@ -106,14 +106,17 @@ const loadLibrary = () => {
   const data = jsonfile.readFileSync(libraryPath)
   store.dispatch(fetchLibraryReceived(data.plugins))
 
-  setTimeout(autoUpdatePlugins, (1000 * 30)) // check for plugin updates after 30s
+  setTimeout(autoUpdatePlugins, ms(PLUGIN_AUTOUPDATE_INTERVAL))
 }
 loadLibrary()
+
+
 
 ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, pluginId) => {
   browserHistory.push('library/installed')
   ipcRenderer.send('IMPORT_FROM_SKETCH_TOOLBOX')
 })
+
 
 ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
   store.dispatch(webInstallPluginRequest(pluginId))

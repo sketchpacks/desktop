@@ -124,10 +124,12 @@ ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
 })
 
 ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
-  PluginManager.install(event, arg)
-    .then((plugin) => {
-      mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, plugin)
-      rimraf(arg.install_path)
+  PluginManager.install(event, arg.updatedPlugin)
+    .then((newPlugin) => {
+      PluginManager.uninstall(event, arg.outdatedPlugin)
+        .then((oldPlugin) => {
+          mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, newPlugin)
+        })
     })
 })
 

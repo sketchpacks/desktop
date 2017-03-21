@@ -108,6 +108,8 @@ function installPluginError (error, plugin) {
 const UPDATE_PLUGIN_REQUEST = 'manager/UPDATE_REQUEST'
 
 function updatePluginRequest (plugin) {
+  const outdatedPlugin = plugin
+
   return (dispatch, getState, {api}) => {
     api.getPluginUpdate({ pluginId: plugin.id, version: sanitizeSemVer(plugin.version) })
       .then(response => {
@@ -120,7 +122,7 @@ function updatePluginRequest (plugin) {
           download_url: update.download_url
         })
 
-        ipcRenderer.send(UPDATE_PLUGIN_REQUEST, updatedPlugin)
+        ipcRenderer.send(UPDATE_PLUGIN_REQUEST, {updatedPlugin, outdatedPlugin})
       })
   }
 }

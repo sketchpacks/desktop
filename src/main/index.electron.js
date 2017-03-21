@@ -1,7 +1,8 @@
 import {
   __PRODUCTION__,
   __ELECTRON__,
-  PLUGIN_AUTOUPDATE_INTERVAL
+  PLUGIN_AUTOUPDATE_INTERVAL,
+  PLUGIN_AUTOUPDATE_DELAY
 } from 'config'
 
 import pkg from '../../package'
@@ -122,7 +123,7 @@ const loadLibrary = () => {
     console.log(err)
   }
 
-  setTimeout(autoUpdatePlugins, ms(PLUGIN_AUTOUPDATE_INTERVAL))
+  setTimeout(autoUpdatePlugins, ms(PLUGIN_AUTOUPDATE_DELAY))
 }
 loadLibrary()
 

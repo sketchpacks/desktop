@@ -1,6 +1,7 @@
 const {
   API_URL,
-  PLUGIN_AUTOUPDATE_DELAY
+  PLUGIN_AUTOUPDATE_DELAY,
+  PLUGIN_AUTOUPDATE_INTERVAL
 } = require('../config')
 
 const { ipcRenderer } = require('electron')

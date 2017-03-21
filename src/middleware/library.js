@@ -1,6 +1,6 @@
 const {remote} = require('electron')
 const path = require('path')
-const {includes,values} = require('lodash')
+const {includes,values,forEach} = require('lodash')
 const os = require('os')
 const jsonfile = require('jsonfile')
 
@@ -34,6 +34,10 @@ const libraryMiddleware = store => next => action => {
     const data = {
       plugins: store.getState().library.items
     }
+
+    forEach(data.plugins, (plugin) => {
+      plugin.version = `^${plugin.version}`
+    })
 
     const opts = {
       spaces: 2,

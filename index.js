@@ -16,6 +16,7 @@ const path = require('path')
 const os = require('os')
 const ms = require('ms')
 const fs = require('fs')
+const rimraf = require('rimraf')
 const {forEach} = require('lodash')
 const electron = require('electron')
 const app = electron.app
@@ -126,6 +127,7 @@ ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.install(event, arg)
     .then((plugin) => {
       mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, plugin)
+      rimraf(arg.install_path)
     })
 })
 

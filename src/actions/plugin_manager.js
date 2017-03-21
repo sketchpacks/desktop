@@ -217,17 +217,14 @@ const AUTOUPDATE_PLUGINS_REQUEST = 'manager/AUTOUPDATE_PLUGINS'
 
 function autoUpdatePluginsRequest () {
   return (dispatch, getState, {api}) => {
+    dispatch({ type: AUTOUPDATE_PLUGINS_REQUEST })
+
     const plugins = getState().library.items
     const unlockedPlugins = filter(plugins, (p) => p.version.indexOf('^') > -1)
 
     unlockedPlugins.forEach(plugin => dispatch(updatePluginRequest(plugin)))
 
-    setTimeout(() => dispatch(autoUpdatePluginsRequest()), ms(PLUGIN_AUTOUPDATE_DELAY))
-
-    return {
-      type: AUTOUPDATE_PLUGINS_REQUEST,
-      payload: plugins
-    }
+    setTimeout(() => dispatch(autoUpdatePluginsRequest()), ms(PLUGIN_AUTOUPDATE_INTERVAL))
   }
 }
 

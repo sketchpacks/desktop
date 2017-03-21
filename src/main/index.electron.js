@@ -141,8 +141,9 @@ const migrateCatalog = (catalogPath) => {
   })
 }
 
-if (fs.existsSync(path.join(remote.app.getPath('userData'), 'catalog.db'))) {
-  migrateCatalog()
+let catalogPath = path.join(remote.app.getPath('userData'), 'catalog.db')
+if (fs.existsSync(catalogPath)) {
+  migrateCatalog(catalogPath)
 }
 
 

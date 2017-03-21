@@ -3,7 +3,7 @@ const path = require('path')
 const {includes,values} = require('lodash')
 const os = require('os')
 const jsonfile = require('jsonfile')
-const sketchpackPath = path.join(remote.app.getPath('userData'), 'sketchpack.json')
+const libraryPath = path.join(remote.app.getPath('userData'), 'library.json')
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,
   INSTALL_PLUGIN_SUCCESS,
@@ -20,7 +20,7 @@ const WATCHED_ACTIONS = {
 
 const {fetchLibraryReceived} = require('../actions/index')
 
-const sketchpackMiddleware = store => next => action => {
+const libraryMiddleware = store => next => action => {
   const prevState = store.getState().library.items
   next(action)
   const nextState = store.getState().library.items
@@ -36,11 +36,11 @@ const sketchpackMiddleware = store => next => action => {
       encoding: 'utf8'
     }
 
-    jsonfile.writeFile(sketchpackPath, data, opts, (err) => {
+    jsonfile.writeFile(libraryPath, data, opts, (err) => {
       if (err) console.error(err)
       store.dispatch(fetchLibraryReceived(data.plugins))
     })
   }
 }
 
-export default sketchpackMiddleware
+export default libraryMiddleware

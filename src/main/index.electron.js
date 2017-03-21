@@ -101,10 +101,26 @@ export const render = () => {
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest())
 
 const loadLibrary = () => {
-  const libraryPath = path.join(remote.app.getPath('userData'), 'sketchpack.json')
+  const libraryPath = path.join(remote.app.getPath('userData'), 'library.json')
+  const opts = {
+    flag: 'w',
+    encoding: 'utf8'
+  }
 
-  const data = jsonfile.readFileSync(libraryPath)
-  store.dispatch(fetchLibraryReceived(data.plugins))
+  try {
+    jsonfile.readFile(libraryPath, opts, (err, data) => {
+      const contents = !(err)
+        ? data
+        : {
+          plugins: []
+        }
+
+      store.dispatch(fetchLibraryReceived(contents.plugins))
+    })
+  } catch (err) {
+    console.log(err)
+  }
+
 
   setTimeout(autoUpdatePlugins, ms(PLUGIN_AUTOUPDATE_INTERVAL))
 }

@@ -137,6 +137,7 @@ const migrateCatalog = (catalogPath) => {
         type: 'MIGRATE_CATALOG',
         payload: docs
       })
+      fs.unlink(catalogPath)
     })
   })
 }

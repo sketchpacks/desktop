@@ -197,7 +197,11 @@ function library (state = initialListState, action) {
     case 'manager/INSTALL_SUCCESS':
       return {
         ...state,
-        items: state.items.concat(action.plugin)
+        items: (findIndex(state.items, (p) => {
+          return p.owner.handle === action.plugin.owner.handle && p.name === action.plugin.name
+        }) === -1)
+          ? state.items.concat(action.plugin)
+          : updateObjectInArray(state.items, action)
       }
 
     default:

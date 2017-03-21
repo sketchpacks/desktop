@@ -32,6 +32,8 @@ const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
 
+const {getInstallPath} = require('./src/lib/utils')
+
 const PluginManager = require('./src/main/plugin_manager')
 const {
   CATALOG_FETCH_DELAY,
@@ -183,6 +185,14 @@ const importFromSketchToolbox = (dbPath) => {
 
   mainWindow.webContents.send('IMPORT_START')
   db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
+    async.series(rows.map(plugin => (callback) => {
+        PluginManager.uninstall(null, Object.assign({}, {install_path: path.join(getInstallPath(),plugin.directory_name.replace(/ /g, '\\ ')) }))
+          .then((result) => {
+            callback(null, result)
+          })
+      }), (error, results) => console.log(results))
+
+
     Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
       .then(data => {
         installQueue(data)

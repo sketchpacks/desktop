@@ -101,6 +101,25 @@ export const render = () => {
   ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
 }
 
+
+const migrateCatalog = (catalogPath, libraryContents) => {
+  const Datastore = require('nedb')
+  const db = new Datastore({ filename: catalogPath })
+  db.loadDatabase((err) => {
+    if (err) console.log(err)
+    db.find({ installed: true }, (err, docs) => {
+      store.dispatch(fetchLibraryReceived(Object.assign(libraryContents.concat(docs))))
+      store.dispatch({
+        type: 'MIGRATE_CATALOG',
+        payload: docs
+      })
+      fs.unlink(catalogPath)
+    })
+  })
+}
+
+
+
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest())
 
 const loadLibrary = () => {
@@ -118,6 +137,12 @@ const loadLibrary = () => {
         : { plugins: [] }
 
       if (contents.plugins.length > 0) store.dispatch(fetchLibraryReceived(contents.plugins))
+
+
+      let catalogPath = path.join(remote.app.getPath('userData'), 'catalog.db')
+      if (fs.existsSync(catalogPath)) {
+        migrateCatalog(catalogPath, contents.plugins)
+      }
     })
   } catch (err) {
     console.log(err)
@@ -127,26 +152,7 @@ const loadLibrary = () => {
 }
 loadLibrary()
 
-const migrateCatalog = (catalogPath) => {
-  const Datastore = require('nedb')
-  const db = new Datastore({ filename: catalogPath })
-  db.loadDatabase((err) => {
-    if (err) console.log(err)
-    db.find({ installed: true }, (err, docs) => {
-      store.dispatch(fetchLibraryReceived(docs))
-      store.dispatch({
-        type: 'MIGRATE_CATALOG',
-        payload: docs
-      })
-      fs.unlink(catalogPath)
-    })
-  })
-}
 
-let catalogPath = path.join(remote.app.getPath('userData'), 'catalog.db')
-if (fs.existsSync(catalogPath)) {
-  migrateCatalog(catalogPath)
-}
 
 
 

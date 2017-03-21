@@ -3,7 +3,11 @@ const path = require('path')
 const {includes,values} = require('lodash')
 const os = require('os')
 const jsonfile = require('jsonfile')
+
+const {sanitizeSemVer} = require('lib/utils')
+
 const libraryPath = path.join(remote.app.getPath('userData'), 'library.json')
+
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,
   INSTALL_PLUGIN_SUCCESS,

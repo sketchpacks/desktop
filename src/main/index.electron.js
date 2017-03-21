@@ -102,8 +102,9 @@ const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest())
 
 const loadLibrary = () => {
   const libraryPath = path.join(remote.app.getPath('userData'), 'library.json')
+
   const opts = {
-    flag: 'w',
+    flag: 'r',
     encoding: 'utf8'
   }
 
@@ -111,16 +112,13 @@ const loadLibrary = () => {
     jsonfile.readFile(libraryPath, opts, (err, data) => {
       const contents = !(err)
         ? data
-        : {
-          plugins: []
-        }
+        : { plugins: [] }
 
-      store.dispatch(fetchLibraryReceived(contents.plugins))
+      if (contents.plugins.length > 0) store.dispatch(fetchLibraryReceived(contents.plugins))
     })
   } catch (err) {
     console.log(err)
   }
-
 
   setTimeout(autoUpdatePlugins, ms(PLUGIN_AUTOUPDATE_INTERVAL))
 }

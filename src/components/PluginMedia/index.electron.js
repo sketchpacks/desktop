@@ -135,9 +135,9 @@ class PluginMedia extends Component {
       <div
         onClick={this.handleClickLock}
         className="tooltipped tooltipped-n"
-        aria-label={plugin.locked
+        aria-label={isLocked
           ? 'Enable auto-updates'
-          : `Lock this version at v${sanitizeSemVer(plugin.installed_version)}` }
+          : `Lock this version at v${sanitizeSemVer(plugin.version)}` }
       >
         {isLocked ? '🔒' : '🔓'}
       </div>

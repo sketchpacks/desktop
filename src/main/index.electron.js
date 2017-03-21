@@ -19,7 +19,9 @@ import path from 'path'
 
 import ms from 'ms'
 import os from 'os'
+import fs from 'fs'
 import jsonfile from 'jsonfile'
+import {filter} from 'lodash'
 
 import App from 'containers/App'
 
@@ -123,6 +125,25 @@ const loadLibrary = () => {
   setTimeout(autoUpdatePlugins, ms(PLUGIN_AUTOUPDATE_INTERVAL))
 }
 loadLibrary()
+
+const migrateCatalog = (catalogPath) => {
+  const Datastore = require('nedb')
+  const db = new Datastore({ filename: catalogPath })
+  db.loadDatabase((err) => {
+    if (err) console.log(err)
+    db.find({ installed: true }, (err, docs) => {
+      store.dispatch(fetchLibraryReceived(docs))
+      store.dispatch({
+        type: 'MIGRATE_CATALOG',
+        payload: docs
+      })
+    })
+  })
+}
+
+if (fs.existsSync(path.join(remote.app.getPath('userData'), 'catalog.db'))) {
+  migrateCatalog()
+}
 
 
 

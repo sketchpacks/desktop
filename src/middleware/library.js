@@ -20,6 +20,7 @@ const WATCHED_ACTIONS = {
   INSTALL_PLUGIN_SUCCESS,
   UPDATE_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_SUCCESS,
+  'MIGRATE_CATALOG': 'MIGRATE_CATALOG'
 }
 
 const {fetchLibraryReceived} = require('../actions/index')

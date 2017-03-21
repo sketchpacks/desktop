@@ -35,10 +35,6 @@ const libraryMiddleware = store => next => action => {
       plugins: store.getState().library.items
     }
 
-    forEach(data.plugins, (plugin) => {
-      plugin.version = `^${plugin.version}`
-    })
-
     const opts = {
       spaces: 2,
       flags: 'w',

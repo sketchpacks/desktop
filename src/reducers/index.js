@@ -182,7 +182,8 @@ function library (state = initialListState, action) {
         ...state,
         items: update(state.items, {
           [findIndex(state.items, ['id', action.plugin.id])]: {
-            install_path: { $set: action.plugin.install_path }
+            install_path: { $set: action.plugin.install_path },
+            version: { $set: `^${action.plugin.version}` }
           }
         })
       }

@@ -164,8 +164,6 @@ function library (state = initialListState, action) {
       }
 
     case TOGGLE_VERSION_LOCK_SUCCESS:
-      const pos = findIndex(state.items, ['id', action.plugin.id])
-
       const newVersion = (action.plugin.version.indexOf('^') > -1)
         ? `${action.plugin.version.slice(1)}`
         : `^${action.plugin.version}`
@@ -173,8 +171,18 @@ function library (state = initialListState, action) {
       return {
         ...state,
         items: update(state.items, {
-          [pos]: {
+          [findIndex(state.items, ['id', action.plugin.id])]: {
             version: { $set: newVersion }
+          }
+        })
+      }
+
+    case 'manager/UPDATE_SUCCESS':
+      return {
+        ...state,
+        items: update(state.items, {
+          [findIndex(state.items, ['id', action.plugin.id])]: {
+            install_path: { $set: action.plugin.install_path }
           }
         })
       }

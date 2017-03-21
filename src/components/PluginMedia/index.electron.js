@@ -78,12 +78,8 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
-    const { version, installed_version } = this.props.plugin
+    const {version} = this.props.plugin
     const {location} = this.props
-
-    const value = (location.pathname === '/library/installed')
-      ? installed_version
-      : version
 
     const tooltip = (location.pathname === '/library/installed')
       ? 'Installed version'
@@ -92,7 +88,7 @@ class PluginMedia extends Component {
     return <PluginMetric
       icon={'versions'}
       shape={'path'}
-      value={sanitizeSemVer(value)}
+      value={sanitizeSemVer(version)}
       tooltip={tooltip} />
   }
 

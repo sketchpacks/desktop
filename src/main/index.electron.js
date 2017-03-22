@@ -120,7 +120,7 @@ const migrateCatalog = (catalogPath, libraryContents) => {
 
 
 
-const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest())
+const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true}))
 
 const loadLibrary = () => {
   const libraryPath = path.join(remote.app.getPath('userData'), 'library.json')
@@ -209,7 +209,7 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
-  store.dispatch(autoUpdatePluginsRequest())
+  store.dispatch(autoUpdatePluginsRequest({repeat: false}))
 })
 
 ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {

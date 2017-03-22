@@ -17,7 +17,7 @@ const os = require('os')
 const ms = require('ms')
 const fs = require('fs')
 const rimraf = require('rimraf')
-const {forEach} = require('lodash')
+const {forEach,filter} = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
@@ -171,7 +171,10 @@ const pluginData = (owner,slug) => new Promise((resolve,reject) => {
 })
 
 const installQueue = (plugins) => {
-  async.series(plugins.map(plugin => (callback) => {
+  if (plugins.length === 0) return
+  const queue = filter(plugins, (p) => Object.keys(p).length > 0)
+
+  async.series(queue.map(plugin => (callback) => {
       PluginManager.install(null, plugin)
         .then((result) => {
           mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
@@ -185,6 +188,8 @@ const importFromSketchToolbox = (dbPath) => {
 
   mainWindow.webContents.send('IMPORT_START')
   db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
+    if (rows.length === 0) return
+
     async.series(rows.map(plugin => (callback) => {
         PluginManager.uninstall(null, Object.assign({}, {install_path: path.join(getInstallPath(),plugin.directory_name.replace(/ /g, '\\ ')) }))
           .then((result) => {

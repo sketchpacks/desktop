@@ -19,8 +19,7 @@ const VALID_KEYS = [
   'download_url',
   'owner',
   'locked',
-  'installed_version',
-  'installed',
+  'install_path'
 ]
 
 const prunePluginData = (plugins) => plugins.map(p => pick(p, VALID_KEYS))

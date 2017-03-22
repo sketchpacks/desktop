@@ -33,12 +33,6 @@ const ConnectedPluginList = ComposedComponent =>
       this.handlePluginEvent = this.handlePluginEvent.bind(this)
     }
 
-    toggleLock ({ id, locked }) {
-      const {dispatch} = this.props
-
-      dispatch(toggleVersionLockRequest(id,locked))
-    }
-
     handlePluginEvent ({ type, plugin, author }) {
       const {dispatch} = this.props
 
@@ -50,7 +44,7 @@ const ConnectedPluginList = ComposedComponent =>
         case "update":
           return dispatch(updatePluginRequest(plugin))
         case "lock":
-          return this.toggleLock(plugin)
+          return dispatch(toggleVersionLockRequest(plugin))
         case "favorite":
           return console.log(type, plugin)
         case "collect":

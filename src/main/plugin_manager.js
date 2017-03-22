@@ -64,14 +64,10 @@ const install = (event, plugin) => {
 
           extractionPath = new AdmZip(savePath).getEntries()[0].entryName
 
-          resolve({
-            id: id,
-            name: name,
-            download_url: download_url,
-            filename: filename,
+          resolve(Object.assign(plugin, {
             install_path: path.join(getInstallPath(), extractionPath),
-            version: version
-          })
+            version: version,
+          }))
         })
 
         response.pipe(archiveFileStream)
@@ -93,21 +89,11 @@ const uninstall = (event, plugin) => {
       console.log(`stderr: ${stderr}`)
     })
 
-    resolve({
-      id: id,
-      name: name,
-      install_path: null,
-      installed_version: null
-    })
+    resolve(plugin)
   })
-}
-
-const update = (event, plugin) => {
-  event.sender.send('manager/UPDATE_SUCCESS', plugin)
 }
 
 module.exports = {
   install,
-  uninstall,
-  update
+  uninstall
 }

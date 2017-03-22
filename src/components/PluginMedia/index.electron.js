@@ -78,12 +78,8 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
-    const { version, installed_version } = this.props.plugin
+    const {version} = this.props.plugin
     const {location} = this.props
-
-    const value = (location.pathname === '/library/installed')
-      ? installed_version
-      : version
 
     const tooltip = (location.pathname === '/library/installed')
       ? 'Installed version'
@@ -92,7 +88,7 @@ class PluginMedia extends Component {
     return <PluginMetric
       icon={'versions'}
       shape={'path'}
-      value={sanitizeSemVer(value)}
+      value={sanitizeSemVer(version)}
       tooltip={tooltip} />
   }
 
@@ -131,17 +127,19 @@ class PluginMedia extends Component {
   renderVersionLock () {
     const {plugin,location} = this.props
 
+    const isLocked = plugin.version.indexOf('^') === -1
+
     if (location.pathname !== '/library/installed') return
 
     return (
       <div
         onClick={this.handleClickLock}
         className="tooltipped tooltipped-n"
-        aria-label={plugin.locked
+        aria-label={isLocked
           ? 'Enable auto-updates'
-          : `Lock this version at v${sanitizeSemVer(plugin.installed_version)}` }
+          : `Lock this version at v${sanitizeSemVer(plugin.version)}` }
       >
-        {plugin.locked ? '🔒' : '🔓'}
+        {isLocked ? '🔒' : '🔓'}
       </div>
     )
   }

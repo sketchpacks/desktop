@@ -2,6 +2,40 @@ import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 import * as actions from 'actions'
 
+import sanitizeSemVer from 'lib/utils'
+
+import semver from 'semver'
+import update from 'immutability-helper'
+
+import {
+  installPluginRequest,
+  installPluginSuccess,
+  installPluginError,
+  INSTALL_PLUGIN_REQUEST,
+  INSTALL_PLUGIN_SUCCESS,
+  INSTALL_PLUGIN_ERROR,
+
+  updatePluginRequest,
+  updatePluginSuccess,
+  updatePluginError,
+  UPDATE_PLUGIN_REQUEST,
+  UPDATE_PLUGIN_SUCCESS,
+  UPDATE_PLUGIN_ERROR,
+
+  uninstallPluginSuccess,
+  uninstallPluginError,
+  UNINSTALL_PLUGIN_REQUEST,
+  UNINSTALL_PLUGIN_SUCCESS,
+  UNINSTALL_PLUGIN_ERROR,
+
+  toggleVersionLockRequest,
+  toggleVersionLockSuccess,
+  TOGGLE_VERSION_LOCK_REQUEST,
+  TOGGLE_VERSION_LOCK_SUCCESS
+} from 'actions/plugin_manager'
+
+import {filter,findIndex} from 'lodash'
+
 const initialListState = {
   items: [],
   isLoading: false,
@@ -17,6 +51,10 @@ const updateObjectInArray = (array, action) => {
     ? plugin
     : { ...plugin, ...action.plugin }
   )
+}
+
+const removeObjectFromArray = (array, action) => {
+  return filter(array, (plugin) => plugin.id !== action.plugin.id)
 }
 
 function catalog (state = initialListState, action) {
@@ -86,13 +124,13 @@ function catalog (state = initialListState, action) {
         ...pageInfo
       }
 
-    case 'manager/UNINSTALL_SUCCESS':
+    case UNINSTALL_PLUGIN_SUCCESS:
       return {
         ...state,
         items: updateObjectInArray(state.items, action)
       }
 
-    case 'manager/INSTALL_SUCCESS':
+    case INSTALL_PLUGIN_SUCCESS:
       return {
         ...state,
         items: updateObjectInArray(state.items, action)
@@ -125,16 +163,45 @@ function library (state = initialListState, action) {
         isLoading: false
       }
 
+    case TOGGLE_VERSION_LOCK_SUCCESS:
+      const newVersion = (action.plugin.version.indexOf('^') > -1)
+        ? `${action.plugin.version.slice(1)}`
+        : `^${action.plugin.version}`
+
+      return {
+        ...state,
+        items: update(state.items, {
+          [findIndex(state.items, ['id', action.plugin.id])]: {
+            version: { $set: newVersion }
+          }
+        })
+      }
+
+    case 'manager/UPDATE_SUCCESS':
+      return {
+        ...state,
+        items: update(state.items, {
+          [findIndex(state.items, ['id', action.plugin.id])]: {
+            install_path: { $set: action.plugin.install_path },
+            version: { $set: `^${action.plugin.version}` }
+          }
+        })
+      }
+
     case 'manager/UNINSTALL_SUCCESS':
       return {
         ...state,
-        items: updateObjectInArray(state.items, action)
+        items: removeObjectFromArray(state.items, action)
       }
 
     case 'manager/INSTALL_SUCCESS':
       return {
         ...state,
-        items: updateObjectInArray(state.items, action)
+        items: (findIndex(state.items, (p) => {
+          return p.owner.handle === action.plugin.owner.handle && p.name === action.plugin.name
+        }) === -1)
+          ? state.items.concat(action.plugin)
+          : updateObjectInArray(state.items, action)
       }
 
     default:

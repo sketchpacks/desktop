@@ -26,12 +26,24 @@ class Sketchpacks {
     return client.get(`/users/${userId}/plugins/${pluginId}`)
   }
 
+  getPluginById ({pluginId}) {
+    return client.get(`/plugins/${pluginId}`)
+  }
+
   getPluginReadme (endpoint) {
     return axios.request({ url: endpoint, method: 'get', timeout: DEFAULT_TIMEOUT })
   }
 
   getCatalog ({query}) {
     return client.get(`/plugins?${query}`)
+  }
+
+  getPluginUpdate ({pluginId, version}) {
+    return axios.request({
+      url: `${API_URL}/v1/plugins/${pluginId}/versions?compare=${version}`,
+      method: 'get',
+      timeout: DEFAULT_TIMEOUT,
+    })
   }
 }
 

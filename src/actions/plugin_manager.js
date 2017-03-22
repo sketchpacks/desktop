@@ -217,7 +217,7 @@ function updateAvailable (remote,local) {
 
 const AUTOUPDATE_PLUGINS_REQUEST = 'manager/AUTOUPDATE_PLUGINS'
 
-function autoUpdatePluginsRequest () {
+function autoUpdatePluginsRequest ({repeat}) {
   return (dispatch, getState, {api}) => {
     dispatch({ type: AUTOUPDATE_PLUGINS_REQUEST })
 
@@ -226,7 +226,9 @@ function autoUpdatePluginsRequest () {
 
     unlockedPlugins.forEach(plugin => dispatch(updatePluginRequest(plugin)))
 
-    setTimeout(() => dispatch(autoUpdatePluginsRequest()), ms(PLUGIN_AUTOUPDATE_INTERVAL))
+    if (repeat) {
+      setTimeout(() => dispatch(autoUpdatePluginsRequest({repeat: true})), ms(PLUGIN_AUTOUPDATE_INTERVAL))
+    }
   }
 }
 

@@ -37,9 +37,9 @@ const sketchpackMiddleware = store => next => action => {
         name: value.name,
         owner: value.owner.handle,
         version: value.version || "^0.0.0",
-        version_range: semver.toComparators(value.version)[0],
+        version_range: semver.toComparators(value.version || "^0.0.0")[0],
     		compatible_version: value.compatible_version || "^0.0.0",
-        compatible_version_range: semver.toComparators(value.compatible_version)[0],
+        compatible_version_range: semver.toComparators(value.compatible_version || "^0.0.0")[0],
       }
 
     	return result

@@ -16,7 +16,8 @@ const path = require('path')
 const os = require('os')
 const ms = require('ms')
 const fs = require('fs')
-const {forEach} = require('lodash')
+const rimraf = require('rimraf')
+const {forEach,filter} = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
@@ -27,13 +28,13 @@ const querystring = require('querystring')
 const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
-const Database = require('nedb')
 const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
 
+const {getInstallPath} = require('./src/lib/utils')
+
 const PluginManager = require('./src/main/plugin_manager')
-const Catalog = require('./src/lib/catalog')
 const {
   CATALOG_FETCH_DELAY,
   CATALOG_FETCH_INTERVAL
@@ -125,9 +126,12 @@ ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
 })
 
 ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
-  PluginManager.install(event, arg)
-    .then((plugin) => {
-      mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, plugin)
+  PluginManager.install(event, arg.updatedPlugin)
+    .then((newPlugin) => {
+      PluginManager.uninstall(event, arg.outdatedPlugin)
+        .then((oldPlugin) => {
+          mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, newPlugin)
+        })
     })
 })
 
@@ -167,7 +171,10 @@ const pluginData = (owner,slug) => new Promise((resolve,reject) => {
 })
 
 const installQueue = (plugins) => {
-  async.series(plugins.map(plugin => (callback) => {
+  if (plugins.length === 0) return
+  const queue = filter(plugins, (p) => Object.keys(p).length > 0)
+
+  async.series(queue.map(plugin => (callback) => {
       PluginManager.install(null, plugin)
         .then((result) => {
           mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
@@ -181,6 +188,16 @@ const importFromSketchToolbox = (dbPath) => {
 
   mainWindow.webContents.send('IMPORT_START')
   db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
+    if (rows.length === 0) return
+
+    async.series(rows.map(plugin => (callback) => {
+        PluginManager.uninstall(null, Object.assign({}, {install_path: path.join(getInstallPath(),plugin.directory_name.replace(/ /g, '\\ ')) }))
+          .then((result) => {
+            callback(null, result)
+          })
+      }), (error, results) => console.log(results))
+
+
     Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
       .then(data => {
         installQueue(data)

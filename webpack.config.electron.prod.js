@@ -14,8 +14,7 @@ const htmlTemplate = isWeb ? 'index.web.html' : 'index.electron.html'
 
 let options = {
   entry: {
-    main: './index.js',
-    renderer: './renderer/renderer.js'
+    main: './index.js'
   },
 
   output: {

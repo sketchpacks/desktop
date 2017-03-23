@@ -17,7 +17,7 @@ const os = require('os')
 const ms = require('ms')
 const fs = require('fs')
 const rimraf = require('rimraf')
-const {forEach,filter} = require('lodash')
+const {forEach,filter,reduce} = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
@@ -31,6 +31,8 @@ const menubar = require('menubar')
 const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
+const jsonfile = require('jsonfile')
+const semver = require('semver')
 
 const {getInstallPath} = require('./src/lib/utils')
 
@@ -82,7 +84,7 @@ menuBar.on('ready', () => {
 menuBar.on('after-show', () => {
   if (__DEVELOPMENT__) {
     // require('devtron').install()
-    menuBar.window.openDevTools({ mode: 'detach' })
+    // menuBar.window.openDevTools({ mode: 'detach' })
   }
 })
 
@@ -240,10 +242,12 @@ ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
     filters: [
       {
         name: 'Sketchpack',
-        extensions: ['sketchpack','json']
+        extensions: ['sketchpack']
       }
     ]
   }, (filePaths) => {
+
+    if (filePaths.length === 0) return
 
     fs.readFile(filePaths[0], 'utf8', (err, data) => {
       if (err) throw err
@@ -260,4 +264,53 @@ ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
 
     })
   })
+})
+
+const writeSketchpack = (filepath, contents) => {
+  const reducedPlugins = (collection) => reduce(collection, ((result, value, key) => {
+    result[`${value.owner.handle}/${value.name}`] = {
+      name: value.name,
+      owner: value.owner.handle,
+      version: value.version || "^0.0.0",
+      version_range: semver.toComparators(value.version || "^0.0.0")[0],
+      compatible_version: value.compatible_version || "^0.0.0",
+      compatible_version_range: semver.toComparators(value.compatible_version || "^0.0.0")[0],
+    }
+
+    return result
+  }), {})
+
+  const data = {
+    name: "My Library",
+    schema_version: '0.1.0',
+    locked: false,
+    plugins: reducedPlugins(contents)
+  }
+
+  const opts = {
+    spaces: 2,
+    flags: 'w',
+    encoding: 'utf8'
+  }
+
+  jsonfile.writeFile(filepath, data, opts, (err) => {
+    if (err) console.error(err)
+  })
+}
+
+ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
+  try {
+    dialog.showSaveDialog(null, {
+      nameFieldLabel: 'my-library',
+      extensions: ['sketchpack'],
+      defaultPath: '~/Desktop/my-library.sketchpack',
+      message: 'Export My Library',
+      buttonLabel: 'Export',
+      title: 'Export My Library'
+    }, (filepath) => {
+      if (filepath) writeSketchpack(filepath,libraryContents)
+    })
+  } catch (err) {
+    log.error(err)
+  }
 })

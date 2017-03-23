@@ -153,7 +153,10 @@ const loadLibrary = () => {
 loadLibrary()
 
 
-
+ipcRenderer.on('IMPORT_FROM_SKETCHPACK', (evt, pluginId) => {
+  browserHistory.push('library/installed')
+  ipcRenderer.send('IMPORT_FROM_SKETCHPACK')
+})
 
 
 ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, pluginId) => {

@@ -231,3 +231,33 @@ ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
     }, (response, checkboxChecked) => {})
   }
 })
+
+
+
+ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
+  dialog.showOpenDialog(null, {
+    properties: ['openFile'],
+    filters: [
+      {
+        name: 'Sketchpack',
+        extensions: ['sketchpack','json']
+      }
+    ]
+  }, (filePaths) => {
+
+    fs.readFile(filePaths[0], 'utf8', (err, data) => {
+      if (err) throw err
+
+      const contents = JSON.parse(data)
+
+      const importables = Object.keys(contents.plugins).map(p => contents.plugins[p])
+
+      Promise.all(importables.map(plugin => pluginData(plugin.owner,plugin.name)))
+        .then(data => {
+          installQueue(data)
+        })
+
+
+    })
+  })
+})

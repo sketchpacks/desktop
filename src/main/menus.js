@@ -50,6 +50,13 @@ const settingsMenu = [
   },
 
   {
+    label: 'Import a Sketchpack',
+    click(item, window, event) {
+      window.webContents.send('IMPORT_FROM_SKETCHPACK', null)
+    },
+  },
+
+  {
     label: 'Import from Sketch Toolbox',
     click(item, window, event) {
       window.webContents.send('IMPORT_FROM_SKETCH_TOOLBOX', null)

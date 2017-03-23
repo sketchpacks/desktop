@@ -36,6 +36,7 @@ const semver = require('semver')
 
 const {getInstallPath} = require('./src/lib/utils')
 const writeSketchpack = require('./src/lib/writeSketchpack')
+const readSketchpack = require('./src/lib/readSketchpack')
 
 const PluginManager = require('./src/main/plugin_manager')
 const {
@@ -247,23 +248,20 @@ ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
       }
     ]
   }, (filePaths) => {
-
     if (filePaths.length === 0) return
 
-    fs.readFile(filePaths[0], 'utf8', (err, data) => {
-      if (err) throw err
-
-      const contents = JSON.parse(data)
-
-      const importables = Object.keys(contents.plugins).map(p => contents.plugins[p])
-
-      Promise.all(importables.map(plugin => pluginData(plugin.owner,plugin.name)))
-        .then(data => {
-          installQueue(data)
+    try {
+      readSketchpack(filePaths[0])
+        .then(plugins => {
+          Promise.all(plugins.map(plugin => pluginData(plugin.owner,plugin.name)))
+            .then(data => {
+              installQueue(data)
+            })
         })
+    } catch (err) {
+      log.error(err)
+    }
 
-
-    })
   })
 })
 
@@ -279,7 +277,10 @@ ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
       buttonLabel: 'Export',
       title: 'Export My Library'
     }, (filepath) => {
+      if (libraryContents.length === 0) return
+
       log.info(`My Library exported to ${filepath}`)
+
       if (filepath) writeSketchpack(filepath,libraryContents)
     })
   } catch (err) {

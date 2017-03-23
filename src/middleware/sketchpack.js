@@ -7,7 +7,7 @@ const semver = require('semver')
 
 const {sanitizeSemVer} = require('lib/utils')
 
-const sketchpackPath = path.join(remote.app.getPath('userData'), 'sketchpack.json')
+const sketchpackPath = path.join(remote.app.getPath('userData'), 'my.sketchpack')
 
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,
@@ -47,6 +47,8 @@ const sketchpackMiddleware = store => next => action => {
 
     const data = {
       name: "My Sketchpack",
+      schema_version: '0.1.0',
+      locked: false,
       plugins: reducedPlugins(store.getState().library.items)
     }
 

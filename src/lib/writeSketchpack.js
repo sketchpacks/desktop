@@ -1,16 +1,17 @@
 const {reduce} = require('lodash')
 const semver = require('semver')
 const jsonfile = require('jsonfile')
+const {sanitizeSemVer} = require('./utils')
 
 const writeSketchpack = (filepath, contents) => {
   const reducedPlugins = (collection) => reduce(collection, ((result, value, key) => {
     result[`${value.owner.handle}/${value.name}`] = {
       name: value.name,
       owner: value.owner.handle,
-      version: value.version || "^0.0.0",
-      version_range: semver.toComparators(value.version || "^0.0.0")[0],
-      compatible_version: value.compatible_version || "^0.0.0",
-      compatible_version_range: semver.toComparators(value.compatible_version || "^0.0.0")[0],
+      version: sanitizeSemVer(value.version) || "0.0.0",
+      version_range: semver.toComparators(sanitizeSemVer(value.version) || "0.0.0")[0],
+      compatible_version: sanitizeSemVer(value.compatible_version) || "0.0.0",
+      compatible_version_range: semver.toComparators(sanitizeSemVer(value.compatible_version) || "0.0.0")[0],
     }
 
     return result

@@ -1,10 +1,25 @@
+const {
+  API_URL,
+  PLUGIN_AUTOUPDATE_DELAY,
+  PLUGIN_AUTOUPDATE_INTERVAL
+} = require('../config')
+
 const { ipcRenderer } = require('electron')
+
+const ms = require('ms')
+const axios = require('axios')
+const semver = require('semver')
+const {filter} = require('lodash')
+
+const {sanitizeSemVer} = require('../lib/utils')
+
+
 
 const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
 
-function toggleVersionLockRequest (id, locked) {
+function toggleVersionLockRequest (plugin) {
   return (dispatch, getState) => {
-    ipcRenderer.send(TOGGLE_VERSION_LOCK_REQUEST, {id: id, locked: locked || false} )
+    dispatch(toggleVersionLockSuccess(plugin))
   }
 }
 
@@ -12,13 +27,15 @@ function toggleVersionLockRequest (id, locked) {
 const TOGGLE_VERSION_LOCK_SUCCESS = 'manager/TOGGLE_VERSION_LOCK_SUCCESS'
 
 function toggleVersionLockSuccess (plugin) {
+  const isLocked = plugin.version.indexOf('^') === -1
+
   return {
     type: TOGGLE_VERSION_LOCK_SUCCESS,
     plugin,
     meta: {
       mixpanel: {
         eventName: 'Manage',
-        type: plugin.locked ? 'Lock Plugin Version' : 'Unlock Plugin Version',
+        type: isLocked ? 'Lock Plugin Version' : 'Unlock Plugin Version',
         props: {
           source: 'desktop',
           pluginId: plugin.id,
@@ -45,6 +62,13 @@ const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
 function installPluginRequest (plugin) {
   return (dispatch, getState) => {
     ipcRenderer.send(INSTALL_PLUGIN_REQUEST, plugin)
+  }
+}
+
+function webInstallPluginRequest (pluginId) {
+  return (dispatch, getState, {api}) => {
+    api.getPluginById({ pluginId })
+      .then(response => dispatch(installPluginRequest(response.data)))
   }
 }
 
@@ -84,8 +108,22 @@ function installPluginError (error, plugin) {
 const UPDATE_PLUGIN_REQUEST = 'manager/UPDATE_REQUEST'
 
 function updatePluginRequest (plugin) {
-  return (dispatch, getState) => {
-    ipcRenderer.send(UPDATE_PLUGIN_REQUEST, plugin)
+  const outdatedPlugin = plugin
+
+  return (dispatch, getState, {api}) => {
+    api.getPluginUpdate({ pluginId: plugin.id, version: sanitizeSemVer(plugin.version) })
+      .then(response => {
+        if (response.status === 204) return
+
+        const update = response.data[0]
+
+        const updatedPlugin = Object.assign(plugin, {
+          version: sanitizeSemVer(update.version),
+          download_url: update.download_url
+        })
+
+        ipcRenderer.send(UPDATE_PLUGIN_REQUEST, {updatedPlugin, outdatedPlugin})
+      })
   }
 }
 
@@ -160,6 +198,40 @@ function uninstallPluginError (error, plugin) {
   }
 }
 
+const pluginData = (owner,slug) => new Promise((resolve,reject) => {
+  axios.get(`${API_URL}/v1/users/${owner}/plugins/${slug.toLowerCase()}`)
+    .then(response => {
+      resolve(response.data)
+    })
+    .catch(response => {
+      resolve({})
+    })
+})
+
+function updateAvailable (remote,local) {
+  let remoteVersion = sanitizeSemVer(plugin.version)
+  let localVersion = sanitizeSemVer(plugin.installed_version)
+
+  return semver.lt(localVersion,remoteVersion)
+}
+
+const AUTOUPDATE_PLUGINS_REQUEST = 'manager/AUTOUPDATE_PLUGINS'
+
+function autoUpdatePluginsRequest ({repeat}) {
+  return (dispatch, getState, {api}) => {
+    dispatch({ type: AUTOUPDATE_PLUGINS_REQUEST })
+
+    const plugins = getState().library.items
+    const unlockedPlugins = filter(plugins, (p) => p.version.indexOf('^') > -1)
+
+    unlockedPlugins.forEach(plugin => dispatch(updatePluginRequest(plugin)))
+
+    if (repeat) {
+      setTimeout(() => dispatch(autoUpdatePluginsRequest({repeat: true})), ms(PLUGIN_AUTOUPDATE_INTERVAL))
+    }
+  }
+}
+
 
 module.exports = {
   installPluginRequest,
@@ -192,5 +264,8 @@ module.exports = {
 
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
-  UNINSTALL_PLUGIN_ERROR
+  UNINSTALL_PLUGIN_ERROR,
+
+  autoUpdatePluginsRequest,
+  webInstallPluginRequest
 }

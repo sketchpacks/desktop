@@ -10,8 +10,8 @@ module.exports = {
   WEB_URL: 'https://www.sketchpacks.com',
   API_URL: 'https://sketchpacks-api.herokuapp.com',
 
-  CATALOG_FETCH_DELAY: '30s',
-  CATALOG_FETCH_INTERVAL: process.env.NODE_ENV === 'development' ? '5m' : '4h',
+  PLUGIN_AUTOUPDATE_DELAY: '2m',
+  PLUGIN_AUTOUPDATE_INTERVAL: process.env.NODE_ENV === 'development' ? '30s' : '30m',
 
   UPDATER_INTERVAL: '4h',
 

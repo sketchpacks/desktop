@@ -20,8 +20,7 @@ let options = {
       `webpack-dev-server/client?http://localhost:${SERVER_PORT}/`,
       'webpack/hot/only-dev-server',
       './index.js',
-    ],
-    renderer: './renderer/renderer.js'
+    ]
   },
 
   output: {

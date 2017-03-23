@@ -44,16 +44,27 @@ const settingsMenu = [
       window.webContents.send('CHECK_FOR_PLUGIN_UPDATES', null)
     },
   },
+
   {
-    label: 'Check for Catalog Updates',
-    accelerator: 'Cmd+R',
+    type: 'separator'
+  },
+
+  {
+    label: 'Export My Library',
     click(item, window, event) {
-      window.webContents.send('CHECK_FOR_CATALOG_UPDATES', null)
+      window.webContents.send('EXPORT_LIBRARY', null)
     },
   },
 
   {
     type: 'separator'
+  },
+
+  {
+    label: 'Import a Sketchpack',
+    click(item, window, event) {
+      window.webContents.send('IMPORT_FROM_SKETCHPACK', null)
+    },
   },
 
   {

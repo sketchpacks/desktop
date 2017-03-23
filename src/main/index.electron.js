@@ -1,6 +1,8 @@
 import {
   __PRODUCTION__,
-  __ELECTRON__
+  __ELECTRON__,
+  PLUGIN_AUTOUPDATE_INTERVAL,
+  PLUGIN_AUTOUPDATE_DELAY
 } from 'config'
 
 import pkg from '../../package'
@@ -11,12 +13,16 @@ import { Router, Route, IndexRoute, IndexRedirect, browserHistory, hashHistory }
 import { syncHistoryWithStore } from 'react-router-redux'
 import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
-import { ipcRenderer, ipcMain } from 'electron'
-import waterfall from 'async/waterfall'
-import Promsie from 'promise'
+import { ipcRenderer, ipcMain, remote } from 'electron'
 import log from 'electron-log'
 import firstRun from 'first-run'
 import path from 'path'
+
+import ms from 'ms'
+import os from 'os'
+import fs from 'fs'
+import jsonfile from 'jsonfile'
+import {filter} from 'lodash'
 
 import App from 'containers/App'
 
@@ -46,28 +52,26 @@ import {
 import {
   installPluginRequest,
   installPluginSuccess,
-  installPluginError,
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
-  INSTALL_PLUGIN_ERROR,
 
   updatePluginRequest,
   updatePluginSuccess,
-  updatePluginError,
   UPDATE_PLUGIN_REQUEST,
   UPDATE_PLUGIN_SUCCESS,
-  UPDATE_PLUGIN_ERROR,
 
+  uninstallPluginRequest,
   uninstallPluginSuccess,
-  uninstallPluginError,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
-  UNINSTALL_PLUGIN_ERROR,
 
   toggleVersionLockRequest,
   toggleVersionLockSuccess,
   TOGGLE_VERSION_LOCK_REQUEST,
-  TOGGLE_VERSION_LOCK_SUCCESS
+  TOGGLE_VERSION_LOCK_SUCCESS,
+
+  autoUpdatePluginsRequest,
+  webInstallPluginRequest
 } from 'actions/plugin_manager'
 
 let store = configureStore()
@@ -97,137 +101,127 @@ export const render = () => {
   ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
 }
 
-const catalogCheck = () => {
-  if (window.Catalog === undefined) {
-    setTimeout(catalogCheck, 100)
-  }
-  else {
-    Catalog.getInstalledPlugins()
-      .then(plugins => {
-        store.dispatch(fetchLibraryReceived(plugins))
 
-        Catalog.enableAutoUpdate()
+const migrateCatalog = (catalogPath, libraryContents) => {
+  const Datastore = require('nedb')
+  const db = new Datastore({ filename: catalogPath })
+  db.loadDatabase((err) => {
+    if (err) console.log(err)
+    db.find({ installed: true }, (err, docs) => {
+      store.dispatch(fetchLibraryReceived(Object.assign(libraryContents.concat(docs))))
+      store.dispatch({
+        type: 'MIGRATE_CATALOG',
+        payload: docs
       })
-        // else {
-        //   waterfall([
-        //     (callback) => {
-        //       Catalog.setStore(store)
-        //       Catalog.update().then(plugins => callback(null, plugins))
-        //     },
-        //     (plugins, callback) => {
-        //       Catalog.upsert(plugins)
-        //       callback(null)
-        //     },
-        //     (callback) => {
-        //       Catalog.getInstalledPlugins().then(plugins => callback(null, plugins))
-        //     }
-        //   ], (err, result) => {
-        //
-        //     store.dispatch(pluginsRequest())
-        //     store.dispatch(fetchLibraryReceived(result))
-        //   })
-        // }
-
-
-  }
+      fs.unlink(catalogPath)
+    })
+  })
 }
-catalogCheck()
 
-ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, pluginId) => {
+
+
+const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true}))
+
+const loadLibrary = () => {
+  const libraryPath = path.join(remote.app.getPath('userData'), 'library.json')
+
+  const opts = {
+    flag: 'r',
+    encoding: 'utf8'
+  }
+
+  try {
+    jsonfile.readFile(libraryPath, opts, (err, data) => {
+      const contents = !(err)
+        ? data
+        : { plugins: [] }
+
+      if (contents.plugins.length > 0) store.dispatch(fetchLibraryReceived(contents.plugins))
+
+
+      let catalogPath = path.join(remote.app.getPath('userData'), 'catalog.db')
+      if (fs.existsSync(catalogPath)) {
+        migrateCatalog(catalogPath, contents.plugins)
+      }
+    })
+  } catch (err) {
+    console.log(err)
+  }
+
+  setTimeout(autoUpdatePlugins, ms(PLUGIN_AUTOUPDATE_DELAY))
+}
+loadLibrary()
+
+
+ipcRenderer.on('IMPORT_FROM_SKETCHPACK', (evt, args) => {
+  browserHistory.push('library/installed')
+  ipcRenderer.send('IMPORT_FROM_SKETCHPACK')
+})
+
+
+ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, args) => {
   browserHistory.push('library/installed')
   ipcRenderer.send('IMPORT_FROM_SKETCH_TOOLBOX')
 })
 
-ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
-  Catalog.getPluginById(pluginId)
-    .then((plugin) => {
-      store.dispatch(installPluginRequest(plugin))
-
-      const notif = new window.Notification('Sketchpacks', {
-        body: `Installing ${plugin.title} v${plugin.installed_version}...`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
-    })
+ipcRenderer.on('EXPORT_LIBRARY', (evt, args) => {
+  ipcRenderer.send('EXPORT_LIBRARY', store.getState().library.items)
 })
 
+
+ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
+  store.dispatch(webInstallPluginRequest(pluginId))
+  browserHistory.push('library/installed')
+
+  const notif = new window.Notification('Sketchpacks', {
+    body: `Starting install...`,
+    silent: true,
+    icon: path.join(__dirname, 'src/static/images/icon.png'),
+  })
+})
+
+
 ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
-  Catalog.toggleVersionLock({id: args.id, locked: args.locked})
-    .then((plugin) => {
-
-      const result = args.locked ? 'unlocked' : 'locked'
-
-      const notif = new window.Notification('Sketchpacks', {
-        body: `${plugin.title} v${plugin.installed_version} ${result}`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
-
-      store.dispatch(toggleVersionLockSuccess(plugin))
-      Catalog.getInstalledPlugins()
-        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
-    })
+  store.dispatch(toggleVersionLockSuccess(args))
 })
 
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  Catalog.pluginInstalled(plugin)
-    .then((plugin) => {
-      const notif = new window.Notification('Sketchpacks', {
-        body: `${plugin.title} v${plugin.installed_version} installed`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
+  const notif = new window.Notification('Sketchpacks', {
+    body: `${plugin.title} v${plugin.version} installed`,
+    silent: true,
+    icon: path.join(__dirname, 'src/static/images/icon.png'),
+  })
 
-      store.dispatch(installPluginSuccess(plugin))
-      Catalog.getInstalledPlugins()
-        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
-    })
+  store.dispatch(installPluginSuccess(plugin))
 })
 
 ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
-  Catalog.pluginInstalled(plugin)
-    .then((plugin) => {
-      const notif = new window.Notification('Sketchpacks', {
-        body: `${plugin.title} updated to v${plugin.installed_version}`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
+  const notif = new window.Notification('Sketchpacks', {
+    body: `${plugin.title} updated to v${plugin.version}`,
+    silent: true,
+    icon: path.join(__dirname, 'src/static/images/icon.png'),
+  })
 
-      store.dispatch(updatePluginSuccess(plugin))
-      Catalog.getInstalledPlugins()
-        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
-    })
+  store.dispatch(updatePluginSuccess(plugin))
 })
 
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  Catalog.pluginRemoved(plugin)
-    .then((plugin) => {
-      const notif = new window.Notification('Sketchpacks', {
-        body: `${plugin.title} uninstalled`,
-        silent: true,
-        icon: path.join(__dirname, 'src/static/images/icon.png'),
-      })
+  const notif = new window.Notification('Sketchpacks', {
+    body: `${plugin.title} uninstalled`,
+    silent: true,
+    icon: path.join(__dirname, 'src/static/images/icon.png'),
+  })
 
-      store.dispatch(uninstallPluginSuccess(plugin))
-      Catalog.getInstalledPlugins()
-        .then((plugins) => store.dispatch(fetchLibraryReceived(plugins)))
-    })
+  store.dispatch(uninstallPluginSuccess(plugin))
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
-  log.info('CHECK_FOR_PLUGIN_UPDATES')
-  Catalog.update()
-    .then(plugins => Catalog.autoUpdatePlugins())
+  store.dispatch(autoUpdatePluginsRequest({repeat: false}))
 })
 
 ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
-
-ipcRenderer.on('CHECK_FOR_CATALOG_UPDATES', (evt) => {
-  Catalog.update()
-})
-
 
 
 if (firstRun({name: `${pkg.name}-${pkg.version}`})) {

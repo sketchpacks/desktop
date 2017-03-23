@@ -245,18 +245,19 @@ ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
       }
     ]
   }, (filePaths) => {
-    if (filePaths.length === 0) return
-
-    try {
-      readSketchpack(filePaths[0])
+    if (filePaths) {
+      try {
+        readSketchpack(filePaths[0])
         .then(plugins => {
           Promise.all(plugins.map(plugin => pluginData(plugin.owner,plugin.name)))
-            .then(data => {
-              installQueue(data)
-            })
+          .then(data => {
+            installQueue(data)
+          })
         })
-    } catch (err) {
-      log.error(err)
+      } catch (err) {
+        log.error(err)
+      }
+
     }
 
   })

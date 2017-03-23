@@ -50,7 +50,7 @@
 .spaced-between {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-between !important;
 }
 
 .column.column__content {

@@ -153,12 +153,19 @@ const loadLibrary = () => {
 loadLibrary()
 
 
+ipcRenderer.on('IMPORT_FROM_SKETCHPACK', (evt, args) => {
+  browserHistory.push('library/installed')
+  ipcRenderer.send('IMPORT_FROM_SKETCHPACK')
+})
 
 
-
-ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, pluginId) => {
+ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, args) => {
   browserHistory.push('library/installed')
   ipcRenderer.send('IMPORT_FROM_SKETCH_TOOLBOX')
+})
+
+ipcRenderer.on('EXPORT_LIBRARY', (evt, args) => {
+  ipcRenderer.send('EXPORT_LIBRARY', store.getState().library.items)
 })
 
 

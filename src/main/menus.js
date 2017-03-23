@@ -50,6 +50,24 @@ const settingsMenu = [
   },
 
   {
+    label: 'Export My Library',
+    click(item, window, event) {
+      window.webContents.send('EXPORT_LIBRARY', null)
+    },
+  },
+
+  {
+    type: 'separator'
+  },
+
+  {
+    label: 'Import a Sketchpack',
+    click(item, window, event) {
+      window.webContents.send('IMPORT_FROM_SKETCHPACK', null)
+    },
+  },
+
+  {
     label: 'Import from Sketch Toolbox',
     click(item, window, event) {
       window.webContents.send('IMPORT_FROM_SKETCH_TOOLBOX', null)

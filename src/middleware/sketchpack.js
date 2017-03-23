@@ -3,10 +3,11 @@ const path = require('path')
 const {includes,values,reduce} = require('lodash')
 const os = require('os')
 const jsonfile = require('jsonfile')
+const semver = require('semver')
 
 const {sanitizeSemVer} = require('lib/utils')
 
-const sketchpackPath = path.join(remote.app.getPath('userData'), 'sketchpack.json')
+const sketchpackPath = path.join(remote.app.getPath('userData'), 'my.sketchpack')
 
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,
@@ -36,13 +37,18 @@ const sketchpackMiddleware = store => next => action => {
         name: value.name,
         owner: value.owner.handle,
         version: value.version || "^0.0.0",
-    		compatible_version: value.compatible_version || "^0.0.0"
+        version_range: semver.toComparators(value.version || "^0.0.0")[0],
+    		compatible_version: value.compatible_version || "^0.0.0",
+        compatible_version_range: semver.toComparators(value.compatible_version || "^0.0.0")[0],
       }
 
     	return result
     }), {})
 
     const data = {
+      name: "My Sketchpack",
+      schema_version: '0.1.0',
+      locked: false,
       plugins: reducedPlugins(store.getState().library.items)
     }
 

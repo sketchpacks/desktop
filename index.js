@@ -35,6 +35,7 @@ const jsonfile = require('jsonfile')
 const semver = require('semver')
 
 const {getInstallPath} = require('./src/lib/utils')
+const writeSketchpack = require('./src/lib/writeSketchpack')
 
 const PluginManager = require('./src/main/plugin_manager')
 const {
@@ -266,37 +267,7 @@ ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
   })
 })
 
-const writeSketchpack = (filepath, contents) => {
-  const reducedPlugins = (collection) => reduce(collection, ((result, value, key) => {
-    result[`${value.owner.handle}/${value.name}`] = {
-      name: value.name,
-      owner: value.owner.handle,
-      version: value.version || "^0.0.0",
-      version_range: semver.toComparators(value.version || "^0.0.0")[0],
-      compatible_version: value.compatible_version || "^0.0.0",
-      compatible_version_range: semver.toComparators(value.compatible_version || "^0.0.0")[0],
-    }
 
-    return result
-  }), {})
-
-  const data = {
-    name: "My Library",
-    schema_version: '0.1.0',
-    locked: false,
-    plugins: reducedPlugins(contents)
-  }
-
-  const opts = {
-    spaces: 2,
-    flags: 'w',
-    encoding: 'utf8'
-  }
-
-  jsonfile.writeFile(filepath, data, opts, (err) => {
-    if (err) console.error(err)
-  })
-}
 
 ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
   try {
@@ -308,6 +279,7 @@ ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
       buttonLabel: 'Export',
       title: 'Export My Library'
     }, (filepath) => {
+      log.info(`My Library exported to ${filepath}`)
       if (filepath) writeSketchpack(filepath,libraryContents)
     })
   } catch (err) {

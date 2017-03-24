@@ -185,6 +185,17 @@ const installQueue = (plugins) => {
     }), (error, results) => console.log(results))
 }
 
+const uninstallQueue = (plugins) => {
+  if (plugins.length === 0) return
+
+  async.series(plugins.map(plugin => (callback) => {
+    PluginManager.uninstall(null, Object.assign({}, {install_path: path.join(getInstallPath(),plugin.directory_name.replace(/ /g, '\\ ')) }))
+    .then((result) => {
+      callback(null, result)
+    })
+  }), (error, results) => console.log(results))
+}
+
 const importFromSketchToolbox = (dbPath) => {
   const db = dblite(dbPath)
 
@@ -192,16 +203,17 @@ const importFromSketchToolbox = (dbPath) => {
   db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
     if (rows.length === 0) return
 
-    async.series(rows.map(plugin => (callback) => {
-        PluginManager.uninstall(null, Object.assign({}, {install_path: path.join(getInstallPath(),plugin.directory_name.replace(/ /g, '\\ ')) }))
-          .then((result) => {
-            callback(null, result)
-          })
-      }), (error, results) => console.log(results))
-
     Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
       .then(data => {
-        installQueue(data)
+        const importables = _.filter(rows, row => {
+          return _.find(data, d => {
+          	return d.name === row.name && d.owner.handle === row.owner
+          })
+        })
+
+        installQueue(importables)
+        uninstallQueue(importables)
+
         db.close()
       })
   })
@@ -284,4 +296,8 @@ ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
   } catch (err) {
     log.error(err)
   }
+})
+
+process.on('uncaughtException', (err) => {
+  log.error(err)
 })

@@ -49,7 +49,7 @@ const install = (event, plugin) => {
           disposition = response.headers['content-disposition']
           filename = contentDisposition.parse(disposition)['parameters']['filename']
         } catch (err) {
-          log.info(err)
+          log.error(err)
           filename = `sketch-plugin-${id}.zip`
         }
 
@@ -69,7 +69,7 @@ const install = (event, plugin) => {
               return
             }
             log.info(`stdout: ${stdout}`)
-            log.info(`stderr: ${stderr}`)
+            log.error(`stderr: ${stderr}`)
           })
 
           extractionPath = new AdmZip(savePath).getEntries()[0].entryName
@@ -91,12 +91,12 @@ const uninstall = (event, plugin) => {
   return new Promise((resolve, reject) => {
     exec(`rm -rf ${install_path}`, (error, stdout, stderr) => {
       if (error) {
-        log.info(`exec error: ${error}`)
+        log.error(`exec error: ${error}`)
         reject(error)
         return
       }
       log.info(`stdout: ${stdout}`)
-      log.info(`stderr: ${stderr}`)
+      log.error(`stderr: ${stderr}`)
     })
 
     resolve(plugin)

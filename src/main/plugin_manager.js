@@ -41,13 +41,22 @@ const install = (event, plugin) => {
   return new Promise ((resolve, reject) => {
     request(opts)
       .on('response', (response) => {
-        const disposition = response.headers['content-disposition']
-        const filename = contentDisposition.parse(disposition)['parameters']['filename']
+        let disposition
+        let filename
+
+        try {
+          disposition = response.headers['content-disposition']
+          filename = contentDisposition.parse(disposition)['parameters']['filename']
+        } catch (err) {
+          log.info(err)
+          filename = `sketch-plugin-${id}.zip`
+        }
+
+        console.log(filename)
+
         const savePath = getSavePath(filename)
         const archiveFileStream = fs.createWriteStream(savePath)
         const installPath = getInstallPath()
-
-        console.log(filename)
 
         let extractionPath
 

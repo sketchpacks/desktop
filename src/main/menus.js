@@ -1,5 +1,10 @@
 const {remote, shell} = require('electron')
 const {Menu, MenuItem} = remote
+const AutoLaunch = require('auto-launch')
+
+const autolauncher = new AutoLaunch({
+	name: 'Sketchpacks'
+})
 
 const settingsMenu = [
   {
@@ -13,6 +18,28 @@ const settingsMenu = [
     label: 'Check for Update',
     click(item, window, event) {
       window.webContents.send('CHECK_FOR_CLIENT_UPDATES', { confirm: true })
+    },
+  },
+
+  {
+    type: 'separator'
+  },
+
+  {
+    label: 'Launch at startup',
+    type: 'checkbox',
+    checked: autolauncher.isEnabled().then(isEnabled => isEnabled),
+    click(item, window, event) {
+      autolauncher.isEnabled()
+        .then(isEnabled => {
+          if (isEnabled) {
+            item.checked = false
+            autolauncher.disable()
+          } else {
+            item.checked = true
+            autolauncher.enable()
+          }
+        })
     },
   },
 

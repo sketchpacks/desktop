@@ -31,6 +31,12 @@ const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
 
+const firstRun = require('first-run')
+const AutoLaunch = require('auto-launch')
+const autolauncher = new AutoLaunch({
+	name: 'Sketchpacks'
+})
+
 const {getInstallPath} = require('./src/lib/utils')
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
@@ -301,3 +307,8 @@ ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
 process.on('uncaughtException', (err) => {
   log.error(err)
 })
+
+
+if (firstRun({name: pkg.name})) {
+  autolauncher.enable()
+}

@@ -297,3 +297,7 @@ ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
     log.error(err)
   }
 })
+
+process.on('uncaughtException', (err) => {
+  log.error(err)
+})

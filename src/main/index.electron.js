@@ -71,7 +71,10 @@ import {
   TOGGLE_VERSION_LOCK_SUCCESS,
 
   autoUpdatePluginsRequest,
-  webInstallPluginRequest
+  webInstallPluginRequest,
+  importSketchToolboxRequest,
+  importSketchpackRequest,
+  exportLibraryRequest
 } from 'actions/plugin_manager'
 
 let store = configureStore()
@@ -156,16 +159,19 @@ loadLibrary()
 ipcRenderer.on('IMPORT_FROM_SKETCHPACK', (evt, args) => {
   browserHistory.push('library/installed')
   ipcRenderer.send('IMPORT_FROM_SKETCHPACK')
+  store.dispatch(importSketchpackRequest())
 })
 
 
 ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, args) => {
   browserHistory.push('library/installed')
   ipcRenderer.send('IMPORT_FROM_SKETCH_TOOLBOX')
+  store.dispatch(importSketchToolboxRequest())
 })
 
 ipcRenderer.on('EXPORT_LIBRARY', (evt, args) => {
   ipcRenderer.send('EXPORT_LIBRARY', store.getState().library.items)
+  store.dispatch(exportLibraryRequest())
 })
 
 
@@ -222,6 +228,7 @@ ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
 ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
+
 
 
 if (firstRun({name: `${pkg.name}-${pkg.version}`})) {

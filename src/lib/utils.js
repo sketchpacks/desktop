@@ -14,7 +14,7 @@ const sanitizeSemVer = (semver) => {
 	if (semver === 0) return "0.0.0"
 	if (semver === "0") return "0.0.0"
 
-  const sanitize = (point) => point.toString().replace(/[^0-9]/g, '')
+  const sanitize = (point) => parseInt(point.toString().replace(/[^0-9]/g, ''))
 
   const x = semver.split('.')
 

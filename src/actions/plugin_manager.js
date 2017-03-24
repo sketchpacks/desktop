@@ -38,8 +38,8 @@ function toggleVersionLockSuccess (plugin) {
         type: isLocked ? 'Lock Plugin Version' : 'Unlock Plugin Version',
         props: {
           source: 'desktop',
-          pluginId: plugin.id,
-          pluginVersion: plugin.installed_version
+          pluginId: `${plugin.owner.handle}/${plugin.name}`,
+          pluginVersion: plugin.version
         },
       },
     },
@@ -85,8 +85,8 @@ function installPluginSuccess (plugin) {
         type: 'Install Plugin',
         props: {
           source: 'desktop',
-          pluginId: plugin.id,
-          pluginVersion: plugin.installed_version
+          pluginId: `${plugin.owner.handle}/${plugin.name}`,
+          pluginVersion: plugin.version
         },
       },
     },
@@ -140,8 +140,8 @@ function updatePluginSuccess (plugin) {
         type: 'Update Plugin',
         props: {
           source: 'desktop',
-          pluginId: plugin.id,
-          pluginVersion: plugin.installed_version
+          pluginId: `${plugin.owner.handle}/${plugin.name}`,
+          pluginVersion: plugin.version
         },
       },
     },
@@ -180,7 +180,7 @@ function uninstallPluginSuccess (plugin) {
         type: 'Uninstall Plugin',
         props: {
           source: 'desktop',
-          pluginId: plugin.id,
+          pluginId: `${plugin.owner.handle}/${plugin.name}`,
         },
       },
     },
@@ -232,6 +232,57 @@ function autoUpdatePluginsRequest ({repeat}) {
   }
 }
 
+const IMPORT_FROM_SKETCHPACK_REQUEST = 'manager/IMPORT_FROM_SKETCHPACK_REQUEST'
+
+function importSketchpackRequest () {
+  return {
+    type: IMPORT_FROM_SKETCHPACK_REQUEST,
+    meta: {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Import',
+        props: {
+          source: 'Sketchpack'
+        },
+      },
+    },
+  }
+}
+
+const IMPORT_FROM_SKETCH_TOOLBOX_REQUEST = 'manager/IMPORT_FROM_SKETCH_TOOLBOX_REQUEST'
+
+function importSketchToolboxRequest () {
+  return {
+    type: IMPORT_FROM_SKETCH_TOOLBOX_REQUEST,
+    meta: {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Import',
+        props: {
+          source: 'Sketch Toolbox'
+        },
+      },
+    },
+  }
+}
+
+const EXPORT_LIBRARY_REQUEST = 'manager/EXPORT_LIBRARY'
+
+function exportLibraryRequest () {
+  return {
+    type: EXPORT_LIBRARY_REQUEST,
+    meta: {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Export',
+        props: {
+          source: 'My Library'
+        },
+      },
+    },
+  }
+}
+
 
 module.exports = {
   installPluginRequest,
@@ -267,5 +318,8 @@ module.exports = {
   UNINSTALL_PLUGIN_ERROR,
 
   autoUpdatePluginsRequest,
-  webInstallPluginRequest
+  webInstallPluginRequest,
+  importSketchToolboxRequest,
+  importSketchpackRequest,
+  exportLibraryRequest
 }

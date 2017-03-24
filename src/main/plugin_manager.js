@@ -1,6 +1,7 @@
 const { app } = require('electron')
 const request = require('request')
 const Promise = require('promise')
+const log = require('electron-log')
 
 const fs = require('fs')
 const path = require('path')
@@ -52,7 +53,7 @@ const install = (event, plugin) => {
           filename = `sketch-plugin-${id}.zip`
         }
 
-        console.log(filename)
+        log.info(filename)
 
         const savePath = getSavePath(filename)
         const archiveFileStream = fs.createWriteStream(savePath)
@@ -63,12 +64,12 @@ const install = (event, plugin) => {
         archiveFileStream.on('finish', () => {
           exec(`unzip -o -a ${savePath} -d ${installPath}`, (error, stdout, stderr) => {
             if (error) {
-              console.error(`exec error: ${error}`)
+              log.info(`exec error: ${error}`)
               reject(error)
               return
             }
-            console.log(`stdout: ${stdout}`)
-            console.log(`stderr: ${stderr}`)
+            log.info(`stdout: ${stdout}`)
+            log.info(`stderr: ${stderr}`)
           })
 
           extractionPath = new AdmZip(savePath).getEntries()[0].entryName
@@ -90,12 +91,12 @@ const uninstall = (event, plugin) => {
   return new Promise((resolve, reject) => {
     exec(`rm -rf ${install_path}`, (error, stdout, stderr) => {
       if (error) {
-        console.error(`exec error: ${error}`)
+        log.info(`exec error: ${error}`)
         reject(error)
         return
       }
-      console.log(`stdout: ${stdout}`)
-      console.log(`stderr: ${stderr}`)
+      log.info(`stdout: ${stdout}`)
+      log.info(`stderr: ${stderr}`)
     })
 
     resolve(plugin)

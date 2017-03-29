@@ -3,7 +3,7 @@
   "productName": "Sketchpacks",
   "companyName": "Sketchpacks",
   "description": "Manage and auto-update your Sketch Plugins from the menu bar",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "main": "index.js",
   "scripts": {
     "postinstall": "install-app-deps",
@@ -51,7 +51,7 @@
     }
   },
   "devDependencies": {
-    "babel-core": "^6.20.0",
+    "babel-core": "^6.24.0",
     "babel-jest": "^19.0.0",
     "babel-loader": "^6.2.10",
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",
@@ -88,7 +88,7 @@
   "dependencies": {
     "adm-zip": "^0.4.7",
     "async": "^2.1.4",
-    "auto-launch": "^5.0.1",
+    "auto-launch": "github:sketchpacks/node-auto-launch",
     "axios": "^0.15.3",
     "content-disposition": "^0.5.2",
     "dblite": "^0.7.8",

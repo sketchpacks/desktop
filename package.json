@@ -88,7 +88,7 @@
   "dependencies": {
     "adm-zip": "^0.4.7",
     "async": "^2.1.4",
-    "auto-launch": "^5.0.1",
+    "auto-launch": "github:sketchpacks/node-auto-launch",
     "axios": "^0.15.3",
     "content-disposition": "^0.5.2",
     "dblite": "^0.7.8",

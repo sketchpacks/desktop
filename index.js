@@ -67,7 +67,7 @@ const opts = {
   alwaysOnTop: false,
   showOnAllWorkspaces: true,
   preloadWindow: true,
-  tooltip: `Sketchpacks v${pkg.version}`,
+  tooltip: `Sketchpacks v${pkg.version} beta`,
   backgroundColor: '#f8f9fa',
 }
 
@@ -118,6 +118,10 @@ app.on('open-url', (event, resource) => {
   else {
     mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
   }
+})
+
+ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
+  menuBar.showWindow(menuBar.tray.getBounds())
 })
 
 

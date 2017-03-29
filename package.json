@@ -51,7 +51,7 @@
     }
   },
   "devDependencies": {
-    "babel-core": "^6.20.0",
+    "babel-core": "^6.24.0",
     "babel-jest": "^19.0.0",
     "babel-loader": "^6.2.10",
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",

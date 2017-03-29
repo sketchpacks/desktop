@@ -102,6 +102,8 @@ export const render = () => {
   )
 
   ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
+
+  ipcRenderer.send('APP_WINDOW_OPEN', null)
 }
 
 

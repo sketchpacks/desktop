@@ -93,6 +93,11 @@ menuBar.on('after-create-window', () => {
   mainWindow = menuBar.window
 })
 
+menuBar.on('show', () => {
+  let bounds = menuBar.tray.getBounds()
+  menuBar.setOption('y', (bounds.y > 0) ? bounds.y * 2 : 0)
+})
+
 app.on('ready', () => {
   if (__PRODUCTION__ && __ELECTRON__) {
     updater = require('./src/main/updater')
@@ -118,6 +123,10 @@ app.on('open-url', (event, resource) => {
   else {
     mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
   }
+})
+
+ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
+  menuBar.showWindow(menuBar.tray.getBounds())
 })
 
 

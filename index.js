@@ -197,7 +197,9 @@ const installQueue = (plugins) => {
           mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
           callback(null, result)
         })
-    }), (error, results) => console.log(results))
+    }), (error, results) => {
+      log.debug(results)
+    })
 }
 
 const uninstallQueue = (plugins) => {
@@ -216,7 +218,17 @@ const importFromSketchToolbox = (dbPath) => {
 
   mainWindow.webContents.send('IMPORT_START')
   db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
-    if (rows.length === 0) return
+    if (rows.length === 0) {
+      dialog.showMessageBox(null, {
+        buttons: ['Ok'],
+        defaultId: 0,
+        cancelId: 0,
+        message: '🤔 Import Failed',
+        detail: 'We had trouble accessing your installed plugins via Sketch Toolbox.',
+      }, (response, checkboxChecked) => {})
+
+      return
+    }
 
     Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
       .then(data => {

@@ -28,7 +28,6 @@ const settingsMenu = [
   {
     label: 'Launch at startup',
     type: 'checkbox',
-    checked: autolauncher.isEnabled().then(isEnabled => isEnabled),
     click(item, window, event) {
       autolauncher.isEnabled()
         .then(isEnabled => {

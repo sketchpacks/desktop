@@ -132,9 +132,9 @@ ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
 
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
   PluginManager.install(event, arg)
-    .then((plugin) => {
-      mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
-    })
+    // .then((plugin) => {
+    //   mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
+    // })
 })
 
 

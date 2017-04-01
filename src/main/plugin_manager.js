@@ -3,13 +3,14 @@ const request = require('request')
 const Promise = require('promise')
 const log = require('electron-log')
 
+const async = require('async')
 const fs = require('fs')
 const path = require('path')
-const exec = require('child_process').exec
 const {find} = require('lodash')
 const IsThere = require("is-there")
-const contentDisposition = require('content-disposition')
 const AdmZip = require('adm-zip')
+
+const {extractAsset,downloadAsset} = require('../lib/utils')
 
 const {
   HOME_PATH,
@@ -34,55 +35,47 @@ const getSavePath = ((filename) => {
 const install = (event, plugin) => {
   const { id, name, download_url, version } = plugin
 
-  const opts = {
-    method: 'GET',
-    uri: download_url
-  }
-
-  return new Promise ((resolve, reject) => {
-    request(opts)
-      .on('response', (response) => {
-        let disposition
-        let filename
-
-        try {
-          disposition = response.headers['content-disposition']
-          filename = contentDisposition.parse(disposition)['parameters']['filename']
-        } catch (err) {
-          log.error(err)
-          filename = `sketch-plugin-${id}.zip`
+  async.waterfall([
+    // Download
+    (callback) => {
+      downloadAsset({
+        plugin: plugin,
+        destinationPath: TEMP_DIR_PATH,
+        onProgress: (received,total) => {
+          let percentage = (received * 100) / total;
+          log.debug(percentage + "% | " + received + " bytes out of " + total + " bytes.")
         }
-
-        log.info(filename)
-
-        const savePath = getSavePath(filename)
-        const archiveFileStream = fs.createWriteStream(savePath)
-        const installPath = getInstallPath()
-
-        let extractionPath
-
-        archiveFileStream.on('finish', () => {
-          exec(`unzip -o -a ${savePath} -d ${installPath}`, (error, stdout, stderr) => {
-            if (error) {
-              log.info(`exec error: ${error}`)
-              reject(error)
-              return
-            }
-            log.info(`stdout: ${stdout}`)
-            log.error(`stderr: ${stderr}`)
-          })
-
-          extractionPath = new AdmZip(savePath).getEntries()[0].entryName
-
-          resolve(Object.assign(plugin, {
-            install_path: path.join(getInstallPath(), extractionPath),
-            version: version,
-          }))
-        })
-
-        response.pipe(archiveFileStream)
       })
+      .then((assetInfo) => {
+        callback(null, assetInfo)
+      })
+      .catch((err) => {
+        log.error('Error', err)
+        callback(err, null)
+      })
+    },
+
+    // Extract
+    (asset, callback) => {
+      extractAsset(asset.savePath,getInstallPath())
+        .then(path => {
+          callback(null, {
+            install_path: path,
+            version: version
+          })
+        })
+        // .then(path => resolve(Object.assign(plugin, {
+        //   install_path: path.join(getInstallPath(), path),
+        //   version: version
+        // })))
+    }
+  ], (err, results) => {
+    log.debug(results)
   })
+
+
+
+
 }
 
 const uninstall = (event, plugin) => {

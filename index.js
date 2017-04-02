@@ -41,6 +41,7 @@ const {getInstallPath} = require('./src/lib/utils')
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
 const PluginManager = require('./src/main/plugin_manager')
+const {extractAsset,downloadAsset} = require('./src/lib/utils')
 
 const {
   INSTALL_PLUGIN_REQUEST,
@@ -131,7 +132,9 @@ ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
 
 
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
-  PluginManager.install(event, arg)
+  const p = { owner: arg.owner.handle, name: arg.name }
+  queueInstall([p])
+  // PluginManager.install(event, arg)
     // .then((plugin) => {
     //   mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
     // })
@@ -199,6 +202,69 @@ const installQueue = (plugins) => {
         })
     }), (error, results) => console.log(results))
 }
+
+
+// const downloadAsset = (plugin,destinationPath) => new Promise((reject, resolve) => {
+//   // do work...
+// })
+//
+// const extractAsset = () => new Promise((reject, resolve) => {
+//   // do work...
+// })
+//
+// const removeAssets = () => new Promise((reject, resolve) => {
+//   // do work...
+// })
+
+
+
+// const updatePluginTask = (plugin, callback) => {
+//   updatePlugin(plugin)
+//     .then(downloadAsset)
+//     .then(extractAsset)
+// }
+//
+// const removePluginTask = (plugin, callback) => {
+//   removePlugin(plugin)
+//     .then(removeAssets)
+// }
+
+const getPluginData = (plugin) => axios.get(`${API_URL}/v1/users/${plugin.owner}/plugins/${plugin.name.toLowerCase()}`)
+
+const installPluginTask = (plugin, callback) => {
+  log.debug('Task: ', plugin)
+  getPluginData(plugin)
+    .then(response => {
+      log.debug('Plugin data: ', response.data)
+      callback(null, response.data)
+    })
+    .catch(err => callback(err))
+
+    // .then(downloadAsset)
+    // .then(extractAsset)
+}
+
+const queueInstall = (plugins) => {
+  if (typeof plugins === undefined) return
+  if (plugins.length === 0) return
+
+  const workQueue = async.queue((plugin, callback) => installPluginTask(plugin, callback), 1)
+
+  log.debug(`Queueing ${plugins.length} plugins`)
+  plugins.map(plugin => workQueue.push(plugin, (err, result) => {
+    if (err) return callback(err)
+    log.debug('Install complete', result)
+    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
+    // return callback(null, result)
+  }))
+
+  workQueue.drain = () => {
+    log.debug('Work complete')
+  }
+}
+
+
+
 
 const uninstallQueue = (plugins) => {
   if (plugins.length === 0) return
@@ -275,12 +341,7 @@ ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
     if (filePaths) {
       try {
         readSketchpack(filePaths[0])
-        .then(plugins => {
-          Promise.all(plugins.map(plugin => pluginData(plugin.owner,plugin.name)))
-          .then(data => {
-            installQueue(data)
-          })
-        })
+          .then(plugins => queueInstall(plugins))
       } catch (err) {
         log.error(err)
       }

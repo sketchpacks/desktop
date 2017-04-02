@@ -32,9 +32,17 @@ const axios = require('axios')
 const async = require('async')
 
 const firstRun = require('first-run')
+
+
+log.debug(app.getLoginItemSettings())
+const appPath = process.platform === 'darwin'
+  ? app.getPath('exe').replace(/\.app\/Content.*/, '.app')
+  : undefined
 const AutoLaunch = require('auto-launch')
 const autolauncher = new AutoLaunch({
-	name: 'Sketchpacks'
+	name: 'Sketchpacks',
+  path: appPath,
+  isHidden: true
 })
 
 const {getInstallPath} = require('./src/lib/utils')

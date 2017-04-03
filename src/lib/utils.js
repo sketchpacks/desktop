@@ -46,15 +46,24 @@ const getInstallPath = () => {
 }
 
 const downloadAsset = (opts) => new Promise((resolve, reject) => {
+  log.debug('Downloading: ', opts.plugin.name)
   let received_bytes = 0
   let total_bytes = 0
   let disposition
   let filename
   let savePath
+  let out
 
   const req = request({
     method: 'GET',
-    uri: opts.plugin.download_url
+    uri: opts.plugin.download_url,
+    timeout: 1500
+  })
+
+  req.on('error', (err) => {
+    if (err.code === 'ETIMEDOUT') log.debug('Timeout')
+    if (err.connect === true) log.debug('Connection Timeout')
+    reject(err)
   })
 
   req.on('response', (data) => {
@@ -72,6 +81,16 @@ const downloadAsset = (opts) => new Promise((resolve, reject) => {
     const out = fs.createWriteStream(savePath)
 
     req.pipe(out)
+
+    out.once('close', () => {
+      resolve({
+        plugin: opts.plugin,
+        asset: {
+          savePath: savePath,
+          filename: filename
+        }
+      })
+    })
   })
 
   if (opts.hasOwnProperty("onProgress")){
@@ -85,34 +104,48 @@ const downloadAsset = (opts) => new Promise((resolve, reject) => {
       received_bytes += chunk.length
     })
   }
+})
 
-  req.on('end', () => {
-    resolve({
-      filename,
-      savePath
-    })
+const extractAsset = (data) => new Promise((resolve, reject) => {
+  const archivePath = data.asset.savePath
+  const extractionPath = getInstallPath()
+  const {entryName} = new AdmZip(archivePath).getEntries()[0]
+
+  data.plugin['install_path'] = path.join(extractionPath, entryName)
+
+  exec(`unzip -o -a ${archivePath} -d ${extractionPath}`, (error, stdout, stderr) => {
+    if (error) {
+      log.info(`exec error: ${error}`)
+      reject(error)
+      return
+    }
+    log.info(`stdout: ${stdout}`)
+    log.error(`stderr: ${stderr}`)
+
+    resolve(data)
   })
 })
 
-const extractAsset = (archivePath,extractionPath) => {
-  return new Promise((resolve, reject) => {
-    exec(`unzip -o -a ${archivePath} -d ${extractionPath}`, (error, stdout, stderr) => {
-      if (error) {
-        log.info(`exec error: ${error}`)
-        reject(error)
-        return
-      }
-      log.info(`stdout: ${stdout}`)
-      log.error(`stderr: ${stderr}`)
+const removeAsset = (data) => new Promise((resolve, reject) => {
+  const {install_path} = data.plugin
+  log.debug('Removing asset: ', install_path)
+  exec(`rm -rf ${install_path}`, (error, stdout, stderr) => {
+    if (error) {
+      log.error(`exec error: ${error}`)
+      reject(error)
+      return
+    }
+    log.info(`stdout: ${stdout}`)
+    log.error(`stderr: ${stderr}`)
 
-      resolve(new AdmZip(archivePath).getEntries()[0].entryName)
-    })
+    resolve(data)
   })
-}
+})
 
 module.exports = {
 	sanitizeSemVer,
 	getInstallPath,
   extractAsset,
-  downloadAsset
+  downloadAsset,
+  removeAsset
 }

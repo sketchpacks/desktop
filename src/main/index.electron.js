@@ -194,8 +194,10 @@ ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
 })
 
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
+  const msgBody = plugin.title || plugin.name
+
   const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} v${plugin.version} installed`,
+    body: `${msgBody} v${plugin.version} installed`,
     silent: true,
     icon: path.join(__dirname, 'src/static/images/icon.png'),
   })

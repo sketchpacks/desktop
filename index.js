@@ -37,11 +37,15 @@ const autolauncher = new AutoLaunch({
 	name: 'Sketchpacks'
 })
 
-const {getInstallPath} = require('./src/lib/utils')
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
 const PluginManager = require('./src/main/plugin_manager')
-const {extractAsset,downloadAsset} = require('./src/lib/utils')
+const {
+  getInstallPath,
+  extractAsset,
+  downloadAsset,
+  removeAsset
+} = require('./src/lib/utils')
 
 const {
   INSTALL_PLUGIN_REQUEST,
@@ -134,10 +138,6 @@ ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
   const p = { owner: arg.owner.handle, name: arg.name }
   queueInstall([p])
-  // PluginManager.install(event, arg)
-    // .then((plugin) => {
-    //   mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
-    // })
 })
 
 
@@ -152,12 +152,7 @@ ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
 })
 
 
-ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
-  PluginManager.uninstall(event, arg)
-    .then((plugin) => {
-      mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
-    })
-})
+ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => queueRemove([arg]))
 
 
 ipcMain.on(TOGGLE_VERSION_LOCK_REQUEST, (event, args) => {
@@ -180,123 +175,119 @@ ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
   updater.checkForUpdates(confirm)
 })
 
-const pluginData = (owner,slug) => new Promise((resolve,reject) => {
-  axios.get(`${API_URL}/v1/users/${owner}/plugins/${slug.toLowerCase()}`)
-    .then(response => {
-      resolve(response.data)
-    })
-    .catch(response => {
-      resolve({})
-    })
-})
-
-const installQueue = (plugins) => {
-  if (plugins.length === 0) return
-  const queue = filter(plugins, (p) => Object.keys(p).length > 0)
-
-  async.series(queue.map(plugin => (callback) => {
-      PluginManager.install(null, plugin)
-        .then((result) => {
-          mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
-          callback(null, result)
-        })
-    }), (error, results) => console.log(results))
-}
-
-
-// const downloadAsset = (plugin,destinationPath) => new Promise((reject, resolve) => {
-//   // do work...
-// })
-//
-// const extractAsset = () => new Promise((reject, resolve) => {
-//   // do work...
-// })
-//
-// const removeAssets = () => new Promise((reject, resolve) => {
-//   // do work...
-// })
-
-
-
-// const updatePluginTask = (plugin, callback) => {
-//   updatePlugin(plugin)
-//     .then(downloadAsset)
-//     .then(extractAsset)
-// }
-//
-// const removePluginTask = (plugin, callback) => {
-//   removePlugin(plugin)
-//     .then(removeAssets)
-// }
-
 const getPluginData = (plugin) => axios.get(`${API_URL}/v1/users/${plugin.owner}/plugins/${plugin.name.toLowerCase()}`)
 
 const installPluginTask = (plugin, callback) => {
-  log.debug('Task: ', plugin)
   getPluginData(plugin)
-    .then(response => {
-      log.debug('Plugin data: ', response.data)
-      callback(null, response.data)
+    .then(response => downloadAsset({
+      plugin: response.data,
+      destinationPath: app.getPath('temp'),
+      onProgress: (received,total) => {
+        let percentage = (received * 100) / total;
+        // log.debug(percentage + "% | " + received + " bytes out of " + total + " bytes.")
+      }
+    }))
+    .then(extractAsset)
+    .then(result => callback(null, result.plugin))
+    .catch(err => {
+      log.error('Error while installing: ', err)
+      callback(err)
     })
-    .catch(err => callback(err))
+}
 
-    // .then(downloadAsset)
-    // .then(extractAsset)
+const updatePluginTask = (plugin, callback) => {
+  getPluginData(plugin)
+    .then(response => downloadAsset({
+      plugin: response.data,
+      destinationPath: app.getPath('temp')
+    }))
+    .then(removeAsset)
+    .then(extractAsset)
+    .then(result => callback(null, result.plugin))
+    .catch(err => callback(err))
+}
+
+const uninstallPluginTask = (plugin, callback) => {
+  removeAsset({ plugin: plugin })
+    .then(result => callback(null, result.plugin))
+    .catch(err => callback(err))
+}
+
+const triageTask = (task, callback) => {
+  const { action,payload } = task
+
+  switch (action) {
+    case 'install':
+      return installPluginTask(payload,callback)
+    case 'update':
+      return updatePluginTask(payload,callback)
+    case 'remove':
+      return uninstallPluginTask(payload,callback)
+  }
+}
+
+const workQueue = async.queue((task, callback) => triageTask(task, callback), 2)
+
+workQueue.drain = () => {
+  log.debug('Work Complete')
 }
 
 const queueInstall = (plugins) => {
   if (typeof plugins === undefined) return
   if (plugins.length === 0) return
 
-  const workQueue = async.queue((plugin, callback) => installPluginTask(plugin, callback), 1)
-
-  log.debug(`Queueing ${plugins.length} plugins`)
-  plugins.map(plugin => workQueue.push(plugin, (err, result) => {
+  log.debug(`Enqueueing ${plugins.length} plugins`)
+  plugins.map(plugin => workQueue.push({ action: 'install', payload: plugin }, (err, result) => {
     if (err) return callback(err)
-    log.debug('Install complete', result)
+    log.debug('Install complete', result.name)
     mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
-    // return callback(null, result)
   }))
-
-  workQueue.drain = () => {
-    log.debug('Work complete')
-  }
 }
 
-
-
-
-const uninstallQueue = (plugins) => {
+const queueUpdate = (plugins) => {
+  if (typeof plugins === undefined) return
   if (plugins.length === 0) return
 
-  async.series(plugins.map(plugin => (callback) => {
-    PluginManager.uninstall(null, Object.assign({}, {install_path: path.join(getInstallPath(),plugin.directory_name.replace(/ /g, '\\ ')) }))
-    .then((result) => {
-      callback(null, result)
-    })
-  }), (error, results) => console.log(results))
+  log.debug(`Enqueueing ${plugins.length} plugins`)
+  plugins.map(plugin => workQueue.push({ action: 'update', payload: plugin }, (err, result) => {
+    if (err) return callback(err)
+    log.debug('Update complete', result)
+    mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, result.plugin)
+  }))
 }
+
+const queueRemove = (plugins) => {
+  if (typeof plugins === undefined) return
+  if (plugins.length === 0) return
+
+  log.debug(`Enqueueing ${plugins.length} plugins`)
+  plugins.map(plugin => workQueue.push({ action: 'remove', payload: plugin }, (err, result) => {
+    if (err) return callback(err)
+    log.debug('Uninstall complete', result)
+    mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, result)
+  }))
+}
+
 
 const importFromSketchToolbox = (dbPath) => {
   const db = dblite(dbPath)
 
-  mainWindow.webContents.send('IMPORT_START')
   db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
     if (rows.length === 0) return
 
-    Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
-      .then(data => {
-        const importables = _.filter(rows, row => {
-          return _.find(data, d => {
-          	return d.name === row.name && d.owner.handle === row.owner
-          })
-        })
+    const importables = []
+    const removables = []
 
-        installQueue(importables)
-        uninstallQueue(importables)
+    rows.forEach(plugin => importables.push({
+      owner: row.owner,
+      name: row.slug,
+      install_path: path.join(getInstallPath(),row.directory_name.replace(/ /g, '\\ '))
+    }))
 
-        db.close()
-      })
+    queueInstall(importables)
+    queueRemove(removables)
+
+    db.close()
   })
 }
 

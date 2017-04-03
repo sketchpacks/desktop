@@ -6,10 +6,11 @@ const {
 
 const { ipcRenderer } = require('electron')
 
+const log = require('electron-log')
 const ms = require('ms')
 const axios = require('axios')
 const semver = require('semver')
-const {filter} = require('lodash')
+const {filter,find} = require('lodash')
 
 const {sanitizeSemVer} = require('../lib/utils')
 
@@ -164,7 +165,12 @@ const UNINSTALL_PLUGIN_REQUEST = 'manager/UNINSTALL_REQUEST'
 
 function uninstallPluginRequest (plugin) {
   return (dispatch, getState) => {
-    ipcRenderer.send(UNINSTALL_PLUGIN_REQUEST, plugin)
+    const removable = find(getState().library.items, (item) => {
+      return plugin.owner.handle === item.owner.handle
+        && plugin.name === item.name
+    })
+
+    ipcRenderer.send(UNINSTALL_PLUGIN_REQUEST, removable)
   }
 }
 

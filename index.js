@@ -32,9 +32,15 @@ const axios = require('axios')
 const async = require('async')
 
 const firstRun = require('first-run')
+
+const appPath = process.platform === 'darwin'
+  ? app.getPath('exe').replace(/\.app\/Content.*/, '.app')
+  : undefined
 const AutoLaunch = require('auto-launch')
 const autolauncher = new AutoLaunch({
-	name: 'Sketchpacks'
+	name: 'Sketchpacks',
+  path: appPath,
+  isHidden: true
 })
 
 const {getInstallPath} = require('./src/lib/utils')
@@ -332,4 +338,13 @@ process.on('uncaughtException', (err) => {
 
 if (firstRun({name: pkg.name})) {
   autolauncher.enable()
+}
+
+if (firstRun({name: `${pkg.name}-0.5.4`})) {
+  autolauncher.isEnabled()
+    .then(isEnabled => {
+      if (isEnabled) {
+        autolauncher.disable()
+      }
+    })
 }

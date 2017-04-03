@@ -3,7 +3,7 @@
   "productName": "Sketchpacks",
   "companyName": "Sketchpacks",
   "description": "Manage and auto-update your Sketch Plugins from the menu bar",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "main": "index.js",
   "scripts": {
     "postinstall": "install-app-deps",

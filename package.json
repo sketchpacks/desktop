@@ -90,6 +90,7 @@
     "async": "^2.1.4",
     "auto-launch": "^5.0.1",
     "axios": "^0.15.3",
+    "chokidar": "^1.6.1",
     "content-disposition": "^0.5.2",
     "dblite": "^0.7.8",
     "electron-log": "^1.2.2",

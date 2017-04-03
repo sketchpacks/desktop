@@ -34,6 +34,11 @@ import {
   TOGGLE_VERSION_LOCK_SUCCESS
 } from 'actions/plugin_manager'
 
+import {
+  SYNC_FILE_RECEIVED,
+  SYNC_CHANGE_RECEIVED
+} from 'actions/sketchpack'
+
 import {filter,findIndex} from 'lodash'
 
 const initialListState = {
@@ -342,6 +347,32 @@ function authorPlugins (state = initialListState, action) {
   }
 }
 
+const initialSketchpackState = {
+  isEnabled: false,
+  isSyncing: false,
+  items: [],
+  files: []
+}
+
+function sketchpack ( state = initialSketchpackState, action ) {
+  switch(action.type) {
+    case SYNC_CHANGE_RECEIVED:
+      return {
+        ...state,
+        items: payload
+      }
+
+    case SYNC_FILE_RECEIVED:
+      return {
+        ...state,
+        files: state.files.concat(payload)
+      }
+
+    default:
+      return state
+  }
+}
+
 
 const rootReducer = combineReducers({
   routing: routerReducer,
@@ -351,6 +382,7 @@ const rootReducer = combineReducers({
   app,
   authorDetails,
   authorPlugins,
+  sketchpack
 })
 
 export default rootReducer

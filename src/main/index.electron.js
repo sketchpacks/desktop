@@ -52,8 +52,10 @@ import {
 import {
   installPluginRequest,
   installPluginSuccess,
+  installPluginError,
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
+  INSTALL_PLUGIN_ERROR,
 
   updatePluginRequest,
   updatePluginSuccess,
@@ -76,6 +78,12 @@ import {
   importSketchpackRequest,
   exportLibraryRequest
 } from 'actions/plugin_manager'
+
+import {
+  SYNC_FILE_RECEIVED,
+  SYNC_CHANGE_RECEIVED,
+  syncChangeReceived
+} from 'actions/sketchpack'
 
 let store = configureStore()
 const history = syncHistoryWithStore((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory, store)
@@ -203,6 +211,18 @@ ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   })
 
   store.dispatch(installPluginSuccess(plugin))
+})
+
+ipcRenderer.on(INSTALL_PLUGIN_ERROR, (error, plugin) => {
+  const msgBody = plugin.title || plugin.name
+
+  const notif = new window.Notification('Sketchpacks', {
+    body: `Could not install ${msgBody}`,
+    silent: true,
+    icon: path.join(__dirname, 'src/static/images/icon.png'),
+  })
+
+  store.dispatch(installPluginError(error, plugin))
 })
 
 ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {

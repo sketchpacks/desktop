@@ -7,7 +7,7 @@ const semver = require('semver')
 
 const {sanitizeSemVer} = require('lib/utils')
 
-const sketchpackPath = path.join(remote.app.getPath('userData'), 'my.sketchpack')
+const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')
 
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,

@@ -17,7 +17,7 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-const {forEach,filter} = require('lodash')
+const {forEach,filter,find} = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
@@ -30,6 +30,7 @@ const menubar = require('menubar')
 const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
+const chokidar = require('chokidar')
 
 const firstRun = require('first-run')
 const AutoLaunch = require('auto-launch')
@@ -39,12 +40,14 @@ const autolauncher = new AutoLaunch({
 
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
+const readLibrary = require('./src/lib/readLibrary')
 const PluginManager = require('./src/main/plugin_manager')
 const {
   getInstallPath,
   extractAsset,
   downloadAsset,
-  removeAsset
+  removeAsset,
+  sanitizeSemVer
 } = require('./src/lib/utils')
 
 const {
@@ -81,6 +84,7 @@ const menuBar = menubar(opts)
 let mainWindow
 let updater
 let externalPluginInstallQueue = []
+let watcher
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
@@ -204,13 +208,34 @@ const updatePluginTask = (plugin, callback) => {
     .then(removeAsset)
     .then(extractAsset)
     .then(result => callback(null, result.plugin))
-    .catch(err => callback(err))
+    .catch(err => {
+      log.error('Error while updating: ', err)
+      callback(err)
+    })
 }
 
 const uninstallPluginTask = (plugin, callback) => {
   removeAsset({ plugin: plugin })
     .then(result => callback(null, result.plugin))
     .catch(err => callback(err))
+}
+
+const syncTask = (sketchpack, callback) => {
+  readLibrary('/Users/adam/Library/Application\ Support/Sketchpacks/library.json')
+    .then(library => {
+
+      const installables = filter(sketchpack, (pack) => {
+        return find(library, (lib) => {
+          return lib.owner.handle !== pack.owner
+            && lib.name !== pack.name
+        })
+      })
+
+      callback(null, {
+        pendingInstalls: installables,
+        pendingUpdates: []
+      })
+    })
 }
 
 const triageTask = (task, callback) => {
@@ -223,6 +248,8 @@ const triageTask = (task, callback) => {
       return updatePluginTask(payload,callback)
     case 'remove':
       return uninstallPluginTask(payload,callback)
+    case 'sync':
+      return syncTask(payload,callback)
   }
 }
 
@@ -238,7 +265,10 @@ const queueInstall = (plugins) => {
 
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'install', payload: plugin }, (err, result) => {
-    if (err) return callback(err)
+    if (err) {
+      mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err, plugin)
+      return callback(err)
+    }
     log.debug('Install complete', result.name)
     mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
   }))
@@ -266,6 +296,14 @@ const queueRemove = (plugins) => {
     log.debug('Uninstall complete', result)
     mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, result)
   }))
+}
+
+const queueSync = (sketchpackContents) => {
+  workQueue.push({ action: 'sync', payload: sketchpackContents }, (err, result) => {
+    if (err) return callback(err)
+    log.debug('Sync complete', result)
+    queueInstall(result.pendingInstalls)
+  })
 }
 
 
@@ -373,3 +411,27 @@ process.on('uncaughtException', (err) => {
 if (firstRun({name: pkg.name})) {
   autolauncher.enable()
 }
+
+
+const watch = (path) => {
+  log.debug('Watching ', path)
+  const watcher = chokidar.watch(path, {
+    ignored: /(^|[\/\\])\../,
+    persistent: true,
+    followSymlinks: true
+  })
+
+  watcher.on('change', (path, stats) => {
+    log.debug('Change detected: ', path)
+
+    readSketchpack(path)
+      .then(contents => queueSync(contents))
+  })
+}
+
+watch(path.resolve('/Users/adam/Library/Application\ Support/Sketchpacks/my-library.sketchpack'))
+
+app.on('before-quit', () => {
+  log.info('Watcher stopped')
+  watcher.close()
+})

@@ -9,14 +9,12 @@ const {sanitizeSemVer} = require('lib/utils')
 const libraryPath = path.join(remote.app.getPath('userData'), 'library.json')
 
 const {
-  TOGGLE_VERSION_LOCK_SUCCESS,
   INSTALL_PLUGIN_SUCCESS,
   UPDATE_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_SUCCESS,
 } = require('actions/plugin_manager')
 
 const WATCHED_ACTIONS = {
-  TOGGLE_VERSION_LOCK_SUCCESS,
   INSTALL_PLUGIN_SUCCESS,
   UPDATE_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_SUCCESS,

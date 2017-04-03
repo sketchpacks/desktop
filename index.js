@@ -33,8 +33,6 @@ const async = require('async')
 
 const firstRun = require('first-run')
 
-
-log.debug(app.getLoginItemSettings())
 const appPath = process.platform === 'darwin'
   ? app.getPath('exe').replace(/\.app\/Content.*/, '.app')
   : undefined
@@ -340,4 +338,13 @@ process.on('uncaughtException', (err) => {
 
 if (firstRun({name: pkg.name})) {
   autolauncher.enable()
+}
+
+if (firstRun({name: `${pkg.name}-0.5.4`})) {
+  autolauncher.isEnabled()
+    .then(isEnabled => {
+      if (isEnabled) {
+        autolauncher.disable()
+      }
+    })
 }

@@ -83,7 +83,7 @@ const downloadAsset = (opts) => new Promise((resolve, reject) => {
 
     req.pipe(out)
 
-    out.once('close', () => {
+    out.on('close', () => {
       resolve({
         plugin: opts.plugin,
         asset: {
@@ -133,7 +133,7 @@ const removeAsset = (data) => new Promise((resolve, reject) => {
   exec(`rm -rf ${install_path}`, (error, stdout, stderr) => {
     if (error) {
       log.error(`exec error: ${error}`)
-      reject(error)
+      reject(data)
       return
     }
     log.info(`stdout: ${stdout}`)

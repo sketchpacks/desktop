@@ -17,7 +17,7 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-const {forEach,filter,find} = require('lodash')
+const {forEach,filter,find,difference} = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
@@ -140,23 +140,22 @@ ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
 
 
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
+  log.debug(INSTALL_PLUGIN_REQUEST, arg)
   const p = { owner: arg.owner.handle, name: arg.name }
   queueInstall([p])
 })
 
 
 ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
-  PluginManager.install(event, arg.updatedPlugin)
-    .then((newPlugin) => {
-      PluginManager.uninstall(event, arg.outdatedPlugin)
-        .then((oldPlugin) => {
-          mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, newPlugin)
-        })
-    })
+  log.debug(UPDATE_PLUGIN_REQUEST, arg)
+  const p = { owner: arg.owner.handle, name: arg.name }
+  queueUpdate([p])
 })
 
-
-ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => queueRemove([arg]))
+ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
+  log.debug(UNINSTALL_PLUGIN_REQUEST, arg)
+  queueRemove([arg])
+})
 
 
 ipcMain.on(TOGGLE_VERSION_LOCK_REQUEST, (event, args) => {
@@ -220,21 +219,68 @@ const uninstallPluginTask = (plugin, callback) => {
     .catch(err => callback(err))
 }
 
+function denormalizePlugins (plugins) {
+	return new Promise ((resolve, reject) => {
+  	try {
+      let denormalized = plugins.map(plugin => {
+      	return {
+        	name: plugin.name,
+          owner: plugin.owner.handle,
+          version: plugin.version,
+          compatible_version: plugin.compatible_version
+        }
+      })
+      log.debug('denormalizePlugins',denormalized)
+      resolve(denormalized)
+    } catch (err) {
+    	reject(err)
+    }
+  })
+}
+
+function mapSketchpack (plugins) {
+	return new Promise ((resolve, reject) => {
+  	try {
+      resolve(plugins)
+    } catch (err) {
+    	reject(err)
+    }
+  })
+}
+
+function getPluginNamespace (plugins) {
+	return new Promise((resolve, reject) => {
+  	try {
+    	const namespaces = plugins.map(plugin => `${plugin.owner}/${plugin.name}`)
+      log.debug('getPluginNamespace',namespaces)
+      resolve(namespaces)
+    } catch (err) {
+    	reject(err)
+    }
+  })
+}
+
 const syncTask = (sketchpack, callback) => {
   readLibrary('/Users/adam/Library/Application\ Support/Sketchpacks/library.json')
     .then(library => {
 
-      const installables = filter(sketchpack, (pack) => {
-        return find(library, (lib) => {
-          return lib.owner.handle !== pack.owner
-            && lib.name !== pack.name
-        })
+      log.debug('syncTask: ', sketchpack)
+
+      const denormalizedLibrary = denormalizePlugins(library)
+      	.then(getPluginNamespace)
+
+      const mappedSketchpack = mapSketchpack(sketchpack)
+      	.then(getPluginNamespace)
+
+      const getInstallables = (payload) => new Promise((resolve,reject) => {
+        let installables = difference(payload[0], payload[1])
+        let plugins = installables.map(plugin => sketchpack[plugin])
+        log.debug('getInstallables',plugins)
+        resolve(plugins)
       })
 
-      callback(null, {
-        pendingInstalls: installables,
-        pendingUpdates: []
-      })
+      Promise.all([mappedSketchpack,denormalizedLibrary])
+        .then(results => callback(null, results))
     })
 }
 
@@ -301,8 +347,18 @@ const queueRemove = (plugins) => {
 const queueSync = (sketchpackContents) => {
   workQueue.push({ action: 'sync', payload: sketchpackContents }, (err, result) => {
     if (err) return callback(err)
-    log.debug('Sync complete', result)
-    queueInstall(result.pendingInstalls)
+
+    const diff = difference(result[0],result[1])
+    const installables = diff.map(plugin => {
+      let owner = plugin.split('/')[0]
+      let name = plugin.split('/')[1]
+
+      return find(sketchpackContents, (o) => {
+        return o.name === name && o.owner === owner
+      })
+    })
+    
+    queueInstall(installables)
   })
 }
 

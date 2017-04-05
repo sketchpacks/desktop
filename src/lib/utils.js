@@ -16,15 +16,16 @@ const {
 } = require('../config')
 
 const sanitizeSemVer = (semver) => {
-	if (typeof semver === undefined) return "0.0.0"
-	if (typeof semver !== 'string') return "0.0.0"
-	if (typeof semver === 'integer') return "0.0.0"
-	if (semver === 0) return "0.0.0"
-	if (semver === "0") return "0.0.0"
+  let semverStr = semver.toString()
 
-  const sanitize = (point) => parseInt(point.toString().replace(/[^0-9]/g, ''))
+	if (typeof semverStr === undefined) return "0.0.0"
+	if (typeof semverStr === 'integer') return "0.0.0"
+	if (semverStr === 0) return "0.0.0"
+  if (semverStr === "0") return "0.0.0"
 
-  const x = semver.split('.')
+  const sanitize = (point) => parseInt(point.toString().replace(/[^0-9]/g, '')) || 0
+
+  const x = semverStr.split('.')
 
   const major = x[0] || 0
   const minor = x[1] || 0

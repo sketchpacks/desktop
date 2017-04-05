@@ -264,21 +264,11 @@ function getPluginNamespace (plugins) {
 const syncTask = (sketchpack, callback) => {
   readLibrary(path.join(app.getPath('userData'),'library.json'))
     .then(library => {
-
-      log.debug('syncTask: ', sketchpack)
-
       const denormalizedLibrary = denormalizePlugins(library)
       	.then(getPluginNamespace)
 
       const mappedSketchpack = mapSketchpack(sketchpack)
       	.then(getPluginNamespace)
-
-      const getInstallables = (payload) => new Promise((resolve,reject) => {
-        let installables = difference(payload[0], payload[1])
-        let plugins = installables.map(plugin => sketchpack[plugin])
-        log.debug('getInstallables',plugins)
-        resolve(plugins)
-      })
 
       Promise.all([mappedSketchpack,denormalizedLibrary])
         .then(results => callback(null, results))

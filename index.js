@@ -339,8 +339,8 @@ const queueSync = (sketchpackContents) => {
   workQueue.push({ action: 'sync', payload: sketchpackContents }, (err, result) => {
     if (err) return callback(err)
 
-    const diff = difference(result[0],result[1])
-    const installables = diff.map(plugin => {
+    const additions = difference(result[0],result[1])
+    const installables = additions.map(plugin => {
       let owner = plugin.split('/')[0]
       let name = plugin.split('/')[1]
 

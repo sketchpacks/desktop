@@ -21,10 +21,8 @@ const WATCHED_ACTIONS = {
 const {fetchLibraryReceived} = require('../actions/index')
 
 const libraryMiddleware = store => next => action => {
-  const prevState = store.getState().library.items
   next(action)
-  const nextState = store.getState().library.items
-
+  
   if (includes(values(WATCHED_ACTIONS),action.type)) {
     const data = {
       plugins: store.getState().library.items
@@ -41,7 +39,10 @@ const libraryMiddleware = store => next => action => {
         console.error(err)
         return
       }
-      store.dispatch(fetchLibraryReceived(data.plugins))
+
+      if (data.plugins.length > 0) {
+        store.dispatch(fetchLibraryReceived(data.plugins))
+      }
     })
   }
 }

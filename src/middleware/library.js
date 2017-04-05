@@ -1,10 +1,7 @@
 const {remote} = require('electron')
 const path = require('path')
-const {includes,values,forEach} = require('lodash')
-const os = require('os')
+const {includes,values} = require('lodash')
 const jsonfile = require('jsonfile')
-
-const {sanitizeSemVer} = require('lib/utils')
 
 const libraryPath = path.join(remote.app.getPath('userData'), 'library.json')
 
@@ -40,7 +37,10 @@ const libraryMiddleware = store => next => action => {
     }
 
     jsonfile.writeFile(libraryPath, data, opts, (err) => {
-      if (err) console.error(err)
+      if (err) {
+        console.error(err)
+        return
+      }
       store.dispatch(fetchLibraryReceived(data.plugins))
     })
   }

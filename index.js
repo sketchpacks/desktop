@@ -130,6 +130,7 @@ app.on('open-url', (event, resource) => {
     externalPluginInstallQueue.push(pluginId)
   }
   else {
+    // TODO: User pretty namespaces in place of pluginID
     mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
   }
 })
@@ -261,7 +262,7 @@ function getPluginNamespace (plugins) {
 }
 
 const syncTask = (sketchpack, callback) => {
-  readLibrary('/Users/adam/Library/Application\ Support/Sketchpacks/library.json')
+  readLibrary(path.join(app.getPath('userData'),'library.json'))
     .then(library => {
 
       log.debug('syncTask: ', sketchpack)
@@ -357,7 +358,7 @@ const queueSync = (sketchpackContents) => {
         return o.name === name && o.owner === owner
       })
     })
-
+    
     queueInstall(installables)
   })
 }
@@ -486,7 +487,7 @@ const watch = (path) => {
   })
 }
 
-watch(path.resolve('/Users/adam/Library/Application\ Support/Sketchpacks/my-library.sketchpack'))
+watch(path.join(app.getPath('userData'),'my-library.sketchpack'))
 
 app.on('before-quit', () => {
   log.info('Watcher stopped')

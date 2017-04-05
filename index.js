@@ -65,6 +65,10 @@ const {
   TOGGLE_VERSION_LOCK_ERROR
 } = require('./src/actions/plugin_manager')
 
+const {
+  SYNC_CHANGE_RECEIVED
+} = require('./src/actions/sketchpack')
+
 const opts = {
   dir: __dirname,
   icon: __dirname + '/src/IconTemplate.png',
@@ -348,8 +352,10 @@ const queueSync = (sketchpackContents) => {
         return o.name === name && o.owner === owner
       })
     })
-    
+
     queueInstall(installables)
+
+    mainWindow.webContents.send(SYNC_CHANGE_RECEIVED, sketchpackContents)
   })
 }
 

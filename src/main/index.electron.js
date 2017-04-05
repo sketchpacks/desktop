@@ -253,6 +253,9 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
 
+ipcRenderer.on(SYNC_CHANGE_RECEIVED, (evt,contents) => {
+  store.dispatch(syncChangeReceived(contents))
+})
 
 
 if (firstRun({name: `${pkg.name}-${pkg.version}`})) {

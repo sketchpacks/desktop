@@ -359,13 +359,13 @@ function sketchpack ( state = initialSketchpackState, action ) {
     case SYNC_CHANGE_RECEIVED:
       return {
         ...state,
-        items: payload
+        items: action.payload
       }
 
     case SYNC_FILE_RECEIVED:
       return {
         ...state,
-        files: state.files.concat(payload)
+        files: state.files.concat(action.payload)
       }
 
     default:

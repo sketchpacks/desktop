@@ -9,25 +9,36 @@ const {filter,find} = require('lodash')
 
 const {sanitizeSemVer} = require('../lib/utils')
 
-export const SYNC_REQUEST = 'sync/CHANGE_RECEIVED'
-export function syncRequest () {
+const SYNC_REQUEST = 'sync/CHANGE_RECEIVED'
+function syncRequest () {
   return (dispatch, getState, {api}) => {
 
   }
 }
 
-export const SYNC_FILE_RECEIVED = 'sync/FILE_RECEIVED'
-export function syncFileReceived (payload) {
+const SYNC_FILE_RECEIVED = 'sync/FILE_RECEIVED'
+function syncFileReceived (payload) {
   return {
     type: SYNC_FILE_RECEIVED,
-    padyload
+    payload
   }
 }
 
-export const SYNC_CHANGE_RECEIVED = 'sync/CHANGE_RECEIVED'
-export function syncChangeReceived (payload) {
+const SYNC_CHANGE_RECEIVED = 'sync/CHANGE_RECEIVED'
+function syncChangeReceived (payload) {
   return {
     type: SYNC_CHANGE_RECEIVED,
-    padyload
+    payload
   }
+}
+
+module.exports = {
+  SYNC_REQUEST,
+  syncRequest,
+
+  SYNC_FILE_RECEIVED,
+  syncFileReceived,
+
+  SYNC_CHANGE_RECEIVED,
+  syncChangeReceived
 }

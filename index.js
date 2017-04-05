@@ -357,7 +357,7 @@ const queueSync = (sketchpackContents) => {
         return o.name === name && o.owner === owner
       })
     })
-    
+
     queueInstall(installables)
   })
 }
@@ -482,6 +482,7 @@ const watch = (path) => {
 
     readSketchpack(path)
       .then(contents => queueSync(contents))
+      .catch(err => log.debug(err))
   })
 }
 

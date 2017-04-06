@@ -360,54 +360,7 @@ const queueSync = (sketchpackContents) => {
 }
 
 
-const importFromSketchToolbox = (dbPath) => {
-  const db = dblite(dbPath)
-
-  db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
-    if (rows.length === 0) return
-
-    const importables = []
-    const removables = []
-
-    rows.forEach(plugin => importables.push({
-      owner: row.owner,
-      name: row.slug,
-      install_path: path.join(getInstallPath(),row.directory_name.replace(/ /g, '\\ '))
-    }))
-
-    queueInstall(importables)
-    queueRemove(removables)
-
-    db.close()
-  })
 }
-
-
-ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
-  const homepath = os.homedir()
-  const dbPath = path.join(homepath, SKETCH_TOOLBOX_DB_PATH)
-
-  if (fs.existsSync(dbPath)) {
-    dialog.showMessageBox(null, {
-      buttons: ['Cancel', 'Import plugins'],
-      defaultId: 1,
-      cancelId: 0,
-      message: '🚚 Import from Sketch Toolbox',
-      detail: 'Import installed plugins from Sketch Toolbox. Plugins not found in the Sketchpacks Registry will be excluded.',
-    }, (response, checkboxChecked) => {
-      if (response) importFromSketchToolbox(dbPath)
-    })
-  }
-  else {
-    dialog.showMessageBox(null, {
-      buttons: ['Ok'],
-      defaultId: 0,
-      cancelId: 0,
-      message: '🤔 Import Failed',
-      detail: 'We had trouble finding the location of Sketch Toolbox. No plugins were imported.',
-    }, (response, checkboxChecked) => {})
-  }
-})
 
 
 ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {

@@ -229,10 +229,12 @@ const uninstallPluginTask = (plugin, callback) => {
 
 const identifyPluginTask = (manifestPath, callback) => {
   let install_path
+  let identifier
 
   const buildPlugin = (manifestContents) => new Promise((resolve,reject) => {
     try {
       install_path = manifestContents.install_path
+      identifier = manifestContents.identifier
       resolve({
         identifier: manifestContents.identifier,
         name: manifestContents.name,
@@ -251,7 +253,7 @@ const identifyPluginTask = (manifestPath, callback) => {
     .then(buildPlugin)
     .then(getPluginByIdentifier)
     .then(response => {
-      const data = Object.assign({}, response.data, { install_path: install_path })
+      const data = Object.assign({}, response.data, { install_path,identifier })
       callback(null, data)
     })
     .catch(err => {
@@ -405,7 +407,7 @@ const queueIdentify = (plugins) => {
   plugins.map(plugin => workQueue.push({ action: 'identify', payload: plugin }, (err, result) => {
     if (err) return callback(err)
     log.debug('Identify complete', result)
-    // mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
+    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
   }))
 }
 

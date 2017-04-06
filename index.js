@@ -31,6 +31,7 @@ const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
 const chokidar = require('chokidar')
+const readManifest = require('./src/lib/readManifest')
 
 const firstRun = require('first-run')
 const AutoLaunch = require('auto-launch')
@@ -184,6 +185,7 @@ ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
 })
 
 const getPluginData = (plugin) => axios.get(`${API_URL}/v1/users/${plugin.owner}/plugins/${plugin.name.toLowerCase()}`)
+const getPluginByIdentifier = (plugin) => axios.get(`${API_URL}/v1/users/utom/plugins/sketch-measure`)
 
 const installPluginTask = (plugin, callback) => {
   getPluginData(plugin)
@@ -222,6 +224,40 @@ const uninstallPluginTask = (plugin, callback) => {
   removeAsset({ plugin: plugin })
     .then(result => callback(null, result.plugin))
     .catch(err => callback(err))
+}
+
+
+const identifyPluginTask = (manifestPath, callback) => {
+  let install_path
+
+  const buildPlugin = (manifestContents) => new Promise((resolve,reject) => {
+    try {
+      install_path = manifestContents.install_path
+      resolve({
+        identifier: manifestContents.identifier,
+        name: manifestContents.name,
+        author: manifestContents.author || manifestContents.authorName,
+        version: sanitizeSemVer(manifestContents.version || 0),
+        compatible_version: sanitizeSemVer(manifestContents.compatibleVersion || 0),
+        install_path: manifestContents.install_path
+      })
+    } catch (err) {
+      log.error(err)
+      reject(err)
+    }
+  })
+
+  readManifest(manifestPath)
+    .then(buildPlugin)
+    .then(getPluginByIdentifier)
+    .then(response => {
+      const data = Object.assign({}, response.data, { install_path: install_path })
+      callback(null, data)
+    })
+    .catch(err => {
+      log.error('Error while identifying: ', err)
+      callback(err)
+    })
 }
 
 function denormalizePlugins (plugins) {
@@ -291,6 +327,8 @@ const triageTask = (task, callback) => {
       return uninstallPluginTask(payload,callback)
     case 'sync':
       return syncTask(payload,callback)
+    case 'identify':
+      return identifyPluginTask(payload,callback)
   }
 }
 
@@ -359,7 +397,16 @@ const queueSync = (sketchpackContents) => {
   })
 }
 
+const queueIdentify = (plugins) => {
+  if (typeof plugins === undefined) return
+  if (plugins.length === 0) return
 
+  log.debug(`Enqueueing ${plugins.length} plugins`)
+  plugins.map(plugin => workQueue.push({ action: 'identify', payload: plugin }, (err, result) => {
+    if (err) return callback(err)
+    log.debug('Identify complete', result)
+    // mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
+  }))
 }
 
 
@@ -419,24 +466,56 @@ if (firstRun({name: pkg.name})) {
 }
 
 
-const watch = (path) => {
-  log.debug('Watching ', path)
-  const watcher = chokidar.watch(path, {
-    ignored: /(^|[\/\\])\../,
+const pluginWatcher = (watchPath) => {
+  log.debug('Watching for ', watchPath)
+  watcher = chokidar.watch(watchPath, {
+    ignored: /[\/\\]\./,
     persistent: true,
-    followSymlinks: true
+    cwd: path.normalize(getInstallPath().replace(/\\/g, ''))
   })
 
-  watcher.on('change', (path, stats) => {
-    log.debug('Change detected: ', path)
+  const onWatcherReady = () => {
+    log.info('From here can you check for real changes, the initial scan has been completed.')
+  }
 
-    readSketchpack(path)
-      .then(contents => queueSync(contents))
-      .catch(err => log.debug(err))
-  })
+  watcher
+    .on('add', (watchPath) => {
+      if (path.parse(watchPath).base === 'manifest.json') {
+        log.debug('Manifest Detected', watchPath)
+        let manifestPath = path.join(getInstallPath().replace(/\\/g, ''),watchPath)
+        queueIdentify([manifestPath])
+      }
+    })
+    .on('addDir', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchplugin') {
+        log.debug('Plugin Bundle Detected', watchPath)
+      }
+    })
+    .on('change', (watchPath) => {
+      if (path.parse(watchPath).base === 'manifest.json') {
+        log.debug('Manifest Changed', watchPath)
+      }
+    })
+    .on('unlink', (watchPath) => {
+      if (path.parse(watchPath).base === 'manifest.json') {
+        log.debug('Manifest Removed', watchPath)
+      }
+    })
+    .on('unlinkDir', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchplugin') {
+        log.debug('Plugin Bundle Removed', watchPath)
+      }
+    })
+    .on('error', (error) => {
+      log.debug('Error happened', error)
+    })
+    .on('ready', onWatcherReady)
 }
 
-watch(path.join(app.getPath('userData'),'my-library.sketchpack'))
+
+setTimeout(() => {
+  pluginWatcher('**/(*.sketchplugin|manifest.json)')
+}, 2000)
 
 app.on('before-quit', () => {
   log.info('Watcher stopped')

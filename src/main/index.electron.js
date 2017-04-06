@@ -18,6 +18,8 @@ import log from 'electron-log'
 import firstRun from 'first-run'
 import path from 'path'
 
+import readSketchpack from 'lib/readSketchpack'
+
 import ms from 'ms'
 import os from 'os'
 import fs from 'fs'
@@ -164,6 +166,15 @@ const loadLibrary = () => {
   setTimeout(autoUpdatePlugins, ms(PLUGIN_AUTOUPDATE_DELAY))
 }
 loadLibrary()
+
+const loadSketchpack = () => {
+  readSketchpack(path.join(remote.app.getPath('userData'), 'my-library.sketchpack'))
+    .then(contents => {
+      log.debug(contents)
+      if (contents.length > 0) store.dispatch(syncChangeReceived(contents))
+    })
+}
+loadSketchpack()
 
 
 ipcRenderer.on('IMPORT_FROM_SKETCHPACK', (evt, args) => {

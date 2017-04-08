@@ -12,6 +12,7 @@ describe('sanitizeSemVer', () => {
     { given: "v1.5a", expected: "1.5.0" },
     { given: "1.5.x", expected: "1.5.0" },
     { given: "1.5.2", expected: "1.5.2" },
+    { given: "1.5.2.1", expected: "1.5.2" },
     { given: " 1.5.2", expected: "1.5.2" },
     { given: "1.5.2-foo", expected: "1.5.2" },
     { given: "1.5.2-foo.10", expected: "1.5.2" },

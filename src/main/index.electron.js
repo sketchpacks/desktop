@@ -170,7 +170,7 @@ loadLibrary()
 const loadSketchpack = () => {
   readSketchpack(path.join(remote.app.getPath('userData'), 'my-library.sketchpack'))
     .then(contents => {
-      log.debug(contents)
+      log.debug('loadSketchpack',contents)
       if (contents.length > 0) store.dispatch(syncChangeReceived(contents))
     })
 }
@@ -265,6 +265,7 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
 })
 
 ipcRenderer.on(SYNC_CHANGE_RECEIVED, (evt,contents) => {
+  log.debug(SYNC_CHANGE_RECEIVED,contents)
   store.dispatch(syncChangeReceived(contents))
 })
 

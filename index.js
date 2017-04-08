@@ -541,7 +541,6 @@ const sketchpackWatcher = (watchPath) => {
         log.debug('Sketchpack Changed', watchPath)
         
         readSketchpack(watchPath)
-          .then(contents => mainWindow.webContents.send(SYNC_CHANGE_RECEIVED, sketchpackContents))
       }
     })
     .on('unlink', (watchPath) => {

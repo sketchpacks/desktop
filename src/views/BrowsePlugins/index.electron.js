@@ -49,6 +49,7 @@ class BrowsePluginsContainer extends Component {
           location={this.props.location}
           installedPluginIds={map(this.props.library.items, 'id')}
           dispatch={this.props.dispatch}
+          sketchpack={this.props.sketchpack}
         />
       </div>
     )
@@ -62,13 +63,14 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { catalog,search,library,location } = state
+  const { catalog,search,library,location,sketchpack } = state
 
   return {
     library,
     plugins: catalog,
     search,
-    location: state.routing.locationBeforeTransitions
+    location: state.routing.locationBeforeTransitions,
+    sketchpack
   }
 }
 

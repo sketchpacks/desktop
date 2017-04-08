@@ -1,4 +1,7 @@
-import {sanitizeSemVer} from '../lib/utils'
+import {
+  sanitizeSemVer,
+  hasSemanticRange
+} from '../../lib/utils'
 
 describe('sanitizeSemVer', () => {
   const EXPECTATIONS = [
@@ -21,5 +24,22 @@ describe('sanitizeSemVer', () => {
     it(`should sanitize "${t.given}" as "${t.expected}"`, () => {
       expect(sanitizeSemVer(t.given)).toEqual(t.expected)
     })
+  })
+})
+
+describe('hasSemanticRange', () => {
+  it('should return true with a caret (^)', () => {
+    let plugin = { version: '^1.0.0' }
+    expect(hasSemanticRange(plugin)).toEqual(true)
+  })
+
+  it('should return true with a tilde (~)', () => {
+    let plugin = { version: '~1.0.0' }
+    expect(hasSemanticRange(plugin)).toEqual(true)
+  })
+
+  it('should return false without range flags', () => {
+    let plugin = { version: '1.0.0' }
+    expect(hasSemanticRange(plugin)).toEqual(false)
   })
 })

@@ -144,10 +144,16 @@ const removeAsset = (data) => new Promise((resolve, reject) => {
   })
 })
 
+
+const hasSemanticRange = (plugin) => {
+  return /(\^|\~)/.test(plugin.version)
+}
+
 module.exports = {
 	sanitizeSemVer,
 	getInstallPath,
   extractAsset,
   downloadAsset,
-  removeAsset
+  removeAsset,
+  hasSemanticRange
 }

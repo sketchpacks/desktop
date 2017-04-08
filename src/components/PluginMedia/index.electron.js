@@ -127,7 +127,6 @@ class PluginMedia extends Component {
   renderVersionLock () {
     const {plugin,location} = this.props
 
-    const isLocked = plugin.version.indexOf('^') === -1
 
     if (location.pathname !== '/library/installed') return
 

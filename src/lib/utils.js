@@ -1,7 +1,7 @@
 const fs = require('fs')
 const Promise = require('promise')
 const request = require('request')
-const {find} = require('lodash')
+const {find,replace} = require('lodash')
 const path = require('path')
 const IsThere = require("is-there")
 
@@ -130,7 +130,8 @@ const extractAsset = (data) => new Promise((resolve, reject) => {
 const removeAsset = (data) => new Promise((resolve, reject) => {
   const {install_path} = data.plugin
   log.debug('Removing asset: ', install_path)
-  exec(`rm -rf ${install_path}`, (error, stdout, stderr) => {
+
+  exec(`rm -rf ${install_path.replace(/ /g, '\\ ')}`, (error, stdout, stderr) => {
     if (error) {
       log.error(`exec error: ${error}`)
       reject(data)

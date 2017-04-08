@@ -1,6 +1,6 @@
 import semver from 'semver'
 import { createSelector } from 'reselect'
-const {filter} = require('lodash')
+const {filter,reduce} = require('lodash')
 import {sanitizeSemVer} from 'lib/utils'
 
 const getList = (state) => state.app.location
@@ -28,4 +28,17 @@ export const getUpdatesCount = createSelector(
   [ getUpdatedPlugins ], (plugins) => {
     return plugins.length
   }
+)
+
+export const getReducedLibrary = createSelector(
+  [ getLibrary ], (plugins) => reduce(plugins, ((result, value, key) => {
+    result[`${value.owner.handle}/${value.name}`] = {
+      name: value.name,
+      owner: value.owner.handle,
+      version: sanitizeSemVer(value.version),
+      compatible_version: sanitizeSemVer(value.compatible_version),
+    }
+
+    return result
+  }), {})
 )

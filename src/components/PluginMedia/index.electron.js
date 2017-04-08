@@ -8,7 +8,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-import {sanitizeSemVer} from 'lib/utils'
+import {sanitizeSemVer,hasSemanticRange} from 'lib/utils'
 
 import Button from 'components/Button'
 import Nameplate from 'components/Nameplate'
@@ -127,6 +127,7 @@ class PluginMedia extends Component {
   renderVersionLock () {
     const {plugin,location} = this.props
 
+    const isLocked = hasSemanticRange(plugin)
 
     if (location.pathname !== '/library/installed') return
 

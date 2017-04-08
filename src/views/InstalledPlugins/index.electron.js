@@ -51,6 +51,7 @@ class InstalledPluginsContainer extends Component {
           location={this.props.location}
           installedPluginIds={map(this.props.plugins.items, 'id')}
           dispatch={this.props.dispatch}
+          sketchpack={this.props.state.sketchpack}
         />
       </div>
     )

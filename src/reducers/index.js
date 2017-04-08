@@ -2,7 +2,7 @@ import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 import * as actions from 'actions'
 
-import sanitizeSemVer from 'lib/utils'
+import {sanitizeSemVer} from 'lib/utils'
 
 import semver from 'semver'
 import update from 'immutability-helper'
@@ -334,6 +334,7 @@ function authorPlugins (state = initialListState, action) {
 }
 
 const initialSketchpackState = {
+  isLocked: false,
   isEnabled: false,
   isSyncing: false,
   items: [],
@@ -355,13 +356,13 @@ function sketchpack ( state = initialSketchpackState, action ) {
       }
 
     case TOGGLE_VERSION_LOCK_SUCCESS:
-      let lockablePluginIndex = findIndex(state.items, {
-        name: action.plugin.name,
-        owner: action.plugin.owner.handle
+      let lockablePluginIndex = findIndex(state.items, (o) => {
+        return o.name === action.plugin.name
+          && o.owner === action.plugin.owner.handle
       })
       let lockablePlugin = state.items[lockablePluginIndex]
 
-      const newVersion = action.isLocked
+      const newVersion = lockablePlugin.version.indexOf('^') > -1
         ? `${lockablePlugin.version.slice(1)}`
         : `^${lockablePlugin.version}`
 
@@ -369,7 +370,18 @@ function sketchpack ( state = initialSketchpackState, action ) {
         ...state,
         items: update(state.items, {
           [lockablePluginIndex]: {
-            version: { $set: newVersion }
+            version: {
+              $set: newVersion
+            },
+            version_range: {
+              $set: semver.toComparators(newVersion)[0]
+            },
+            compatible_version: {
+              $set: lockablePlugin.compatible_version
+            },
+            compatible_version_range: {
+              $set: semver.toComparators(lockablePlugin.compatible_version)[0]
+            }
           }
         })
       }

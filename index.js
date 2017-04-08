@@ -519,6 +519,47 @@ setTimeout(() => {
   pluginWatcher('**/(*.sketchplugin|manifest.json)')
 }, 2000)
 
+const sketchpackWatcher = (watchPath) => {
+  log.debug('Syncing with ', watchPath)
+  watcher = chokidar.watch(watchPath, {
+    ignored: /[\/\\]\./,
+    persistent: true
+  })
+
+  const onWatcherReady = () => {
+    log.info('From here can you check for real changes, the initial scan has been completed.')
+  }
+
+  watcher
+    .on('add', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchpack') {
+        log.debug('Sketchpack Detected', watchPath)
+      }
+    })
+    .on('change', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchpack') {
+        log.debug('Sketchpack Changed', watchPath)
+        
+        readSketchpack(watchPath)
+          .then(contents => mainWindow.webContents.send(SYNC_CHANGE_RECEIVED, sketchpackContents))
+      }
+    })
+    .on('unlink', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchpack') {
+        log.debug('Sketchpack Removed', watchPath)
+      }
+    })
+    .on('error', (error) => {
+      log.debug('Error happened', error)
+    })
+    .on('ready', onWatcherReady)
+}
+
+setTimeout(() => {
+  const librarySketchpackPath = path.join(app.getPath('userData'),'my-library.sketchpack')
+  sketchpackWatcher(librarySketchpackPath)
+}, 1000)
+
 app.on('before-quit', () => {
   log.info('Watcher stopped')
   watcher.close()

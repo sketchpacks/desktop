@@ -168,20 +168,6 @@ function library (state = initialListState, action) {
         isLoading: false
       }
 
-    case TOGGLE_VERSION_LOCK_SUCCESS:
-      const newVersion = (action.plugin.version.indexOf('^') > -1)
-        ? `${action.plugin.version.slice(1)}`
-        : `^${action.plugin.version}`
-
-      return {
-        ...state,
-        items: update(state.items, {
-          [findIndex(state.items, ['id', action.plugin.id])]: {
-            version: { $set: newVersion }
-          }
-        })
-      }
-
     case 'manager/UPDATE_SUCCESS':
       return {
         ...state,
@@ -366,6 +352,26 @@ function sketchpack ( state = initialSketchpackState, action ) {
       return {
         ...state,
         files: state.files.concat(action.payload)
+      }
+
+    case TOGGLE_VERSION_LOCK_SUCCESS:
+      let lockablePluginIndex = findIndex(state.items, {
+        name: action.plugin.name,
+        owner: action.plugin.owner.handle
+      })
+      let lockablePlugin = state.items[lockablePluginIndex]
+
+      const newVersion = action.isLocked
+        ? `${lockablePlugin.version.slice(1)}`
+        : `^${lockablePlugin.version}`
+
+      return {
+        ...state,
+        items: update(state.items, {
+          [lockablePluginIndex]: {
+            version: { $set: newVersion }
+          }
+        })
       }
 
     default:

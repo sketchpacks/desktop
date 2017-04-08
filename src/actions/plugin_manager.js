@@ -18,17 +18,16 @@ const {sanitizeSemVer} = require('../lib/utils')
 
 const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
 
-function toggleVersionLockRequest (plugin) {
+function toggleVersionLockRequest (plugin, isLocked) {
   return (dispatch, getState) => {
-    dispatch(toggleVersionLockSuccess(plugin))
+    dispatch(toggleVersionLockSuccess(plugin, isLocked))
   }
 }
 
 
 const TOGGLE_VERSION_LOCK_SUCCESS = 'manager/TOGGLE_VERSION_LOCK_SUCCESS'
 
-function toggleVersionLockSuccess (plugin) {
-  const isLocked = plugin.version.indexOf('^') === -1
+function toggleVersionLockSuccess (plugin, isLocked) {
 
   return {
     type: TOGGLE_VERSION_LOCK_SUCCESS,

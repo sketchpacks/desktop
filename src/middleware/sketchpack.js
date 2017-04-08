@@ -24,12 +24,12 @@ const WATCHED_ACTIONS = {
 const {fetchLibraryReceived} = require('../actions/index')
 
 const sketchpackMiddleware = store => next => action => {
-  const prevState = store.getState().library.items
+  const prevState = store.getState().sketchpack.items
   next(action)
-  const nextState = store.getState().library.items
+  const nextState = store.getState().sketchpack.items
 
   if (includes(values(WATCHED_ACTIONS),action.type)) {
-    writeSketchpack(sketchpackPath,store.getState().library.items)
+    writeSketchpack(sketchpackPath,store.getState().sketchpack.items)
   }
 }
 

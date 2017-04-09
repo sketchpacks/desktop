@@ -1,6 +1,6 @@
 import semver from 'semver'
 import { createSelector } from 'reselect'
-const {filter,reduce,find} = require('lodash')
+const {filter,reduce,find,reject} = require('lodash')
 import {sanitizeSemVer} from '../lib/utils'
 
 const getList = (state) => state.app.location
@@ -49,5 +49,21 @@ export const getManagedPlugins = createSelector(
   [ getReducedLibrary, getSketchpack ], (library,sketchpack) => {
     return filter(library, (lib) => find(sketchpack, (p) => {
       return lib.name === p.name && lib.owner === p.owner
+    }))
+  })
+
+export const getUnmanagedPlugins = createSelector(
+  [ getReducedLibrary, getSketchpack ], (library,sketchpack) => {
+    return reject(library, (lib) => find(sketchpack, (p) => {
+      return lib.name === p.name && lib.owner === p.owner
+    }))
+  })
+
+export const getLockedPlugins = createSelector(
+  [ getManagedPlugins, getSketchpack ], (library,sketchpack) => {
+    return filter(library, (lib) => find(sketchpack, (p) => {
+      return lib.name === p.name
+        && lib.owner === p.owner
+        && p.version_range.length === 1
     }))
   })

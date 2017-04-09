@@ -1,5 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`getLockedPlugins should return locked library items found in the sketchpack 1`] = `
+Array [
+  Object {
+    "compatible_version": "0.0.0",
+    "name": "auto-layout",
+    "owner": "animaapp",
+    "version": "1.0.0",
+  },
+]
+`;
+
 exports[`getManagedPlugins should return library items found in the sketchpack 1`] = `
 Array [
   Object {
@@ -8,11 +19,23 @@ Array [
     "owner": "utom",
     "version": "2.0.0",
   },
+  Object {
+    "compatible_version": "0.0.0",
+    "name": "auto-layout",
+    "owner": "animaapp",
+    "version": "1.0.0",
+  },
 ]
 `;
 
 exports[`getReducedLibrary should return library items found in the sketchpack 1`] = `
 Object {
+  "animaapp/auto-layout": Object {
+    "compatible_version": "0.0.0",
+    "name": "auto-layout",
+    "owner": "animaapp",
+    "version": "1.0.0",
+  },
   "author-beta/plugin-beta": Object {
     "compatible_version": "0.0.0",
     "name": "plugin-beta",
@@ -26,4 +49,15 @@ Object {
     "version": "2.0.0",
   },
 }
+`;
+
+exports[`getUnmanagedPlugins should return library items NOT found in the sketchpack 1`] = `
+Array [
+  Object {
+    "compatible_version": "0.0.0",
+    "name": "plugin-beta",
+    "owner": "author-beta",
+    "version": "1.0.0",
+  },
+]
 `;

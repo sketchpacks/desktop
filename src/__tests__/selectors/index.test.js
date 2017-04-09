@@ -1,7 +1,8 @@
 import {
   getLibrary,
   getSketchpack,
-  getManagedPlugins
+  getManagedPlugins,
+  getReducedLibrary
 } from '../../selectors'
 
 const state = {
@@ -37,6 +38,14 @@ const state = {
     ]
   }
 }
+
+describe('getReducedLibrary', () => {
+  it('should return library items found in the sketchpack', () => {
+    const library = getReducedLibrary(state)
+    expect(library).toMatchSnapshot()
+    expect(Object.keys(library).length).toEqual(2)
+  })
+})
 
 describe('getManagedPlugins', () => {
   it('should return library items found in the sketchpack', () => {

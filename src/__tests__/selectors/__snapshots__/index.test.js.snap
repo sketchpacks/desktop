@@ -10,3 +10,20 @@ Array [
   },
 ]
 `;
+
+exports[`getReducedLibrary should return library items found in the sketchpack 1`] = `
+Object {
+  "author-beta/plugin-beta": Object {
+    "compatible_version": "0.0.0",
+    "name": "plugin-beta",
+    "owner": "author-beta",
+    "version": "1.0.0",
+  },
+  "utom/sketch-measure": Object {
+    "compatible_version": "0.0.0",
+    "name": "sketch-measure",
+    "owner": "utom",
+    "version": "2.0.0",
+  },
+}
+`;

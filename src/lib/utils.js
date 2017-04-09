@@ -16,7 +16,13 @@ const {
 } = require('../config')
 
 const sanitizeSemVer = (semver) => {
-  let semverStr = semver.toString()
+  let semverStr
+
+  try {
+    semverStr = semver.toString()
+  } catch (err) {
+    semverStr = "0.0.0"
+  }
 
 	if (typeof semverStr === undefined) return "0.0.0"
 	if (typeof semverStr === 'integer') return "0.0.0"

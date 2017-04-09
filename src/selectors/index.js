@@ -1,11 +1,12 @@
 import semver from 'semver'
 import { createSelector } from 'reselect'
-const {filter,reduce} = require('lodash')
-import {sanitizeSemVer} from 'lib/utils'
+const {filter,reduce,find} = require('lodash')
+import {sanitizeSemVer} from '../lib/utils'
 
 const getList = (state) => state.app.location
 const getPlugins = (state) => state.plugins.items
 const getLibrary = (state) => state.library.items
+const getSketchpack = (state) => state.sketchpack.items
 
 const hasNewVersion = (plugin) => {
   if (plugin.installed === undefined) return false
@@ -42,3 +43,11 @@ export const getReducedLibrary = createSelector(
     return result
   }), {})
 )
+
+
+export const getManagedPlugins = createSelector(
+  [ getReducedLibrary, getSketchpack ], (library,sketchpack) => {
+    return filter(library, (lib) => find(sketchpack, (p) => {
+      return lib.name === p.name && lib.owner === p.owner
+    }))
+  })

@@ -44,6 +44,12 @@ export const getReducedLibrary = createSelector(
   }), {})
 )
 
+export const getUnmanagedPlugins = createSelector(
+  [ getReducedLibrary, getSketchpack ], (library,sketchpack) => {
+    return reject(library, (lib) => find(sketchpack, (p) => {
+      return lib.name === p.name && lib.owner === p.owner
+    }))
+  })
 
 export const getManagedPlugins = createSelector(
   [ getReducedLibrary, getSketchpack ], (library,sketchpack) => {
@@ -52,18 +58,20 @@ export const getManagedPlugins = createSelector(
     }))
   })
 
-export const getUnmanagedPlugins = createSelector(
-  [ getReducedLibrary, getSketchpack ], (library,sketchpack) => {
+export const getLockedPlugins = createSelector(
+  [ getManagedPlugins, getSketchpack ], (library,sketchpack) => {
     return reject(library, (lib) => find(sketchpack, (p) => {
-      return lib.name === p.name && lib.owner === p.owner
+      return p.name === lib.name
+        && p.owner === lib.owner
+        && p.version_range.length > 1
     }))
   })
 
-export const getLockedPlugins = createSelector(
-  [ getManagedPlugins, getSketchpack ], (library,sketchpack) => {
-    return filter(library, (lib) => find(sketchpack, (p) => {
-      return lib.name === p.name
-        && lib.owner === p.owner
-        && p.version_range.length === 1
-    }))
-  })
+  export const getUnlockedPlugins = createSelector(
+    [ getManagedPlugins, getSketchpack ], (library,sketchpack) => {
+      return reject(library, (lib) => find(sketchpack, (p) => {
+        return p.name === lib.name
+          && p.owner === lib.owner
+          && p.version_range.length === 1
+      }))
+    })

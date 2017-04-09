@@ -4,7 +4,7 @@ exports[`getLockedPlugins should return locked library items found in the sketch
 Array [
   Object {
     "compatible_version": "0.0.0",
-    "name": "auto-layout",
+    "name": "managed-locked",
     "owner": "animaapp",
     "version": "1.0.0",
   },
@@ -15,13 +15,13 @@ exports[`getManagedPlugins should return library items found in the sketchpack 1
 Array [
   Object {
     "compatible_version": "0.0.0",
-    "name": "sketch-measure",
+    "name": "managed-unlocked",
     "owner": "utom",
     "version": "2.0.0",
   },
   Object {
     "compatible_version": "0.0.0",
-    "name": "auto-layout",
+    "name": "managed-locked",
     "owner": "animaapp",
     "version": "1.0.0",
   },
@@ -30,32 +30,43 @@ Array [
 
 exports[`getReducedLibrary should return library items found in the sketchpack 1`] = `
 Object {
-  "animaapp/auto-layout": Object {
+  "animaapp/managed-locked": Object {
     "compatible_version": "0.0.0",
-    "name": "auto-layout",
+    "name": "managed-locked",
     "owner": "animaapp",
     "version": "1.0.0",
   },
-  "author-beta/plugin-beta": Object {
+  "author-beta/unmanaged": Object {
     "compatible_version": "0.0.0",
-    "name": "plugin-beta",
+    "name": "unmanaged",
     "owner": "author-beta",
     "version": "1.0.0",
   },
-  "utom/sketch-measure": Object {
+  "utom/managed-unlocked": Object {
     "compatible_version": "0.0.0",
-    "name": "sketch-measure",
+    "name": "managed-unlocked",
     "owner": "utom",
     "version": "2.0.0",
   },
 }
 `;
 
+exports[`getUnlockedPlugins should return unlocked library items found in the sketchpack 1`] = `
+Array [
+  Object {
+    "compatible_version": "0.0.0",
+    "name": "managed-unlocked",
+    "owner": "utom",
+    "version": "2.0.0",
+  },
+]
+`;
+
 exports[`getUnmanagedPlugins should return library items NOT found in the sketchpack 1`] = `
 Array [
   Object {
     "compatible_version": "0.0.0",
-    "name": "plugin-beta",
+    "name": "unmanaged",
     "owner": "author-beta",
     "version": "1.0.0",
   },

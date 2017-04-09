@@ -4,14 +4,15 @@ import {
   getManagedPlugins,
   getReducedLibrary,
   getUnmanagedPlugins,
-  getLockedPlugins
+  getLockedPlugins,
+  getUnlockedPlugins
 } from '../../selectors'
 
 const state = {
   library: {
     items: [
       {
-        name: 'sketch-measure',
+        name: 'managed-unlocked',
         version: '2.0.0',
         owner: {
           handle: 'utom',
@@ -19,7 +20,7 @@ const state = {
         }
       },
       {
-        name: 'plugin-beta',
+        name: 'unmanaged',
         version: '1.0.0',
         owner: {
           handle: 'author-beta',
@@ -27,7 +28,7 @@ const state = {
         }
       },
       {
-        name: 'auto-layout',
+        name: 'managed-locked',
         version: '1.0.0',
         owner: {
           handle: 'animaapp',
@@ -39,13 +40,13 @@ const state = {
   sketchpack: {
     items: [
       {
-        name: "sketch-measure",
+        name: "managed-unlocked",
         owner: "utom",
         version: "^2.0.0",
         version_range: [ ">=2.0.0", "<3.0.0" ]
       },
       {
-        name: "auto-layout",
+        name: "managed-locked",
         owner: "animaapp",
         version: "1.0.0",
         version_range: [ "1.0.0" ]
@@ -67,8 +68,6 @@ describe('getManagedPlugins', () => {
     const managedPlugins = getManagedPlugins(state)
     expect(managedPlugins).toMatchSnapshot()
     expect(managedPlugins.length).toEqual(2)
-    expect(managedPlugins[0].name).toEqual(state.sketchpack.items[0].name)
-    expect(managedPlugins[0].owner).toEqual(state.sketchpack.items[0].owner)
   })
 })
 
@@ -85,5 +84,13 @@ describe('getLockedPlugins', () => {
     const lockedPlugins = getLockedPlugins(state)
     expect(lockedPlugins).toMatchSnapshot()
     expect(lockedPlugins.length).toEqual(1)
+  })
+})
+
+describe('getUnlockedPlugins', () => {
+  it('should return unlocked library items found in the sketchpack', () => {
+    const unlockedPlugins = getUnlockedPlugins(state)
+    expect(unlockedPlugins).toMatchSnapshot()
+    expect(unlockedPlugins.length).toEqual(1)
   })
 })

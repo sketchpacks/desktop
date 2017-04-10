@@ -62,6 +62,19 @@ const removeObjectFromArray = (array, action) => {
   return filter(array, (plugin) => plugin.id !== action.plugin.id)
 }
 
+function plugins (state = {}, action) {
+  switch (action.type) {
+    case 'ADD_ENTITIES':
+      return {
+        ...state,
+        ...action.payload
+      }
+
+    default:
+      return state
+  }
+}
+
 function catalog (state = initialListState, action) {
   switch (action.type) {
     case actions.FETCH_CATALOG_REQUEST:
@@ -400,7 +413,8 @@ const rootReducer = combineReducers({
   app,
   authorDetails,
   authorPlugins,
-  sketchpack
+  sketchpack,
+  plugins
 })
 
 export default rootReducer

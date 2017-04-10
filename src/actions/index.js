@@ -40,6 +40,17 @@ const prunePluginData = (plugins) => plugins.map(p => pick(p, VALID_KEYS))
 export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE'
 
 //
+// ENTITIES
+//
+
+export const ADD_ENTITIES = 'ADD_ENTITIES'
+export const addEntities = (entities) => ({
+  type: ADD_ENTITIES,
+  payload: entities
+})
+
+
+//
 // CATALOG
 //
 

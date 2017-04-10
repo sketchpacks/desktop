@@ -1,5 +1,17 @@
 import linkHeader from 'parse-link-header'
 import qs from 'qs'
+import { normalize, schema, arrayOf } from 'normalizr'
+
+
+const getPluginSlug = (plugin) => `${plugin.owner.handle}/${plugin.name}`
+
+const userSchema = new schema.Entity('users')
+const pluginSchema = new schema.Entity('plugins', {
+  owner: userSchema
+}, { idAttribute: getPluginSlug })
+
+const pluginListSchema = new schema.Array(pluginSchema)
+
 
 import {pick} from 'lodash'
 
@@ -38,6 +50,10 @@ export function fetchCatalog (query, append=true) {
     api.getCatalog({query: query})
       .then(response => {
         const pageMeta = linkHeader(response.headers.link)
+
+        const normalizedData = normalize(response.data, pluginListSchema)
+
+        console.log(normalizedData)
 
         if (pageMeta) dispatch(catalogPaginate(pageMeta))
 

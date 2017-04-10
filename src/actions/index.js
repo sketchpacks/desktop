@@ -1,17 +1,8 @@
 import linkHeader from 'parse-link-header'
 import qs from 'qs'
-import { normalize, schema, arrayOf } from 'normalizr'
 
-
-const getPluginSlug = (plugin) => `${plugin.owner.handle}/${plugin.name}`
-
-const userSchema = new schema.Entity('users')
-const pluginSchema = new schema.Entity('plugins', {
-  owner: userSchema
-}, { idAttribute: getPluginSlug })
-
-const pluginListSchema = new schema.Array(pluginSchema)
-
+import { normalize } from 'normalizr'
+import * as schemas from 'schemas'
 
 import {pick} from 'lodash'
 
@@ -44,10 +35,12 @@ export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE'
 //
 
 export const ADD_ENTITIES = 'ADD_ENTITIES'
-export const addEntities = (payload) => ({
-  type: ADD_ENTITIES,
-  payload
-})
+export const addEntities = (payload) => {
+  return {
+    type: ADD_ENTITIES,
+    payload: normalize(payload, schemas.pluginSchema)
+  }
+}
 
 
 //
@@ -62,7 +55,7 @@ export function fetchCatalog (query, append=true) {
       .then(response => {
         const pageMeta = linkHeader(response.headers.link)
 
-        const normalizedPlugins = normalize(response.data, pluginListSchema)
+        const normalizedPlugins = normalize(response.data, schemas.pluginListSchema)
         dispatch(addEntities(normalizedPlugins))
 
         if (pageMeta) dispatch(catalogPaginate(pageMeta))

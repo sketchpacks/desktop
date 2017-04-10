@@ -62,12 +62,75 @@ const removeObjectFromArray = (array, action) => {
   return filter(array, (plugin) => plugin.id !== action.plugin.id)
 }
 
+//
+// PLUGINS
+//
+
 function plugins (state = {}, action) {
   switch (action.type) {
     case 'ADD_ENTITIES':
       return {
         ...state,
-        ...action.payload
+        ...action.payload.entities.plugins
+      }
+
+    default:
+      return state
+  }
+}
+
+
+function pluginsByPopularity (state = { ids: [] }, action) {
+  switch (action.type) {
+    case 'ADD_ENTITIES':
+      return {
+        ...state,
+        ids: state.ids.concat(action.payload.result)
+      }
+
+    default:
+      return state
+  }
+}
+
+
+function pluginsByNewest (state = { ids: [] }, action) {
+  switch (action.type) {
+    case 'ADD_ENTITIES':
+      return {
+        ...state,
+        ids: state.ids.concat(action.payload.result)
+      }
+
+    default:
+      return state
+  }
+}
+
+
+function pluginsByName (state = { ids: [] }, action) {
+  switch (action.type) {
+    case 'ADD_ENTITIES':
+      return {
+        ...state,
+        ids: state.ids.concat(action.payload.result)
+      }
+
+    default:
+      return state
+  }
+}
+
+//
+// USERS
+//
+
+function users (state = {}, action) {
+  switch (action.type) {
+    case 'ADD_ENTITIES':
+      return {
+        ...state,
+        ...action.payload.entities.users
       }
 
     default:
@@ -414,7 +477,13 @@ const rootReducer = combineReducers({
   authorDetails,
   authorPlugins,
   sketchpack,
-  plugins
+
+
+  plugins,
+  pluginsByPopularity,
+  pluginsByNewest,
+  pluginsByName,
+  users
 })
 
 export default rootReducer

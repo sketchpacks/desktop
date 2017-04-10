@@ -4,6 +4,8 @@ import { browserHistory } from 'react-router'
 
 import {map,includes} from 'lodash'
 
+import {getPlugin} from 'selectors'
+
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'
 const EnhancedPluginList = ConnectedPluginList(PluginList)
@@ -64,6 +66,8 @@ const mapDispatchToProps = (dispatch) => {
 
 function mapStateToProps(state, ownProps) {
   const { catalog,search,library,location,sketchpack } = state
+
+  console.log(getPlugin(state))
 
   return {
     library,

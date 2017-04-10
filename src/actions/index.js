@@ -44,9 +44,9 @@ export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE'
 //
 
 export const ADD_ENTITIES = 'ADD_ENTITIES'
-export const addEntities = (entities) => ({
+export const addEntities = (payload) => ({
   type: ADD_ENTITIES,
-  payload: entities
+  payload
 })
 
 
@@ -62,11 +62,11 @@ export function fetchCatalog (query, append=true) {
       .then(response => {
         const pageMeta = linkHeader(response.headers.link)
 
-        const normalizedData = normalize(response.data, pluginListSchema)
-
-        console.log(normalizedData)
+        const normalizedPlugins = normalize(response.data, pluginListSchema)
+        dispatch(addEntities(normalizedPlugins))
 
         if (pageMeta) dispatch(catalogPaginate(pageMeta))
+
 
         dispatch(fetchCatalogReceived({
           payload: response.data,

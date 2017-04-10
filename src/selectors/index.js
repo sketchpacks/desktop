@@ -8,6 +8,15 @@ const getPlugins = (state) => state.plugins.items
 const getLibrary = (state) => state.library.items
 const getSketchpack = (state) => state.sketchpack.items
 
+const getPluginEntities = (state) => state.plugins
+
+export const getPlugin = createSelector(
+  [ getPluginEntities ], (plugins) => {
+    console.log(plugins)
+    return plugins
+  }
+)
+
 const hasNewVersion = (plugin) => {
   if (plugin.installed === undefined) return false
   if (!plugin.installed) return false

@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 
 import {map,includes} from 'lodash'
 
-import {getPlugin} from 'selectors'
+import {getPluginList,getPopularPlugins} from 'selectors'
 
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'
@@ -65,13 +65,27 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { catalog,search,library,location,sketchpack } = state
+  const { search,library,location,sketchpack } = state
 
-  console.log(getPlugin(state))
+  const listSwitcher = ()
+
+
+  // TODO: Move list meta into a reducer
+  const listMeta = {
+    total: state.pluginsByPopularity.total,
+    prevPage: state.pluginsByPopularity.prevPage,
+    nextPage: state.pluginsByPopularity.nextPage,
+    lastPage: state.pluginsByPopularity.lastPage
+  }
+
+  const plugins = {
+    ...listMeta,
+    items: getPopularPlugins(state)
+  }
 
   return {
     library,
-    plugins: catalog,
+    plugins,
     search,
     location: state.routing.locationBeforeTransitions,
     sketchpack

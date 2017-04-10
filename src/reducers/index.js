@@ -80,12 +80,49 @@ function plugins (state = {}, action) {
 }
 
 
-function pluginsByPopularity (state = { ids: [] }, action) {
+function pluginsByPopularity (state = { ids: [], isLoading: false }, action) {
   switch (action.type) {
     case 'ADD_ENTITIES':
       return {
         ...state,
         ids: state.ids.concat(action.payload.result)
+      }
+
+    case actions.FETCH_CATALOG_RECEIVED:
+      return {
+        ...state,
+        isLoading: false,
+        total: action.total,
+      }
+
+    case actions.CATALOG_PAGINATE:
+      const defaults = {
+        firstPage: 1,
+        lastPage: 1,
+        nextPage: 1,
+        prevPage: 1,
+        total: 0,
+      }
+
+      const pageInfo = {...defaults}
+
+      if ('payload' in action) {
+        const { payload } = action
+        pageInfo.firstPage = ('first' in payload) ? payload.first.page : 1
+        pageInfo.lastPage = ('last' in payload) ? payload.last.page : 1
+        pageInfo.nextPage = ('next' in payload) ? payload.next.page : 1
+        pageInfo.prevPage = ('prev' in payload) ? payload.prev.page : 1
+      }
+      else {
+        return {
+          ...state,
+          ...defaults
+        }
+      }
+
+      return {
+        ...state,
+        ...pageInfo
       }
 
     default:

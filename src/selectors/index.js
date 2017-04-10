@@ -3,19 +3,34 @@ import { createSelector } from 'reselect'
 const {filter,reduce,find,reject} = require('lodash')
 import {sanitizeSemVer} from '../lib/utils'
 
-const getList = (state) => state.app.location
 const getPlugins = (state) => state.plugins.items
 const getLibrary = (state) => state.library.items
 const getSketchpack = (state) => state.sketchpack.items
 
-const getPluginEntities = (state) => state.plugins
+const getUserEntities = state => state.users
+const getPluginEntities = state => state.plugins
+const getPluginsByPopularity = state => state.pluginsByPopularity.ids
 
-export const getPlugin = createSelector(
-  [ getPluginEntities ], (plugins) => {
-    console.log(plugins)
-    return plugins
+export const getPopularPlugins = createSelector(
+  [ getPluginsByPopularity, getPluginEntities, getUserEntities ],
+  (namespaces,plugins,users) => {
+    return namespaces.map(n => {
+      return {
+        ...plugins[n],
+        owner: users[plugins[n].owner]
+      }
+    })
   }
 )
+
+export const getPluginList = (state) => {
+  try {
+    const list = state.app.location.split('/')
+    return list[list.length-1]
+  } catch (err) {
+    return 'popular'
+  }
+}
 
 const hasNewVersion = (plugin) => {
   if (plugin.installed === undefined) return false

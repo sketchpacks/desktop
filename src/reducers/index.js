@@ -69,7 +69,15 @@ const removeObjectFromArray = (array, action) => {
 const initialEntityState = {
   isLoading: false,
   byIdentifier: {},
-  allIdentifiers: []
+  allIdentifiers: [],
+  meta: {
+    prevPage: "1",
+    currentPage: "1",
+    nextPage: "1",
+    sort: "score:desc",
+    sortKey: "score",
+    sortDir: "desc"
+  }
 }
 
 function plugins (state = initialEntityState, action) {
@@ -94,7 +102,22 @@ function plugins (state = initialEntityState, action) {
     case actions.FETCH_CATALOG_RECEIVED:
       return {
         ...state,
-        isLoading: false
+        isLoading: false,
+        allIdentifiers: action.append
+          ? state.allIdentifiers
+          : []
+      }
+
+    case actions.CATALOG_PAGINATE:
+      console.log(actions.CATALOG_PAGINATE,action.payload)
+      return {
+        ...state,
+        meta: {
+          nextPage: action.payload.pageMeta.next.page || "1",
+          sortKey: action.payload.pageMeta.next.sort.split(':')[0],
+          sortDir: action.payload.pageMeta.next.sort.split(':')[1],
+          sort: action.payload.pageMeta.next.sort
+        }
       }
 
     default:
@@ -123,11 +146,7 @@ function users (state = {}, action) {
 function catalog (state = initialListState, action) {
   switch (action.type) {
     case actions.FETCH_CATALOG_REQUEST:
-      return {
-        ...state,
-        isLoading: true,
-        items: action.append ? state.items : [],
-      }
+      return state
 
     case actions.FETCH_SEARCH_REQUEST:
       return {
@@ -138,12 +157,7 @@ function catalog (state = initialListState, action) {
       }
 
     case actions.FETCH_CATALOG_RECEIVED:
-      return {
-        ...state,
-        isLoading: false,
-        items: action.append ? state.items.concat(action.payload) : action.payload,
-        total: action.total,
-      }
+      return state
 
     case actions.FETCH_CATALOG_ERROR:
       return {
@@ -155,36 +169,6 @@ function catalog (state = initialListState, action) {
       return {
         ...state,
         sort: action.sort,
-      }
-
-    case actions.CATALOG_PAGINATE:
-      const defaults = {
-        firstPage: 1,
-        lastPage: 1,
-        nextPage: 1,
-        prevPage: 1,
-        total: 0,
-      }
-
-      const pageInfo = {...defaults}
-
-      if ('payload' in action) {
-        const { payload } = action
-        pageInfo.firstPage = ('first' in payload) ? payload.first.page : 1
-        pageInfo.lastPage = ('last' in payload) ? payload.last.page : 1
-        pageInfo.nextPage = ('next' in payload) ? payload.next.page : 1
-        pageInfo.prevPage = ('prev' in payload) ? payload.prev.page : 1
-      }
-      else {
-        return {
-          ...state,
-          ...defaults
-        }
-      }
-
-      return {
-        ...state,
-        ...pageInfo
       }
 
     case UNINSTALL_PLUGIN_SUCCESS:
@@ -411,7 +395,6 @@ function sketchpack ( state = initialSketchpackState, action ) {
 
 const rootReducer = combineReducers({
   routing: routerReducer,
-  catalog,
   library,
   pluginDetails,
   app,

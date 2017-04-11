@@ -44,9 +44,9 @@ class SideBarMenu extends Component {
 
           <div className="app__sidebar-section">
             <div><strong className="app__sidebar-subheading">Browse</strong></div>
-            <div><Link to={{ pathname: '/browse/popular', query: { sort: 'score:desc' } }} className="app__sidebar-item" activeClassName="app__sidebar-item--active">Popular</Link></div>
-            <div><Link to={{ pathname: '/browse/newest', query: { sort: 'created_at:desc' } }} className="app__sidebar-item" activeClassName="app__sidebar-item--active">Newest</Link></div>
-            <div><Link to={{ pathname: '/browse/name', query: { sort: 'name:asc' } }} className="app__sidebar-item" activeClassName="app__sidebar-item--active">A-Z</Link></div>
+            <div><Link to={{ pathname: '/browse/popular', query: { sort: 'score:desc', page: 1 } }} className="app__sidebar-item" activeClassName="app__sidebar-item--active">Popular</Link></div>
+            <div><Link to={{ pathname: '/browse/newest', query: { sort: 'created_at:desc', page: 1 } }} className="app__sidebar-item" activeClassName="app__sidebar-item--active">Newest</Link></div>
+            <div><Link to={{ pathname: '/browse/name', query: { sort: 'name:asc', page: 1 } }} className="app__sidebar-item" activeClassName="app__sidebar-item--active">A-Z</Link></div>
           </div>
         </nav>
 

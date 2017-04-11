@@ -58,7 +58,7 @@ const ConnectedPluginList = ComposedComponent =>
 
     componentDidMount () {
       this.fetchData({
-        page: 1,
+        page: this.props.state.plugins.meta.nextPage || "1",
         append: false,
         q: this.props.location.query.q,
         sort: this.props.location.query.sort,
@@ -70,7 +70,7 @@ const ConnectedPluginList = ComposedComponent =>
 
       if (this.props.location.query.sort !== nextProps.location.query.sort) {
         this.fetchData({
-          page: 1,
+          page: "1",
           sort: nextProps.location.query.sort,
           append: false,
           q: nextProps.location.query.q,
@@ -81,14 +81,17 @@ const ConnectedPluginList = ComposedComponent =>
     fetchData ({ sort, page, append, q }) {
       const {dispatch,plugins} = this.props
 
-      if (plugins.isLoading === true) return
+      if (this.props.state.plugins.isLoading === true) return
+
+      console.log('location: ', this.props.location)
 
       const queryParams = qs.stringify({
-        page: page || parseInt(plugins.nextPage),
-        per_page: 10,
-        sort: sort || plugins.sort,
+        page: page,
+        per_page: "10",
+        sort: sort,
         text: q || null
       })
+      console.log(queryParams)
 
       dispatch(fetchCatalog(queryParams, append))
     }

@@ -49,15 +49,28 @@ export const addEntities = (normalizedData) => {
 
 export function fetchCatalog (query, append=true) {
   return (dispatch, getState, {api}) => {
-    dispatch(fetchCatalogRequest({payload: query, append: append}))
 
-    api.getCatalog({query: query})
+    const defaults = getState().plugins.meta
+
+    const queryParams = qs.stringify({
+      sort: qs.parse(query).sort || [defaults.sortKey,defaults.sortDir].join(':'),
+      page: qs.parse(query).page || defaults.nextPage,
+      text: qs.parse(query).text,
+      perPage: qs.parse(query).perPage
+    })
+
+    dispatch(fetchCatalogRequest({ payload: queryParams, append: append }))
+
+    api.getCatalog({query: queryParams})
       .then(response => {
         const pageMeta = linkHeader(response.headers.link)
         const normalizedPluginList = normalize(response.data, schemas.pluginListSchema)
+        dispatch(fetchCatalogReceived({ payload: normalizedPluginList, append }))
+
         dispatch(addEntities(normalizedPluginList))
 
-        if (pageMeta) dispatch(catalogPaginate(pageMeta))
+
+        if (pageMeta) dispatch(catalogPaginate({ pageMeta, append }))
       })
       .catch(error => {
         console.log(error)
@@ -69,15 +82,10 @@ export function fetchCatalog (query, append=true) {
 export const FETCH_CATALOG_REQUEST = 'catalog/FETCH_REQUEST'
 
 export function fetchCatalogRequest ({payload, append}) {
-  return (dispatch, getState) => {
-    const {sort} = qs.parse(payload)
-    // dispatch(catalogSortBy(sort))
-
-    return {
-      type: FETCH_CATALOG_REQUEST,
-      payload,
-      append
-    }
+  return {
+    type: FETCH_CATALOG_REQUEST,
+    payload,
+    append
   }
 }
 
@@ -86,9 +94,8 @@ export const FETCH_CATALOG_RECEIVED = 'catalog/FETCH_RECEIVED'
 export function fetchCatalogReceived ({payload, append, total}) {
   return {
     type: FETCH_CATALOG_RECEIVED,
-    payload: prunePluginData(payload),
-    total: total,
-    append,
+    payload,
+    append
   }
 }
 
@@ -104,6 +111,7 @@ export function fetchCatalogError (error) {
 export const CATALOG_PAGINATE = 'catalog/PAGINATE'
 
 export function catalogPaginate (payload) {
+  console.log(CATALOG_PAGINATE, payload)
   return {
     type: CATALOG_PAGINATE,
     payload: payload

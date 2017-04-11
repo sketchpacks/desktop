@@ -108,8 +108,8 @@ const ConnectedPluginList = ComposedComponent =>
             sketchpack={this.props.sketchpack}
           />
 
-          { !this.props.plugins.isLoading
-            && this.props.plugins.total >= 11
+          { !this.props.state.plugins.isLoading
+            && this.props.state.plugins.allIdentifiers.length >= 9
             && <Waypoint
               onEnter={() => this.fetchData({ sort: this.props.plugins.sort })} /> }
         </div>

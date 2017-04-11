@@ -8,11 +8,27 @@ const getLibrary = (state) => state.library.items
 const getSketchpack = (state) => state.sketchpack.items
 
 const getUserEntities = state => state.users
-const getPluginEntities = state => state.plugins
-const getPluginsByPopularity = state => state.pluginsByPopularity.ids
+const getPluginEntities = state => state.plugins.byIdentifier
+const getPluginsByPopularity = state => state.plugins.allIdentifiers
+
+
+
+const getSketchpack = (state) => state.sketchpack.items
+const getLibrary = (state) => state.library.ids
+
 
 export const getPopularPlugins = createSelector(
   [ getPluginsByPopularity, getPluginEntities, getUserEntities ],
+  (identifiers,plugins,users) => {
+    return identifiers.map(id => {
+      return {
+        ...plugins[id],
+        owner: users[plugins[id].owner]
+      }
+    })
+  }
+)
+
   (namespaces,plugins,users) => {
     return namespaces.map(n => {
       return {

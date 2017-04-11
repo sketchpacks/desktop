@@ -43,10 +43,11 @@ class BrowsePluginsContainer extends Component {
         { (plugins.isLoading)
           && this.renderLoadingState() }
 
-        { (parseInt(plugins.total) === 0)
+        { (parseInt(plugins.length) === 0)
           && this.renderEmptyState() }
 
         <EnhancedPluginList
+          state={this.props.state}
           plugins={plugins}
           location={this.props.location}
           installedPluginIds={this.props.library.ids}
@@ -67,9 +68,6 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   const { search,library,location,sketchpack } = state
 
-  const listSwitcher = ()
-
-
   // TODO: Move list meta into a reducer
   const listMeta = {
     total: state.pluginsByPopularity.total,
@@ -84,11 +82,11 @@ function mapStateToProps(state, ownProps) {
   }
 
   return {
-    library,
+    state,
     plugins,
     search,
+    library,
     location: state.routing.locationBeforeTransitions,
-    sketchpack
   }
 }
 

@@ -66,12 +66,35 @@ const removeObjectFromArray = (array, action) => {
 // PLUGINS
 //
 
-function plugins (state = {}, action) {
+const initialEntityState = {
+  isLoading: false,
+  byIdentifier: {},
+  allIdentifiers: []
+}
+
+function plugins (state = initialEntityState, action) {
   switch (action.type) {
+    case actions.FETCH_CATALOG_REQUEST:
+      return {
+        ...state,
+        isLoadding: true
+      }
+
     case 'ADD_ENTITIES':
       return {
         ...state,
-        ...action.payload.entities.plugins
+
+        byIdentifier: {
+          ...state.byIdentifier,
+          ...action.payload.entities.plugins
+        },
+        allIdentifiers: state.allIdentifiers.concat(action.payload.result)
+      }
+
+    case actions.FETCH_CATALOG_RECEIVED:
+      return {
+        ...state,
+        isLoadding: false
       }
 
     default:

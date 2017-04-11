@@ -68,18 +68,7 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   const { search,library,location,sketchpack } = state
 
-  // TODO: Move list meta into a reducer
-  const listMeta = {
-    total: state.pluginsByPopularity.total,
-    prevPage: state.pluginsByPopularity.prevPage,
-    nextPage: state.pluginsByPopularity.nextPage,
-    lastPage: state.pluginsByPopularity.lastPage
-  }
-
-  const plugins = {
-    ...listMeta,
-    items: getPopularPlugins(state)
-  }
+  const plugins = { items: getPopularPlugins(state) }
 
   return {
     state,

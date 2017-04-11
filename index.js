@@ -185,7 +185,7 @@ ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
 })
 
 const getPluginData = (plugin) => axios.get(`${API_URL}/v1/users/${plugin.owner}/plugins/${plugin.name.toLowerCase()}`)
-const getPluginByIdentifier = (plugin) => axios.get(`${API_URL}/v1/users/utom/plugins/sketch-measure`)
+const getPluginByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
 
 const installPluginTask = (plugin, callback) => {
   getPluginData(plugin)

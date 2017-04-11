@@ -4,6 +4,8 @@ import { browserHistory } from 'react-router'
 
 import {map,includes} from 'lodash'
 
+import {getInstalledPlugins} from 'selectors'
+
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'
 const EnhancedPluginList = ConnectedPluginList(PluginList)
@@ -49,7 +51,7 @@ class InstalledPluginsContainer extends Component {
         <EnhancedPluginList
           plugins={plugins}
           location={this.props.location}
-          installedPluginIds={map(this.props.plugins.items, 'id')}
+          installedPluginIds={this.props.library.ids}
           dispatch={this.props.dispatch}
           sketchpack={this.props.state.sketchpack}
         />
@@ -67,9 +69,14 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   const { library } = state
 
+  const plugins = {
+    items: getInstalledPlugins(state)
+  }
+
   return {
+    library,
     state,
-    plugins: library,
+    plugins,
     location: state.routing.locationBeforeTransitions,
   }
 }

@@ -42,7 +42,7 @@ class SearchResultsContainer extends Component {
         <EnhancedPluginList
           plugins={plugins}
           location={this.props.location}
-          installedPluginIds={map(this.props.library.items, 'id')}
+          installedPluginIds={this.props.library.ids}
           dispatch={this.props.dispatch}
         />
       </div>

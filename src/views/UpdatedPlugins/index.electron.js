@@ -52,7 +52,7 @@ class UpdatedPluginsContainer extends Component {
         <EnhancedPluginList
           plugins={plugins}
           location={this.props.location}
-          installedPluginIds={map(this.props.plugins.items, 'id')}
+          installedPluginIds={this.props.library.ids}
           dispatch={this.props.dispatch}
         />
       </div>

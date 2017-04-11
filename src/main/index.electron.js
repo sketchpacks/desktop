@@ -87,6 +87,10 @@ import {
   syncChangeReceived
 } from 'actions/sketchpack'
 
+import {
+  addEntities
+} from 'actions/index'
+
 let store = configureStore()
 const history = syncHistoryWithStore((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory, store)
 

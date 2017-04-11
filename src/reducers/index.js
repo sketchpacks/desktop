@@ -130,34 +130,6 @@ function pluginsByPopularity (state = { ids: [], isLoading: false }, action) {
   }
 }
 
-
-function pluginsByNewest (state = { ids: [] }, action) {
-  switch (action.type) {
-    case 'ADD_ENTITIES':
-      return {
-        ...state,
-        ids: state.ids.concat(action.payload.result)
-      }
-
-    default:
-      return state
-  }
-}
-
-
-function pluginsByName (state = { ids: [] }, action) {
-  switch (action.type) {
-    case 'ADD_ENTITIES':
-      return {
-        ...state,
-        ids: state.ids.concat(action.payload.result)
-      }
-
-    default:
-      return state
-  }
-}
-
 //
 // USERS
 //
@@ -261,51 +233,10 @@ function catalog (state = initialListState, action) {
 
 function library (state = initialListState, action) {
   switch (action.type) {
-    case actions.FETCH_LIBRARY_REQUEST:
+    case 'ADD_ENTITIES':
       return {
         ...state,
-        items: [],
-        isLoading: true
-      }
-
-    case actions.FETCH_LIBRARY_RECEIVED:
-      return {
-        ...state,
-        items: action.payload,
-        isLoading: false
-      }
-
-    case actions.FETCH_LIBRARY_ERROR:
-      return {
-        ...state,
-        isLoading: false
-      }
-
-    case 'manager/UPDATE_SUCCESS':
-      return {
-        ...state,
-        items: update(state.items, {
-          [findIndex(state.items, ['id', action.plugin.id])]: {
-            install_path: { $set: action.plugin.install_path },
-            version: { $set: `^${action.plugin.version}` }
-          }
-        })
-      }
-
-    case 'manager/UNINSTALL_SUCCESS':
-      return {
-        ...state,
-        items: removeObjectFromArray(state.items, action)
-      }
-
-    case 'manager/INSTALL_SUCCESS':
-      return {
-        ...state,
-        items: (findIndex(state.items, (p) => {
-          return p.owner.handle === action.plugin.owner.handle && p.name === action.plugin.name
-        }) === -1)
-          ? state.items.concat(action.plugin)
-          : updateObjectInArray(state.items, action)
+        ids: state.ids.concat(action.payload.result)
       }
 
     default:
@@ -518,8 +449,6 @@ const rootReducer = combineReducers({
 
   plugins,
   pluginsByPopularity,
-  pluginsByNewest,
-  pluginsByName,
   users
 })
 

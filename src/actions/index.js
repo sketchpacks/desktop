@@ -35,10 +35,10 @@ export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE'
 //
 
 export const ADD_ENTITIES = 'ADD_ENTITIES'
-export const addEntities = (payload) => {
+export const addEntities = (normalizedData) => {
   return {
     type: ADD_ENTITIES,
-    payload: normalize(payload, schemas.pluginSchema)
+    payload: normalizedData
   }
 }
 
@@ -54,20 +54,15 @@ export function fetchCatalog (query, append=true) {
     api.getCatalog({query: query})
       .then(response => {
         const pageMeta = linkHeader(response.headers.link)
-
-        const normalizedPlugins = normalize(response.data, schemas.pluginListSchema)
-        dispatch(addEntities(normalizedPlugins))
+        const normalizedPluginList = normalize(response.data, schemas.pluginListSchema)
+        dispatch(addEntities(normalizedPluginList))
 
         if (pageMeta) dispatch(catalogPaginate(pageMeta))
-
-
-        dispatch(fetchCatalogReceived({
-          payload: response.data,
-          append: append,
-          total: response.headers.total,
-        }))
       })
-      .catch(error => dispatch(fetchCatalogError(error)))
+      .catch(error => {
+        console.log(error)
+        dispatch(fetchCatalogError(error))
+      })
   }
 }
 

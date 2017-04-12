@@ -2,13 +2,9 @@ import React, {Component} from 'react'
 
 import PluginMedia from 'components/PluginMedia'
 
-import {map,includes} from 'lodash'
+import {map,includes,findIndex} from 'lodash'
 
 import './styles.scss'
-
-const isInstalled = (library, pluginId) => {
-  return includes(library, pluginId)
-}
 
 class PluginList extends Component {
   constructor (props) {
@@ -19,19 +15,19 @@ class PluginList extends Component {
     const {
       plugins,
       authorDetails,
-      installedPluginIds,
       location,
       dispatch,
       handlePluginEvent,
-      fetchData
+      fetchData,
+      state
     } = this.props
 
     return (
       <div className="o-plugin-list">
 
         {plugins.items.map((plugin, idx) => {
-
           // Set the owner property if not present
+
           if (!('owner' in plugin)) plugin['owner'] = authorDetails
 
           return <PluginMedia

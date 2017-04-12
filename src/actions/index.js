@@ -111,7 +111,6 @@ export function fetchCatalogError (error) {
 export const CATALOG_PAGINATE = 'catalog/PAGINATE'
 
 export function catalogPaginate (payload) {
-  console.log(CATALOG_PAGINATE, payload)
   return {
     type: CATALOG_PAGINATE,
     payload: payload

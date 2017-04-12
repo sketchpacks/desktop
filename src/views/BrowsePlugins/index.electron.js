@@ -50,7 +50,6 @@ class BrowsePluginsContainer extends Component {
           state={this.props.state}
           plugins={plugins}
           location={this.props.location}
-          installedPluginIds={this.props.library.ids}
           dispatch={this.props.dispatch}
           sketchpack={this.props.sketchpack}
         />

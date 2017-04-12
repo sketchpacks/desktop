@@ -83,15 +83,12 @@ const ConnectedPluginList = ComposedComponent =>
 
       if (this.props.state.plugins.isLoading === true) return
 
-      console.log('location: ', this.props.location)
-
       const queryParams = qs.stringify({
         page: page,
         per_page: "10",
         sort: sort,
         text: q || null
       })
-      console.log(queryParams)
 
       dispatch(fetchCatalog(queryParams, append))
     }
@@ -107,11 +104,12 @@ const ConnectedPluginList = ComposedComponent =>
             state={this.props.state}
             location={this.props.location}
             dispatch={this.props.dispatch}
-            installedPluginIds={this.props.installedPluginIds}
             sketchpack={this.props.sketchpack}
           />
 
-          { !this.props.state.plugins.isLoading
+          { (this.props.state.app.location !== '/library/installed'
+              || this.props.state.app.location !== '/library/updates')
+            && !this.props.state.plugins.isLoading
             && this.props.state.plugins.allIdentifiers.length >= 9
             && <Waypoint
               onEnter={() => this.fetchData({ sort: this.props.plugins.sort })} /> }

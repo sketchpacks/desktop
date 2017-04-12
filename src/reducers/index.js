@@ -39,7 +39,7 @@ import {
   SYNC_CHANGE_RECEIVED
 } from 'actions/sketchpack'
 
-import {filter,findIndex} from 'lodash'
+import {filter,findIndex,uniq} from 'lodash'
 
 const initialListState = {
   items: [],
@@ -109,7 +109,6 @@ function plugins (state = initialEntityState, action) {
       }
 
     case actions.CATALOG_PAGINATE:
-      console.log(actions.CATALOG_PAGINATE,action.payload)
       return {
         ...state,
         meta: {
@@ -188,12 +187,24 @@ function catalog (state = initialListState, action) {
   }
 }
 
-function library (state = initialListState, action) {
+const initialLibraryState = {
+  byIdentifier: {}
+}
+
+function library (state = initialLibraryState, action) {
   switch (action.type) {
     case 'ADD_ENTITIES':
+      return state
+
+    case INSTALL_PLUGIN_SUCCESS:
       return {
         ...state,
-        ids: state.ids.concat(action.payload.result)
+        byIdentifier: {
+          ...state.byIdentifier,
+          [action.plugin.identifier]: {
+            install_path: action.plugin.install_path
+          }
+        }
       }
 
     default:

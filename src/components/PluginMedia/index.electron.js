@@ -36,8 +36,8 @@ class PluginMedia extends Component {
 
     this.state = {
       hidePreview: props.thumbnail_url === "",
-      isInstalled: props.isInstalled,
       clicked: false,
+      installed: false
     }
   }
 

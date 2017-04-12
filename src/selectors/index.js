@@ -3,19 +3,15 @@ import { createSelector } from 'reselect'
 const {filter,reduce,find,reject} = require('lodash')
 import {sanitizeSemVer} from '../lib/utils'
 
-const getPlugins = (state) => state.plugins.items
-const getLibrary = (state) => state.library.items
-const getSketchpack = (state) => state.sketchpack.items
 
 const getUserEntities = state => state.users
+const getLibraryEntities = state => state.library.byIdentifier
 const getPluginEntities = state => state.plugins.byIdentifier
 const getPluginsByPopularity = state => state.plugins.allIdentifiers
-
-
+const getInstalledIdentifiers = state => state.plugins.installedIndentifiers
 
 const getSketchpack = (state) => state.sketchpack.items
 const getLibrary = (state) => state.library.ids
-
 
 export const getPopularPlugins = createSelector(
   [ getPluginsByPopularity, getPluginEntities, getUserEntities ],
@@ -29,11 +25,13 @@ export const getPopularPlugins = createSelector(
   }
 )
 
-  (namespaces,plugins,users) => {
-    return namespaces.map(n => {
+export const getInstalledPlugins = createSelector(
+  [ getLibraryEntities, getPluginEntities, getUserEntities ],
+  (library, plugins, users) => {
+    return Object.keys(library).map(id => {
       return {
-        ...plugins[n],
-        owner: users[plugins[n].owner]
+        ...plugins[id],
+        owner: users[plugins[id].owner]
       }
     })
   }

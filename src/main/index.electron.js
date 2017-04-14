@@ -26,6 +26,9 @@ import fs from 'fs'
 import jsonfile from 'jsonfile'
 import {filter} from 'lodash'
 
+import { normalize } from 'normalizr'
+import * as schemas from 'schemas'
+
 import App from 'containers/App'
 
 import BrowsePlugins from 'views/BrowsePlugins'
@@ -242,6 +245,14 @@ ipcRenderer.on(SYNC_CHANGE_RECEIVED, (evt,contents) => {
   log.debug(SYNC_CHANGE_RECEIVED,contents)
   store.dispatch(syncChangeReceived(contents))
 })
+
+ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
+  const normalizedPlugin = normalize(contents, schemas.pluginSchema)
+  console.log('PLUGIN_DETECTED',normalizedPlugin)
+  store.dispatch(fetchLibraryReceived(normalizedPlugin))
+  store.dispatch(addEntities(normalizedPlugin))
+})
+
 
 
 if (firstRun({name: `${pkg.name}-${pkg.version}`})) {

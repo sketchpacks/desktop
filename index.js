@@ -228,20 +228,21 @@ const uninstallPluginTask = (plugin, callback) => {
 
 
 const identifyPluginTask = (manifestPath, callback) => {
+  const manifest_path = manifestPath
   let install_path
   let identifier
 
   const buildPlugin = (manifestContents) => new Promise((resolve,reject) => {
     try {
       install_path = manifestContents.install_path
-      identifier = manifestContents.identifier
       resolve({
         identifier: manifestContents.identifier,
         name: manifestContents.name,
         author: manifestContents.author || manifestContents.authorName,
         version: sanitizeSemVer(manifestContents.version || 0),
         compatible_version: sanitizeSemVer(manifestContents.compatibleVersion || 0),
-        install_path: manifestContents.install_path
+        install_path,
+        manifest_path
       })
     } catch (err) {
       log.error(err)
@@ -249,11 +250,11 @@ const identifyPluginTask = (manifestPath, callback) => {
     }
   })
 
-  readManifest(manifestPath)
+  readManifest(manifest_path)
     .then(buildPlugin)
     .then(getPluginByIdentifier)
     .then(response => {
-      const data = Object.assign({}, response.data, { install_path,identifier })
+      const data = Object.assign({}, response.data, { install_path, manifest_path })
       callback(null, data)
     })
     .catch(err => {
@@ -406,8 +407,7 @@ const queueIdentify = (plugins) => {
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'identify', payload: plugin }, (err, result) => {
     if (err) return callback(err)
-    log.debug('Identify complete', result)
-    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
+    mainWindow.webContents.send('PLUGIN_DETECTED', result)
   }))
 }
 

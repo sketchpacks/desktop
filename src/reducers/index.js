@@ -39,7 +39,7 @@ import {
   SYNC_CHANGE_RECEIVED
 } from 'actions/sketchpack'
 
-import {filter,findIndex,uniq} from 'lodash'
+import {filter,findIndex,uniq,pick} from 'lodash'
 
 const initialListState = {
   items: [],
@@ -193,9 +193,6 @@ const initialLibraryState = {
 
 function library (state = initialLibraryState, action) {
   switch (action.type) {
-    case 'ADD_ENTITIES':
-      return state
-
     case INSTALL_PLUGIN_SUCCESS:
       return {
         ...state,
@@ -204,6 +201,18 @@ function library (state = initialLibraryState, action) {
           [action.plugin.identifier]: {
             install_path: action.plugin.install_path
           }
+        }
+      }
+
+    case actions.FETCH_LIBRARY_RECEIVED:
+      return {
+        ...state,
+        byIdentifier: {
+          ...state.byIdentifier,
+          [action.payload.result]: pick(
+            action.payload.entities.plugins[action.payload.result],
+            ['install_path', 'manifest_path']
+          )
         }
       }
 
@@ -406,7 +415,6 @@ function sketchpack ( state = initialSketchpackState, action ) {
 
 const rootReducer = combineReducers({
   routing: routerReducer,
-  library,
   pluginDetails,
   app,
   authorDetails,
@@ -414,6 +422,7 @@ const rootReducer = combineReducers({
   sketchpack,
 
 
+  library,
   plugins,
   users
 })

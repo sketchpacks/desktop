@@ -19,17 +19,22 @@ const os = require('os')
 const fs = require('fs')
 const {forEach,filter} = require('lodash')
 const electron = require('electron')
-const app = electron.app
-const dialog = electron.dialog
-const autoUpdater = electron.autoUpdater
-const protocol = electron.protocol
+const {
+  app,
+  dialog,
+  autoUpdater,
+  protocol,
+  Menu,
+  ipcMain,
+  ipcRenderer
+} = electron
 const url = require('url')
-const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
 const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
+const {appMenu} = require('./src/menus/appMenu')
 
 const firstRun = require('first-run')
 
@@ -115,6 +120,8 @@ app.on('ready', () => {
   }, (error) => {
     if (error) console.error('Failed to register protocol', error)
   })
+
+  Menu.setApplicationMenu(appMenu)
 })
 
 app.on('open-url', (event, resource) => {

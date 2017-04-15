@@ -35,6 +35,8 @@ const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
 const {appMenu} = require('./src/menus/appMenu')
+const {inputMenu} = require('./src/menus/inputMenu')
+const {selectionMenu} = require('./src/menus/selectionMenu')
 
 const firstRun = require('first-run')
 
@@ -102,6 +104,15 @@ menuBar.on('after-show', () => {
 menuBar.on('after-create-window', () => {
   menuBar.window.hide()
   mainWindow = menuBar.window
+
+  mainWindow.webContents.on('context-menu', (e, props) => {
+    const { selectionText, isEditable } = props;
+    if (isEditable) {
+      inputMenu.popup(mainWindow)
+    } else if (selectionText && selectionText.trim() !== '') {
+      selectionMenu.popup(mainWindow)
+    }
+  })
 })
 
 menuBar.on('show', () => {
@@ -337,6 +348,7 @@ ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
     log.error(err)
   }
 })
+
 
 process.on('uncaughtException', (err) => {
   log.error(err)

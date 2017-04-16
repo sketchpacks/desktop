@@ -1,0 +1,46 @@
+import { createAction, handleActions } from 'redux-actions'
+import { pick } from 'lodash'
+
+
+//- Actions
+
+export const installPlugin = createAction('manager/INSTALL_SUCCESS')
+export const detectPlugin = createAction('library/FETCH_RECEIVED')
+
+
+//- State
+
+const initialState = {
+  byIdentifier: {}
+}
+
+
+//- Reducers
+
+export default handleActions({
+  [installPlugin]: (state, action) => ({
+    ...state,
+    byIdentifier: {
+      ...state.byIdentifier,
+      [action.plugin.identifier]: {
+        install_path: action.plugin.install_path
+      }
+    }
+  }),
+
+  [detectPlugin]: (state, action) => ({
+    ...state,
+    byIdentifier: {
+      ...state.byIdentifier,
+      [action.payload.result]: pick(
+        action.payload.entities.plugins[action.payload.result],
+        ['install_path', 'manifest_path']
+      )
+    }
+  })
+}, initialState)
+
+
+//- Selectors
+
+export const getSketchpack = (state) => state

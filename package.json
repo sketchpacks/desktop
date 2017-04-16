@@ -126,6 +126,7 @@
     "react-router-redux": "^4.0.7",
     "react-waypoint": "^5.1.0",
     "redux": "^3.6.0",
+    "redux-actions": "^2.0.1",
     "redux-logger": "^2.7.4",
     "redux-thunk": "^2.2.0",
     "remimi": "^1.1.0",

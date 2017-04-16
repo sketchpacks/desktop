@@ -8,7 +8,10 @@ export const addUser = createAction('ADD_ENTITIES')
 
 //- State
 
-const initialState = {}
+const initialState = {
+  byId: {},
+  allIds: []
+}
 
 
 //- Reducers
@@ -16,7 +19,11 @@ const initialState = {}
 export default handleActions({
   [addUser]: (state, action) => ({
     ...state,
-    ...action.payload.entities.users
+    byId: {
+      ...state.byId,
+      ...action.payload.entities.users
+    },
+    allIds: state.allIds.concat(action.payload.result)
   })
 }, initialState)
 

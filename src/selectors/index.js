@@ -4,7 +4,7 @@ const {filter,reduce,find,reject} = require('lodash')
 import {sanitizeSemVer} from '../lib/utils'
 
 
-const getUserEntities = state => state.users
+const getUserEntities = state => state.users.byId
 const getLibraryEntities = state => state.library.byIdentifier
 const getPluginEntities = state => state.plugins.byIdentifier
 const getPluginsByPopularity = state => state.plugins.allIdentifiers

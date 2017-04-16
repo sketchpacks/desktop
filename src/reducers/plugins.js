@@ -64,3 +64,7 @@ export default handleActions({
 
 
 //- Selectors
+
+export const getPluginEntities = state => state.plugins.byIdentifier
+
+export const getPluginsByPopularity = state => state.plugins.allIdentifiers

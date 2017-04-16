@@ -43,4 +43,5 @@ export default handleActions({
 
 //- Selectors
 
-export const getSketchpack = (state) => state
+export const getLibraryEntities = state => state.library.byIdentifier
+export const getLibrary = (state) => state.library.ids

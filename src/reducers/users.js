@@ -29,3 +29,5 @@ export default handleActions({
 
 
 //- Selectors
+
+export const getUserEntities = state => state.users.byId

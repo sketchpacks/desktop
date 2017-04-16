@@ -3,15 +3,14 @@ import { createSelector } from 'reselect'
 const {filter,reduce,find,reject} = require('lodash')
 import {sanitizeSemVer} from '../lib/utils'
 
+import { getPluginEntities } from 'reducers/plugins'
+import { getUserEntities } from 'reducers/users'
+import { getLibrary, getLibraryEntities } from 'reducers/library'
 
-const getUserEntities = state => state.users.byId
-const getLibraryEntities = state => state.library.byIdentifier
-const getPluginEntities = state => state.plugins.byIdentifier
 const getPluginsByPopularity = state => state.plugins.allIdentifiers
 const getInstalledIdentifiers = state => state.plugins.installedIndentifiers
 
 const getSketchpack = (state) => state.sketchpack.items
-const getLibrary = (state) => state.library.ids
 
 export const getPopularPlugins = createSelector(
   [ getPluginsByPopularity, getPluginEntities, getUserEntities ],

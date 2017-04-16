@@ -1,5 +1,6 @@
 import { createAction, handleActions } from 'redux-actions'
 
+import {reduce} from 'lodash'
 
 //- Actions
 
@@ -23,6 +24,10 @@ export default handleActions({
       ...state.byId,
       ...action.payload.entities.users
     },
+    byHandle: reduce(action.payload.entities.users, (result, value, key) => {
+      result[action.payload.entities.users[key].handle] = key
+      return result
+    }, {}),
     allIds: state.allIds.concat(action.payload.result)
   })
 }, initialState)

@@ -11,7 +11,8 @@ export const detectPlugin = createAction('library/FETCH_RECEIVED')
 //- State
 
 const initialState = {
-  byIdentifier: {}
+  byIdentifier: {},
+  allIdentifiers: []
 }
 
 
@@ -36,7 +37,8 @@ export default handleActions({
         action.payload.entities.plugins[action.payload.result],
         ['install_path', 'manifest_path', 'version', 'compatible_version']
       )
-    }
+    },
+    allIdentifiers: state.allIdentifiers.concat(action.payload.result)
   })
 }, initialState)
 
@@ -44,4 +46,4 @@ export default handleActions({
 //- Selectors
 
 export const getLibraryEntities = state => state.library.byIdentifier
-export const getLibrary = (state) => state.library.ids
+export const getLibrary = (state) => state.library

@@ -232,18 +232,23 @@ const identifyPluginTask = (manifestPath, callback) => {
   let install_path
   let identifier
 
+  let unidentifiedPlugin
+
   const buildPlugin = (manifestContents) => new Promise((resolve,reject) => {
     try {
       install_path = manifestContents.install_path
-      resolve({
+      unidentifiedPlugin = {
         identifier: manifestContents.identifier,
         name: manifestContents.name,
-        author: manifestContents.author || manifestContents.authorName,
+        owner: {
+          handle: manifestContents.name || manifestContents.author || manifestContents.authorName
+        },
         version: sanitizeSemVer(manifestContents.version || 0),
         compatible_version: sanitizeSemVer(manifestContents.compatibleVersion || 0),
         install_path,
         manifest_path
-      })
+      }
+      resolve(unidentifiedPlugin)
     } catch (err) {
       log.error(err)
       reject(err)
@@ -258,8 +263,8 @@ const identifyPluginTask = (manifestPath, callback) => {
       callback(null, data)
     })
     .catch(err => {
-      log.error('Error while identifying: ', err)
-      callback(err)
+      // log.error('Error while identifying: ', err)
+      callback(null, unidentifiedPlugin)
     })
 }
 
@@ -534,6 +539,9 @@ const sketchpackWatcher = (watchPath) => {
     .on('add', (watchPath) => {
       if (path.parse(watchPath).ext === '.sketchpack') {
         log.debug('Sketchpack Detected', watchPath)
+
+        readSketchpack(watchPath)
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
       }
     })
     .on('change', (watchPath) => {
@@ -541,7 +549,7 @@ const sketchpackWatcher = (watchPath) => {
         log.debug('Sketchpack Changed', watchPath)
 
         readSketchpack(watchPath)
-          .then(contents => mainWindow.webContents.send(SYNC_CHANGE_RECEIVED, contents))
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
       }
     })
     .on('unlink', (watchPath) => {

@@ -6,7 +6,6 @@ import semver from 'semver'
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 
-import {getPluginByIdentifier} from 'reducers/plugins'
 import {detectPlugin} from 'reducers/library'
 
 
@@ -21,7 +20,8 @@ export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE')
 
 const initialState = {
   isLocked: false,
-  pluginsByNamespace: {}
+  pluginsByNamespace: {},
+  allIdentifiers: []
 }
 
 
@@ -60,8 +60,12 @@ export default handleActions({
   },
 
   [detectPlugin]: (state, action) => {
-    let plugin = action.payload.entities.plugins[action.payload.result]
-    let owner = action.payload.entities.users[plugin.owner]
+    let { entities, result } = action.payload
+
+    if (entities.plugins[result].owner === undefined) return state
+
+    let plugin = entities.plugins[result]
+    let owner = entities.users[plugin.owner].handle
 
     const sanitizedVersion = sanitizeSemVer(plugin.version)
 
@@ -69,12 +73,13 @@ export default handleActions({
       ...state,
       pluginsByNamespace: {
         ...state.pluginsByNamespace,
-        [`${owner.handle}/${plugin.name}`]: {
+        [`${owner}/${plugin.name}`]: {
           version: plugin.version.indexOf('=') > -1
             ? `^${sanitizedVersion}`
             : `=${sanitizedVersion}`
         }
-      }
+      },
+      allIdentifiers: state.allIdentifiers.concat(result)
     }
   }
 }, initialState)
@@ -82,4 +87,4 @@ export default handleActions({
 
 //- Selectors
 
-export const getSketchpack = (state) => state
+export const getSketchpack = (state) => state.sketchpack

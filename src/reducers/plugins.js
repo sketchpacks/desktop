@@ -43,7 +43,11 @@ export default handleActions({
     byNamespace: {
       ...state.byNamespace,
       ...reduce(action.payload.entities.plugins, (result, value, key) => {
-        result[`${action.payload.entities.users[value.owner].handle}/${value.name}`] = key
+        try {
+          result[`${action.payload.entities.users[value.owner].handle}/${value.name}`] = key
+        } catch (err) {
+          return state.byNamespace
+        }
         return result
       }, {})
     },

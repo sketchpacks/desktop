@@ -29,7 +29,8 @@ class SideBarMenu extends Component {
         <nav>
           <div className="app__sidebar-section">
             <div><strong className="app__sidebar-subheading">My Library</strong></div>
-            <div><Link to="/library/installed" className="app__sidebar-item" activeClassName="app__sidebar-item--active">Installed</Link></div>
+            <div><Link to="/library/managed" className="app__sidebar-item" activeClassName="app__sidebar-item--active">Managed</Link></div>
+            <div><Link to="/library/unmanaged" className="app__sidebar-item" activeClassName="app__sidebar-item--active">Unmanaged</Link></div>
             <div>
               <Link
                 to="/library/updates"

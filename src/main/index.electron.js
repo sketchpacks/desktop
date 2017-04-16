@@ -32,7 +32,8 @@ import * as schemas from 'schemas'
 import App from 'containers/App'
 
 import BrowsePlugins from 'views/BrowsePlugins'
-import InstalledPlugins from 'views/InstalledPlugins'
+import ManagedPlugins from 'views/ManagedPlugins'
+import UnmanagedPlugins from 'views/UnmanagedPlugins'
 import UpdatedPlugins from 'views/UpdatedPlugins'
 
 import PluginDetails from 'views/PluginDetails'
@@ -114,7 +115,8 @@ export const render = () => {
 
           <Route path="search" component={BrowsePlugins} />
 
-          <Route path="library/installed" component={InstalledPlugins} />
+          <Route path="library/managed" component={ManagedPlugins} />
+          <Route path="library/unmanaged" component={UnmanagedPlugins} />
           <Route path="library/updates" component={UpdatedPlugins} />
         </Route>
       </Router>

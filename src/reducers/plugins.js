@@ -1,5 +1,7 @@
 import { createAction, handleActions } from 'redux-actions'
 
+import { createSelector } from 'reselect'
+
 import {reduce} from 'lodash'
 
 
@@ -78,3 +80,5 @@ export default handleActions({
 export const getPluginEntities = state => state.plugins.byIdentifier
 
 export const getPluginsByPopularity = state => state.plugins.allIdentifiers
+
+export const getPluginByIdentifier = (state,identifier) => state.plugins.byIdentifier[identifier]

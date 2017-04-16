@@ -12,7 +12,8 @@ const rootReducer = combineReducers({
   library,
   app,
   users,
-  plugins
+  plugins,
+  sketchpack
 })
 
 export default rootReducer

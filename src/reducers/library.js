@@ -34,7 +34,7 @@ export default handleActions({
       ...state.byIdentifier,
       [action.payload.result]: pick(
         action.payload.entities.plugins[action.payload.result],
-        ['install_path', 'manifest_path']
+        ['install_path', 'manifest_path', 'version', 'compatible_version']
       )
     }
   })

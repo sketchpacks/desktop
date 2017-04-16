@@ -94,6 +94,10 @@ import {
   addEntities
 } from 'actions/index'
 
+import {
+  syncSketchpackContents
+} from 'reducers/sketchpack'
+
 let store = configureStore()
 const history = syncHistoryWithStore((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory, store)
 
@@ -147,8 +151,7 @@ const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat
 const loadSketchpack = () => {
   readSketchpack(path.join(remote.app.getPath('userData'), 'my-library.sketchpack'))
     .then(contents => {
-      log.debug('loadSketchpack',contents)
-      if (contents.length > 0) store.dispatch(syncChangeReceived(contents))
+      if (contents.length > 0) store.dispatch(syncSketchpackContents(contents))
     })
 }
 loadSketchpack()
@@ -241,9 +244,9 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
 
-ipcRenderer.on(SYNC_CHANGE_RECEIVED, (evt,contents) => {
-  log.debug(SYNC_CHANGE_RECEIVED,contents)
-  store.dispatch(syncChangeReceived(contents))
+ipcRenderer.on('sketchpack/SYNC_CONTENTS', (evt,contents) => {
+  log.debug('sketchpack/SYNC_CONTENTS',contents)
+  store.dispatch(syncSketchpackContents(contents))
 })
 
 ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {

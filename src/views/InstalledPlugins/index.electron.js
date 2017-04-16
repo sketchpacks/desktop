@@ -6,6 +6,8 @@ import {map,includes} from 'lodash'
 
 import {getInstalledPlugins} from 'selectors'
 
+import {setVersionRange} from 'reducers/sketchpack'
+
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'
 const EnhancedPluginList = ConnectedPluginList(PluginList)
@@ -15,7 +17,28 @@ class InstalledPluginsContainer extends Component {
     super(props)
 
     this.renderEmptyState = this.renderEmptyState.bind(this)
-    this.renderLoadingState = this.renderLoadingState.bind(this)
+
+    this.handlePluginEvent = this.handlePluginEvent.bind(this)
+  }
+
+  handlePluginEvent ({ type, plugin, author, isLocked }) {
+    const {dispatch} = this.props
+
+    switch (type) {
+      case "remove":
+        return dispatch(uninstallPluginRequest(plugin))
+      case "lock":
+        return dispatch(setVersionRange({
+          namespace: `${plugin.owner.handle}/${plugin.name}`,
+          identifier: plugin.identifier,
+          version: plugin.version,
+          compatible_version: plugin.compatible_version
+        }))
+      case "info":
+        return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}`)
+      case "author":
+        return remote.shell.openExternal(`${WEB_URL}/@${plugin.owner.handle}`)
+    }
   }
 
   renderEmptyState () {

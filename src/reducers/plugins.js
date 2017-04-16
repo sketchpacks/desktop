@@ -1,5 +1,7 @@
 import { createAction, handleActions } from 'redux-actions'
 
+import {reduce} from 'lodash'
+
 
 //- Actions
 
@@ -35,6 +37,10 @@ export default handleActions({
       ...state.byIdentifier,
       ...action.payload.entities.plugins
     },
+    byNamespace: reduce(action.payload.entities.plugins, (result, value, key) => {
+      result[`${action.payload.entities.users[value.owner].handle}/${value.name}`] = key
+      return result
+    }, {}),
     allIdentifiers: state.allIdentifiers.concat(action.payload.result)
   }),
 

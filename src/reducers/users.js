@@ -11,6 +11,7 @@ export const addUser = createAction('ADD_ENTITIES')
 
 const initialState = {
   byId: {},
+  byHandle: {},
   allIds: []
 }
 

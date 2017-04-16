@@ -16,6 +16,7 @@ export const catalogPaginate = createAction('catalog/PAGINATE')
 const initialState = {
   isLoading: false,
   byIdentifier: {},
+  byNamespace: {},
   allIdentifiers: [],
   meta: {
     prevPage: "1",

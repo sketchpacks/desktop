@@ -23,18 +23,6 @@ export const getPopularPlugins = createSelector(
   }
 )
 
-export const getInstalledPlugins = createSelector(
-  [ getLibraryEntities, getPluginEntities, getUserEntities ],
-  (library, plugins, users) => {
-    return Object.keys(library).map(id => {
-      return {
-        ...plugins[id],
-        owner: users[plugins[id].owner]
-      }
-    })
-  }
-)
-
 export const getManagedPlugins = createSelector(
   [ getSketchpack, getLibrary, getPluginEntities, getUserEntities ],
   (sketchpack, library, plugins, users) => {

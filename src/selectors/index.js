@@ -3,7 +3,7 @@ import { createSelector } from 'reselect'
 const {filter,reduce,find,reject,difference} = require('lodash')
 import {sanitizeSemVer} from '../lib/utils'
 
-import { getPluginEntities } from 'reducers/plugins'
+import { getPlugins, getPluginEntities } from 'reducers/plugins'
 import { getUserEntities } from 'reducers/users'
 import { getLibrary, getLibraryEntities } from 'reducers/library'
 import { getSketchpack } from 'reducers/sketchpack'
@@ -45,6 +45,24 @@ export const getUnmanagedPlugins = createSelector(
         owner: users[plugins[id].owner]
       }
     })
+  }
+)
+
+export const getUnlockedPlugins = createSelector(
+  [ getSketchpack, getLibrary, getPlugins, getUserEntities ],
+  (sketchpack, library, plugins, users) => {
+
+    let namespaces = filter(
+      sketchpack.allNamespaces,
+      (n) => sketchpack.pluginsByNamespace[n].version.indexOf('=') === -1
+    )
+
+    let managed = namespaces.map(namespace => {
+      let identifier = plugins.byNamespace[namespace]
+      return plugins.byIdentifier[identifier]
+    })
+
+    return managed
   }
 )
 

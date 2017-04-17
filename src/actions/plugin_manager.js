@@ -14,8 +14,6 @@ const {filter,find} = require('lodash')
 
 const {sanitizeSemVer} = require('../lib/utils')
 
-
-
 const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
 
 function toggleVersionLockRequest (plugin, isLocked) {
@@ -219,22 +217,6 @@ function updateAvailable (remote,local) {
   return semver.lt(localVersion,remoteVersion)
 }
 
-const AUTOUPDATE_PLUGINS_REQUEST = 'manager/AUTOUPDATE_PLUGINS'
-
-function autoUpdatePluginsRequest ({repeat}) {
-  return (dispatch, getState, {api}) => {
-    dispatch({ type: AUTOUPDATE_PLUGINS_REQUEST })
-
-    const plugins = getState().library.items
-    const unlockedPlugins = filter(plugins, (p) => p.version.indexOf('^') > -1)
-
-    unlockedPlugins.forEach(plugin => dispatch(updatePluginRequest(plugin)))
-
-    if (repeat) {
-      setTimeout(() => dispatch(autoUpdatePluginsRequest({repeat: true})), ms(PLUGIN_AUTOUPDATE_INTERVAL))
-    }
-  }
-}
 
 const IMPORT_FROM_SKETCHPACK_REQUEST = 'manager/IMPORT_FROM_SKETCHPACK_REQUEST'
 
@@ -320,8 +302,7 @@ module.exports = {
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_ERROR,
-
-  autoUpdatePluginsRequest,
+  
   webInstallPluginRequest,
   importSketchToolboxRequest,
   importSketchpackRequest,

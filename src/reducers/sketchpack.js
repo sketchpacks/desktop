@@ -1,5 +1,7 @@
 import { createAction, handleActions } from 'redux-actions'
 
+import {uniq} from 'lodash'
+
 import {sanitizeSemVer} from 'lib/utils'
 import semver from 'semver'
 
@@ -21,6 +23,7 @@ export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE')
 const initialState = {
   isLocked: false,
   pluginsByNamespace: {},
+  allNamespaces: [],
   allIdentifiers: []
 }
 
@@ -36,7 +39,10 @@ export default handleActions({
       pluginsByNamespace: {
         ...state.pluginsByNamespace,
         ...action.payload.plugins
-      }
+      },
+      allNamespaces: uniq(
+        state.allNamespaces.concat(Object.keys(action.payload.plugins))
+      )
     }
   },
 
@@ -79,7 +85,7 @@ export default handleActions({
             : `=${sanitizedVersion}`
         }
       },
-      allIdentifiers: state.allIdentifiers.concat(result)
+      allIdentifiers: uniq(state.allIdentifiers.concat(result))
     }
   }
 }, initialState)

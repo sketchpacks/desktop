@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions'
 
-import {reduce} from 'lodash'
+import {reduce,filter,uniq} from 'lodash'
 
 //- Actions
 
@@ -32,7 +32,11 @@ export default handleActions({
         return result
       }, {})
     },
-    allIds: state.allIds.concat(action.payload.result)
+    allIds: uniq(
+      state.allIds.concat(
+        Object.keys(action.payload.entities.users)
+      )
+    )
   })
 }, initialState)
 

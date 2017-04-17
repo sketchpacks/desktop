@@ -78,12 +78,15 @@ import {
   TOGGLE_VERSION_LOCK_REQUEST,
   TOGGLE_VERSION_LOCK_SUCCESS,
 
-  autoUpdatePluginsRequest,
   webInstallPluginRequest,
   importSketchToolboxRequest,
   importSketchpackRequest,
   exportLibraryRequest
 } from 'actions/plugin_manager'
+
+import {
+  autoUpdatePluginsRequest,
+} from 'actions/auto_updater'
 
 import {
   SYNC_FILE_RECEIVED,

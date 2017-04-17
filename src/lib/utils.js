@@ -74,6 +74,10 @@ const downloadAsset = (opts) => new Promise((resolve, reject) => {
   })
 
   req.on('response', (data) => {
+    if (data.statusCode !== 200) {
+      reject(Error('No update found'))
+    }
+
     total_bytes = parseInt(data.headers['content-length' ])
 
     try {
@@ -134,6 +138,7 @@ const extractAsset = (data) => new Promise((resolve, reject) => {
 })
 
 const removeAsset = (data) => new Promise((resolve, reject) => {
+  log.debug('removeAsset', data)
   const {install_path} = data.plugin
   log.debug('Removing asset: ', install_path)
 

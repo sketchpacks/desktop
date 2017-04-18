@@ -132,25 +132,6 @@ export const render = () => {
   ipcRenderer.send('APP_WINDOW_OPEN', null)
 }
 
-
-const migrateCatalog = (catalogPath, libraryContents) => {
-  const Datastore = require('nedb')
-  const db = new Datastore({ filename: catalogPath })
-  db.loadDatabase((err) => {
-    if (err) console.log(err)
-    db.find({ installed: true }, (err, docs) => {
-      store.dispatch(fetchLibraryReceived(Object.assign(libraryContents.concat(docs))))
-      store.dispatch({
-        type: 'MIGRATE_CATALOG',
-        payload: docs
-      })
-      fs.unlink(catalogPath)
-    })
-  })
-}
-
-
-
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true}))
 
 const loadSketchpack = () => {

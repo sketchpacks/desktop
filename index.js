@@ -31,7 +31,6 @@ const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
 const chokidar = require('chokidar')
-const readManifest = require('./src/lib/readManifest')
 
 const firstRun = require('first-run')
 const AutoLaunch = require('auto-launch')
@@ -39,10 +38,11 @@ const autolauncher = new AutoLaunch({
 	name: 'Sketchpacks'
 })
 
+const readManifest = require('./src/lib/readManifest')
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
 const readLibrary = require('./src/lib/readLibrary')
-const PluginManager = require('./src/main/plugin_manager')
+
 const {
   getInstallPath,
   extractAsset,
@@ -153,9 +153,8 @@ ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
 
 
 ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
-  log.debug(UPDATE_PLUGIN_REQUEST, arg)
-  const p = { owner: arg.owner.handle, name: arg.name }
-  queueUpdate([p])
+  // log.debug(UPDATE_PLUGIN_REQUEST, arg)
+  queueUpdate(arg)
 })
 
 ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {

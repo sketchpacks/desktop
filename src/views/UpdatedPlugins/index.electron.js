@@ -2,19 +2,39 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
-import {map,includes} from 'lodash'
-import { getUpdatedPlugins } from 'reducers/index'
+import {getUpdatedPlugins} from 'reducers/index'
+
+import {setVersionRange} from 'reducers/sketchpack'
 
 import PluginList from 'components/PluginList'
-import ConnectedPluginList from 'hoc/ConnectedPluginList'
-const EnhancedPluginList = ConnectedPluginList(PluginList)
 
 class UpdatedPluginsContainer extends Component {
   constructor (props) {
     super(props)
 
     this.renderEmptyState = this.renderEmptyState.bind(this)
-    this.renderLoadingState = this.renderLoadingState.bind(this)
+
+    this.handlePluginEvent = this.handlePluginEvent.bind(this)
+  }
+
+  handlePluginEvent ({ type, plugin, author, isLocked }) {
+    const {dispatch} = this.props
+
+    switch (type) {
+      case "remove":
+        return dispatch(uninstallPluginRequest(plugin))
+      case "lock":
+        return dispatch(setVersionRange({
+          namespace: `${plugin.owner.handle}/${plugin.name}`,
+          identifier: plugin.identifier,
+          version: plugin.version,
+          compatible_version: plugin.compatible_version
+        }))
+      case "info":
+        return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}`)
+      case "author":
+        return remote.shell.openExternal(`${WEB_URL}/@${plugin.owner.handle}`)
+    }
   }
 
   renderEmptyState () {
@@ -30,30 +50,19 @@ class UpdatedPluginsContainer extends Component {
     )
   }
 
-  renderLoadingState () {
-    return (
-      <div className="empty-state--expanded">
-        <h4>Loading</h4>
-      </div>
-    )
-  }
-
   render () {
-    const {plugins} = this.props
+    const {plugins,location,dispatch} = this.props
 
     return (
       <div style={{position: 'relative'}}>
-        { (plugins.isLoading)
-          && this.renderLoadingState() }
-
-        { (parseInt(plugins.items.length) === 0)
+        { (parseInt(plugins.length) === 0)
           && this.renderEmptyState() }
 
-        <EnhancedPluginList
+        <PluginList
+          handlePluginEvent={this.handlePluginEvent}
           plugins={plugins}
-          location={this.props.location}
-          installedPluginIds={this.props.library.ids}
-          dispatch={this.props.dispatch}
+          location={location}
+          dispatch={dispatch}
         />
       </div>
     )
@@ -69,7 +78,7 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   return {
     state,
-    plugins: {items: getUpdatedPlugins(state)},
+    plugins: { items: getUpdatedPlugins(state) },
     location: state.routing.locationBeforeTransitions,
   }
 }

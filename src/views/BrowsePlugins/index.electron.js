@@ -67,11 +67,9 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   const { search,library,location,sketchpack } = state
 
-  const plugins = { items: getPluginsList(state) }
-
   return {
     state,
-    plugins,
+    plugins: { items: getPluginsList(state) },
     search,
     library,
     location: state.routing.locationBeforeTransitions,

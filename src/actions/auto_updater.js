@@ -6,7 +6,7 @@ import {
 
 import {ipcRenderer} from 'electron'
 
-import {getUnlockedPlugins} from 'selectors'
+import {getUnlockedPlugins} from 'reducers'
 
 const AUTOUPDATE_PLUGINS_REQUEST = 'manager/AUTOUPDATE_PLUGINS'
 

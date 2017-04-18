@@ -23,13 +23,6 @@ class UnmanagedPluginsContainer extends Component {
     switch (type) {
       case "remove":
         return dispatch(uninstallPluginRequest(plugin))
-      case "lock":
-        return dispatch(setVersionRange({
-          namespace: `${plugin.owner.handle}/${plugin.name}`,
-          identifier: plugin.identifier,
-          version: plugin.version,
-          compatible_version: plugin.compatible_version
-        }))
       case "info":
         return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}`)
       case "author":
@@ -74,13 +67,9 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const plugins = {
-    items: getUnmanagedPlugins(state)
-  }
-
   return {
     state,
-    plugins,
+    plugins: { items: getUnmanagedPlugins(state) },
     location: state.routing.locationBeforeTransitions,
   }
 }

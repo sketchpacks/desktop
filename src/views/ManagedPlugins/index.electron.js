@@ -74,13 +74,9 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const plugins = {
-    items: getManagedPlugins(state)
-  }
-
   return {
     state,
-    plugins,
+    plugins: { items: getManagedPlugins(state) },
     location: state.routing.locationBeforeTransitions,
   }
 }

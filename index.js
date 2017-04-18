@@ -185,6 +185,7 @@ ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
 
 const getPluginData = (plugin) => axios.get(`${API_URL}/v1/users/${plugin.owner}/plugins/${plugin.name.toLowerCase()}`)
 const getPluginByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
+const getPluginUpdateByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.version}`)
 
 const installPluginTask = (plugin, callback) => {
   getPluginData(plugin)
@@ -205,16 +206,18 @@ const installPluginTask = (plugin, callback) => {
 }
 
 const updatePluginTask = (plugin, callback) => {
-  getPluginData(plugin)
-    .then(response => downloadAsset({
-      plugin: response.data,
-      destinationPath: app.getPath('temp')
-    }))
+  if (typeof plugin === undefined) return
+  log.debug('updatePluginTask', plugin.identifier)
+
+  downloadAsset({
+    plugin: Object.assign(plugin, {download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.version}`}),
+    destinationPath: app.getPath('temp')
+  })
     .then(removeAsset)
     .then(extractAsset)
     .then(result => callback(null, result.plugin))
     .catch(err => {
-      log.error('Error while updating: ', err)
+      log.error(err)
       callback(err)
     })
 }

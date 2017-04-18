@@ -1,10 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { browserHistory } from 'react-router'
 
 import {getUnmanagedPlugins} from 'reducers/index'
-
-import {setVersionRange} from 'reducers/sketchpack'
 
 import PluginList from 'components/PluginList'
 
@@ -13,7 +10,6 @@ class UnmanagedPluginsContainer extends Component {
     super(props)
 
     this.renderEmptyState = this.renderEmptyState.bind(this)
-
     this.handlePluginEvent = this.handlePluginEvent.bind(this)
   }
 

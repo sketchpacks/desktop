@@ -87,8 +87,3 @@ export default handleActions({
     }
   }
 }, initialState)
-
-
-//- Selectors
-
-export const getSketchpack = (state) => state.sketchpack

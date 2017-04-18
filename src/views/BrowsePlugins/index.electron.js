@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router'
 
 import {map,includes} from 'lodash'
 
-import {getPluginList,getPopularPlugins} from 'selectors'
+import {getPluginsList} from 'reducers'
 
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'
@@ -67,7 +67,7 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   const { search,library,location,sketchpack } = state
 
-  const plugins = { items: getPopularPlugins(state) }
+  const plugins = { items: getPluginsList(state) }
 
   return {
     state,

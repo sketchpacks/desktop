@@ -39,8 +39,3 @@ export default handleActions({
     )
   })
 }, initialState)
-
-
-//- Selectors
-
-export const getUserEntities = state => state.users.byId

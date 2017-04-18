@@ -3,53 +3,15 @@ import { createSelector } from 'reselect'
 const {filter,reduce,find,reject,difference} = require('lodash')
 import {sanitizeSemVer} from '../lib/utils'
 
-import { getPlugins, getPluginEntities } from 'reducers/plugins'
-import { getUserEntities } from 'reducers/users'
+import { getPlugins, getUsers } from 'reducers/index'
 import { getLibrary, getLibraryEntities } from 'reducers/library'
 import { getSketchpack } from 'reducers/sketchpack'
 
 const getPluginsByPopularity = state => state.plugins.allIdentifiers
 const getInstalledIdentifiers = state => state.plugins.installedIndentifiers
 
-export const getPopularPlugins = createSelector(
-  [ getPluginsByPopularity, getPluginEntities, getUserEntities ],
-  (identifiers,plugins,users) => {
-    return identifiers.map(id => {
-      return {
-        ...plugins[id],
-        owner: users[plugins[id].owner]
-      }
-    })
-  }
-)
-
-export const getManagedPlugins = createSelector(
-  [ getSketchpack, getLibrary, getPluginEntities, getUserEntities ],
-  (sketchpack, library, plugins, users) => {
-    return sketchpack.allIdentifiers.map(id => {
-      return {
-        ...plugins[id],
-        owner: users[plugins[id].owner]
-      }
-    })
-  }
-)
-
-export const getUnmanagedPlugins = createSelector(
-  [ getSketchpack, getLibrary, getPluginEntities, getUserEntities ],
-  (sketchpack, library, plugins, users) => {
-    const unmanagedIdentifiers = difference(library.allIdentifiers, sketchpack.allIdentifiers)
-    return unmanagedIdentifiers.map(id => {
-      return {
-        ...plugins[id],
-        owner: users[plugins[id].owner]
-      }
-    })
-  }
-)
-
 export const getUnlockedPlugins = createSelector(
-  [ getSketchpack, getLibrary, getPlugins, getUserEntities ],
+  [ getSketchpack, getLibrary, getPlugins, getUsers ],
   (sketchpack, library, plugins, users) => {
 
     let namespaces = filter(

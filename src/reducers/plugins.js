@@ -77,16 +77,3 @@ export default handleActions({
     }
   })
 }, initialState)
-
-
-//- Selectors
-
-export const getPlugins = state => state.plugins
-
-export const getPluginByNamespace = state => state.plugins.byNamespace
-
-export const getPluginEntities = state => state.plugins.byIdentifier
-
-export const getPluginsByPopularity = state => state.plugins.allIdentifiers
-
-export const getPluginByIdentifier = (state,identifier) => state.plugins.byIdentifier[identifier]

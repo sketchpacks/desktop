@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
 import {map,includes} from 'lodash'
-import { getUpdatedPlugins } from 'selectors'
+import { getUpdatedPlugins } from 'reducers/index'
 
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'

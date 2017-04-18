@@ -23,8 +23,7 @@ export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE')
 const initialState = {
   isLocked: false,
   pluginsByNamespace: {},
-  allNamespaces: [],
-  allIdentifiers: []
+  allNamespaces: []
 }
 
 
@@ -84,8 +83,7 @@ export default handleActions({
             ? `^${sanitizedVersion}`
             : `=${sanitizedVersion}`
         }
-      },
-      allIdentifiers: uniq(state.allIdentifiers.concat(result))
+      }
     }
   }
 }, initialState)

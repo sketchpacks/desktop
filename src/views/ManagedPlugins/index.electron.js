@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { browserHistory } from 'react-router'
 
-import {getManagedPlugins} from 'selectors'
+import {getManagedPlugins} from 'reducers/index'
 
 import {setVersionRange} from 'reducers/sketchpack'
 

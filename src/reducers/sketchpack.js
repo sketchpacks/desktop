@@ -22,8 +22,10 @@ export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE')
 
 const initialState = {
   isLocked: false,
-  pluginsByNamespace: {},
-  allNamespaces: []
+  plugins: {
+    allNamespaces: [],
+    byNamespace: {}
+  }
 }
 
 
@@ -35,30 +37,36 @@ export default handleActions({
       ...state,
       name: action.payload.name,
       isLocked: action.payload.locked,
-      pluginsByNamespace: {
-        ...state.pluginsByNamespace,
-        ...action.payload.plugins
-      },
-      allNamespaces: uniq(
-        state.allNamespaces.concat(Object.keys(action.payload.plugins))
-      )
+      plugins: {
+        ...state.plugins,
+        byNamespace: {
+          ...state.plugins.byNamespace,
+          ...action.payload.plugins
+        },
+        allNamespaces: uniq(
+          state.plugins.allNamespaces.concat(Object.keys(action.payload.plugins))
+        )
+      }
     }
   },
 
   [setVersionRange]: (state, action) => {
     const sanitizedVersion = sanitizeSemVer(action.payload.version)
 
-    let plugin = state.pluginsByNamespace[action.payload.namespace]
+    let plugin = state.plugins.byNamespace[action.payload.namespace]
 
     return {
       ...state,
-      pluginsByNamespace: {
-        ...state.pluginsByNamespace,
-        [action.payload.namespace]: {
-          ...plugin,
-          version: plugin.version.indexOf('=') > -1
+      plugins: {
+        ...state.plugins,
+        byNamespace: {
+          ...state.plugins.byNamespace,
+          [action.payload.namespace]: {
+            ...plugin,
+            version: plugin.version.indexOf('=') > -1
             ? `^${sanitizedVersion}`
             : `=${sanitizedVersion}`
+          }
         }
       }
     }
@@ -76,12 +84,15 @@ export default handleActions({
 
     return {
       ...state,
-      pluginsByNamespace: {
-        ...state.pluginsByNamespace,
-        [`${owner}/${plugin.name}`]: {
-          version: plugin.version.indexOf('=') > -1
-            ? `^${sanitizedVersion}`
-            : `=${sanitizedVersion}`
+      plugins: {
+        ...state.plugins,
+        byNamespace: {
+          ...state.plugins.byNamespace,
+          [`${owner}/${plugin.name}`]: {
+            version: plugin.version.indexOf('=') > -1
+              ? `^${sanitizedVersion}`
+              : `=${sanitizedVersion}`
+          }
         }
       }
     }

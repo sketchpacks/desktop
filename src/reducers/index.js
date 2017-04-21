@@ -47,7 +47,7 @@ export const getUserById = (state, id) => getUsers(state)[id]
 
 export const getSketchpack = (state) => state.sketchpack
 
-export const getSketchpackNamespaces = (state) => state.sketchpack.allNamespaces
+export const getSketchpackNamespaces = (state) => getSketchpack(state).plugins.allNamespaces
 
 export const getPluginsList = (state) => {
   try {
@@ -86,8 +86,8 @@ export const getUnmanagedPlugins = (state) => {
 
 export const getUnlockedPlugins = (state) => {
   const namespaces = filter(
-    Object.keys(state.sketchpack.pluginsByNamespace),
-    (ns) => state.sketchpack.pluginsByNamespace[ns].version.indexOf('=') === -1
+    Object.keys(state.sketchpack.plugins.byNamespace),
+    (ns) => state.sketchpack.plugins.byNamespace[ns].version.indexOf('=') === -1
   )
 
   const unlockedPlugins = namespaces.map(ns => getPluginByNamespace(state, ns))

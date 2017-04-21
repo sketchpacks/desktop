@@ -3,9 +3,12 @@ import { connect } from 'react-redux'
 
 import {getPluginsList} from 'reducers'
 
+import withSelector from 'hoc/withSelector'
+import withPluginDispatcher from 'hoc/withPluginDispatcher'
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'
-const EnhancedPluginList = ConnectedPluginList(PluginList)
+
+const EnhancedPluginList = ConnectedPluginList(withPluginDispatcher(withSelector(PluginList,getPluginsList)))
 
 class BrowsePluginsContainer extends Component {
   constructor (props) {
@@ -36,19 +39,10 @@ class BrowsePluginsContainer extends Component {
 
     return (
       <div style={{position: 'relative'}}>
-
-        { (plugins.isLoading)
-          && this.renderLoadingState() }
-
-        { (parseInt(plugins.length) === 0)
-          && this.renderEmptyState() }
-
         <EnhancedPluginList
           state={this.props.state}
-          plugins={plugins}
           location={this.props.location}
           dispatch={this.props.dispatch}
-          sketchpack={this.props.sketchpack}
         />
       </div>
     )
@@ -62,13 +56,11 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { search,library,location,sketchpack } = state
+  const { search,location } = state
 
   return {
     state,
-    plugins: { items: getPluginsList(state) },
     search,
-    library,
     location: state.routing.locationBeforeTransitions,
   }
 }

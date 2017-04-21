@@ -16,44 +16,12 @@ import {
   fetchCatalog
 } from 'actions'
 
-import {
-  installPluginRequest,
-  updatePluginRequest,
-  uninstallPluginRequest,
-  toggleVersionLockRequest,
-} from 'actions/plugin_manager'
-
 const ConnectedPluginList = ComposedComponent =>
   class extends React.Component {
     constructor (props) {
       super(props)
 
       this.fetchData = this.fetchData.bind(this)
-
-      this.handlePluginEvent = this.handlePluginEvent.bind(this)
-    }
-
-    handlePluginEvent ({ type, plugin, author, isLocked }) {
-      const {dispatch} = this.props
-
-      switch (type) {
-        case "install":
-          return dispatch(installPluginRequest(plugin))
-        case "remove":
-          return dispatch(uninstallPluginRequest(plugin))
-        case "update":
-          return dispatch(updatePluginRequest(plugin))
-        case "lock":
-          return dispatch(toggleVersionLockRequest(plugin, isLocked))
-        case "favorite":
-          return console.log(type, plugin)
-        case "collect":
-          return console.log(type, plugin)
-        case "info":
-          return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}`)
-        case "author":
-          return remote.shell.openExternal(`${WEB_URL}/@${plugin.owner.handle}`)
-      }
     }
 
     componentDidMount () {
@@ -66,7 +34,7 @@ const ConnectedPluginList = ComposedComponent =>
     }
 
     componentWillReceiveProps (nextProps) {
-      if (this.props.plugins.isLoading === true) return
+      // if (this.props.plugins.isLoading === true) return
 
       if (this.props.location.query.sort !== nextProps.location.query.sort) {
         this.fetchData({
@@ -81,7 +49,7 @@ const ConnectedPluginList = ComposedComponent =>
     fetchData ({ sort, page, append, q }) {
       const {dispatch,plugins} = this.props
 
-      if (this.props.state.plugins.isLoading === true) return
+      // if (this.props.state.plugins.isLoading === true) return
 
       const queryParams = qs.stringify({
         page: page,
@@ -98,18 +66,14 @@ const ConnectedPluginList = ComposedComponent =>
         <div>
           <ComposedComponent
             fetchData={this.fetchData}
-            handlePluginEvent={this.handlePluginEvent}
-
-            plugins={this.props.plugins}
             state={this.props.state}
             location={this.props.location}
             dispatch={this.props.dispatch}
-            sketchpack={this.props.sketchpack}
           />
 
           { (this.props.state.app.location !== '/library/installed'
               || this.props.state.app.location !== '/library/updates')
-            && !this.props.state.plugins.isLoading
+            // && !this.props.state.plugins.isLoading
             && this.props.state.plugins.allIdentifiers.length >= 9
             && <Waypoint
               onEnter={() => this.fetchData({ sort: this.props.plugins.sort })} /> }

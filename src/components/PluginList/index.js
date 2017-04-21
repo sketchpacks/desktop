@@ -2,8 +2,6 @@ import React, {Component} from 'react'
 
 import PluginMedia from 'components/PluginMedia'
 
-import {map,includes,findIndex} from 'lodash'
-
 import './styles.scss'
 
 class PluginList extends Component {
@@ -14,29 +12,29 @@ class PluginList extends Component {
   render () {
     const {
       plugins,
-      authorDetails,
       location,
       dispatch,
-      handlePluginEvent,
-      fetchData,
-      state
+      handlePluginEvent
     } = this.props
+
+    if (!plugins) {
+      return (
+        <div>
+          <h1>empty...</h1>
+        </div>
+      )
+    }
 
     return (
       <div className="o-plugin-list">
 
-        {plugins.items.map((plugin, idx) => {
-          // Set the owner property if not present
-
-          if (!('owner' in plugin)) plugin['owner'] = authorDetails
-
+        {plugins.map((plugin, idx) => {
           return <PluginMedia
             plugin={plugin}
-            isInstalled={isInstalled(installedPluginIds, plugin.id)}
+            isInstalled={ false }
             location={location}
             dispatch={dispatch}
             handlePluginEvent={handlePluginEvent}
-            fetchData={fetchData}
             key={`${idx}-${plugin.id}`} />
         })}
       </div>

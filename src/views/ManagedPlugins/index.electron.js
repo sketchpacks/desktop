@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import {setVersionRange} from 'reducers/sketchpack'
-
 import {getManagedPlugins} from 'reducers/index'
+import withPluginDispatcher from 'hoc/withPluginDispatcher'
 import withSelector from 'hoc/withSelector'
 import PluginList from 'components/PluginList'
-const ConnectedPluginList = withSelector(PluginList,getManagedPlugins)
+const ConnectedPluginList = withPluginDispatcher(withSelector(PluginList,getManagedPlugins))
 
 class ManagedPluginsContainer extends Component {
   constructor (props) {

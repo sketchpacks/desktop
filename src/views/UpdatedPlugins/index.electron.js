@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import {setVersionRange} from 'reducers/sketchpack'
-
 import {getUpdatedPlugins} from 'reducers/index'
+import withPluginDispatcher from 'hoc/withPluginDispatcher'
 import withSelector from 'hoc/withSelector'
 import PluginList from 'components/PluginList'
-const ConnectedPluginList = withSelector(PluginList,getUpdatedPlugins)
+const ConnectedPluginList = withPluginDispatcher(withSelector(PluginList,getUpdatedPlugins))
 
 class UpdatedPluginsContainer extends Component {
   constructor (props) {

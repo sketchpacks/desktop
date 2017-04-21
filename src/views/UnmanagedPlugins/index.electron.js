@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import {getUnmanagedPlugins} from 'reducers/index'
+import withPluginDispatcher from 'hoc/withPluginDispatcher'
 import withSelector from 'hoc/withSelector'
 import PluginList from 'components/PluginList'
-const ConnectedPluginList = withSelector(PluginList,getUnmanagedPlugins)
+const ConnectedPluginList = withPluginDispatcher(withSelector(PluginList,getUnmanagedPlugins))
 
 class UnmanagedPluginsContainer extends Component {
   constructor (props) {

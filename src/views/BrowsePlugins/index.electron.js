@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import {getPluginsList} from 'reducers'
+import {getPluginIdentifiers} from 'reducers'
 
 import withSelector from 'hoc/withSelector'
 import withPluginDispatcher from 'hoc/withPluginDispatcher'
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'
 
-const EnhancedPluginList = ConnectedPluginList(withPluginDispatcher(withSelector(PluginList,getPluginsList)))
+const EnhancedPluginList = ConnectedPluginList(withPluginDispatcher(withSelector(PluginList,getPluginIdentifiers)))
 
 class BrowsePluginsContainer extends Component {
   constructor (props) {

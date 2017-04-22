@@ -2,6 +2,8 @@ import React, {Component} from 'react'
 
 import PluginMedia from 'components/PluginMedia'
 
+import { getPluginByIdentifier,checkForPluginInstallation } from 'reducers'
+
 import './styles.scss'
 
 class PluginList extends Component {
@@ -14,10 +16,11 @@ class PluginList extends Component {
       plugins,
       location,
       dispatch,
-      handlePluginEvent
+      handlePluginEvent,
+      state
     } = this.props
 
-    if (!plugins) {
+    if (plugins.length === 0) {
       return (
         <div>
           <h1>empty...</h1>
@@ -28,14 +31,14 @@ class PluginList extends Component {
     return (
       <div className="o-plugin-list">
 
-        {plugins.map((plugin, idx) => {
+        {plugins.map((identifier, idx) => {
           return <PluginMedia
-            plugin={plugin}
-            isInstalled={ false }
+            key={`${idx}-${identifier}`}
+            plugin={getPluginByIdentifier(state,identifier)}
+            isInstalled={checkForPluginInstallation(state,identifier)}
             location={location}
             dispatch={dispatch}
-            handlePluginEvent={handlePluginEvent}
-            key={`${idx}-${plugin.id}`} />
+            handlePluginEvent={handlePluginEvent} />
         })}
       </div>
     )

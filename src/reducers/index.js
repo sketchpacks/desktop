@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
-import { difference,filter } from 'lodash'
+import { difference,filter,includes,intersection } from 'lodash'
+import { createSelector } from 'reselect'
 
 import app from 'reducers/app'
 import plugins from 'reducers/plugins'
@@ -23,6 +24,12 @@ export default rootReducer
 
 
 //- Selectors
+
+const getStateTree = (state) => state
+
+export const getLibrary = (state) => state.library
+
+export const getLibraryIdentifiers = (state) => state.library.allIdentifiers
 
 export const getPlugins = (state) => state.plugins.byIdentifier
 
@@ -47,64 +54,31 @@ export const getUserById = (state, id) => getUsers(state)[id]
 
 export const getSketchpack = (state) => state.sketchpack
 
-export const getSketchpackNamespaces = (state) => getSketchpack(state).plugins.allNamespaces
+export const getSketchpackIdentifiers = (state) => state.sketchpack.plugins.allIdentifiers
 
-export const getPluginsList = (state) => {
-  try {
-    return getPluginIdentifiers(state)
-      .map(identifier => getPluginByIdentifier(state, identifier))
-  } catch (err) {
-    console.log(err)
-    return []
-  }
+export const getPluginsList = (state) => getPluginIdentifiers(state)
+
+export const getManagedPlugins = createSelector(
+  [ getLibraryIdentifiers, getSketchpackIdentifiers ],
+  (lib, pack) => intersection(pack,lib)
+)
+
+export const getUnmanagedPlugins = createSelector(
+  [ getLibraryIdentifiers, getSketchpackIdentifiers ],
+  (lib, pack) => difference(lib,pack)
+)
+
+export const getUnlockedPlugins = (state) => filter(
+  state.sketchpack.plugins.allIdentifiers,
+  (ns) => state.sketchpack.plugins.byIdentifier[ns].version.indexOf('=') === -1
+)
+
+export const getUpdatedPlugins = (state) => getPluginsList(state)
+
+const pluginInstalled = (state,identifier) => {
+  return includes(state.library.allIdentifiers,identifier)
 }
 
-export const getManagedPlugins = (state) => {
-  try {
-    return getSketchpackNamespaces(state)
-      .map(ns => getPluginByNamespace(state, ns))
-  } catch (err) {
-    console.log(err)
-    return []
-  }
-}
-
-export const getUnmanagedPlugins = (state) => {
-  const sketchpackIdentifiers = getSketchpackNamespaces(state)
-    .map(ns => state.plugins.byNamespace[ns])
-
-  const libraryIdentifiers = state.library.allIdentifiers
-
-  try {
-    return difference(libraryIdentifiers, sketchpackIdentifiers)
-      .map(identifier => getPluginByIdentifier(state,identifier))
-  } catch (err) {
-    console.log(err)
-    return []
-  }
-}
-
-export const getUnlockedPlugins = (state) => {
-  const namespaces = filter(
-    Object.keys(state.sketchpack.plugins.byNamespace),
-    (ns) => state.sketchpack.plugins.byNamespace[ns].version.indexOf('=') === -1
-  )
-
-  const unlockedPlugins = namespaces.map(ns => getPluginByNamespace(state, ns))
-
-  try {
-    return unlockedPlugins
-  } catch (err) {
-    console.log(err)
-    return []
-  }
-}
-
-export const getUpdatedPlugins = (state) => {
-  try {
-    return getPluginsList(state)
-  } catch (err) {
-    console.log(err)
-    return []
-  }
-}
+export const checkForPluginInstallation = createSelector(
+  [ pluginInstalled ], (installed) => installed
+)

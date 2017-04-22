@@ -236,8 +236,8 @@ ipcRenderer.on('sketchpack/SYNC_CONTENTS', (evt,contents) => {
 })
 
 ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
+  if (!contents) return
   const normalizedPlugin = normalize(contents, schemas.pluginSchema)
-  console.log('PLUGIN_DETECTED',normalizedPlugin)
   store.dispatch(fetchLibraryReceived(normalizedPlugin))
   store.dispatch(addEntities(normalizedPlugin))
 })

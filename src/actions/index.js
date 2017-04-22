@@ -228,7 +228,7 @@ export const FETCH_LIBRARY_RECEIVED = 'library/FETCH_RECEIVED'
 export function fetchLibraryReceived (payload) {
   return {
     type: FETCH_LIBRARY_RECEIVED,
-    payload
+    payload: payload
   }
 }
 

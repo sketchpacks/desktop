@@ -23,8 +23,8 @@ export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE')
 const initialState = {
   isLocked: false,
   plugins: {
-    allNamespaces: [],
-    byNamespace: {}
+    allIdentifiers: [],
+    byIdentifier: {}
   }
 }
 
@@ -39,13 +39,10 @@ export default handleActions({
       isLocked: action.payload.locked,
       plugins: {
         ...state.plugins,
-        byNamespace: {
-          ...state.plugins.byNamespace,
+        byIdentifier: {
+          ...state.byIdentifier,
           ...action.payload.plugins
-        },
-        allNamespaces: uniq(
-          state.plugins.allNamespaces.concat(Object.keys(action.payload.plugins))
-        )
+        }
       }
     }
   },
@@ -53,15 +50,15 @@ export default handleActions({
   [setVersionRange]: (state, action) => {
     const sanitizedVersion = sanitizeSemVer(action.payload.version)
 
-    let plugin = state.plugins.byNamespace[action.payload.namespace]
+    let plugin = state.plugins.byIdentifier[action.payload.identifier]
 
     return {
       ...state,
       plugins: {
         ...state.plugins,
-        byNamespace: {
-          ...state.plugins.byNamespace,
-          [action.payload.namespace]: {
+        byIdentifier: {
+          ...state.plugins.byIdentifier,
+          [action.payload.identifier]: {
             ...plugin,
             version: plugin.version.indexOf('=') > -1
             ? `^${sanitizedVersion}`
@@ -80,20 +77,25 @@ export default handleActions({
     let plugin = entities.plugins[result]
     let owner = entities.users[plugin.owner].handle
 
+    let identifier = plugin.identifier
+
     const sanitizedVersion = sanitizeSemVer(plugin.version)
 
     return {
       ...state,
       plugins: {
         ...state.plugins,
-        byNamespace: {
-          ...state.plugins.byNamespace,
-          [`${owner}/${plugin.name}`]: {
+        byIdentifier: {
+          ...state.plugins.byIdentifier,
+          [identifier]: {
             version: plugin.version.indexOf('=') > -1
               ? `^${sanitizedVersion}`
               : `=${sanitizedVersion}`
           }
-        }
+        },
+        allIdentifiers: uniq(
+          state.plugins.allIdentifiers.concat(identifier)
+        )
       }
     }
   }

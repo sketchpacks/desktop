@@ -342,7 +342,8 @@ const triageTask = (task, callback) => {
   }
 }
 
-const workQueue = async.queue((task, callback) => triageTask(task, callback), 2)
+const WORK_QUEUE_CONCURRENCY = 1
+const workQueue = async.queue((task, callback) => triageTask(task, callback), WORK_QUEUE_CONCURRENCY)
 
 workQueue.drain = () => {
   log.debug('Work Complete')
@@ -401,7 +402,10 @@ const queueIdentify = (plugins) => {
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'identify', payload: plugin }, (err, result) => {
     if (err) return callback(err)
-    mainWindow.webContents.send('PLUGIN_DETECTED', result)
+
+    if (typeof result !== undefined) {
+      mainWindow.webContents.send('PLUGIN_DETECTED', result)
+    }
   }))
 }
 

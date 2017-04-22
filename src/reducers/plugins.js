@@ -18,7 +18,6 @@ export const catalogPaginate = createAction('catalog/PAGINATE')
 const initialState = {
   isLoading: false,
   byIdentifier: {},
-  byNamespace: {},
   allIdentifiers: [],
   meta: {
     prevPage: "1",
@@ -34,25 +33,17 @@ const initialState = {
 //- Reducers
 
 export default handleActions({
-  [addPlugin]: (state, action) => ({
-    ...state,
-    byIdentifier: {
-      ...state.byIdentifier,
-      ...action.payload.entities.plugins
-    },
-    byNamespace: {
-      ...state.byNamespace,
-      ...reduce(action.payload.entities.plugins, (result, value, key) => {
-        try {
-          result[`${action.payload.entities.users[value.owner].handle}/${value.name}`] = key
-        } catch (err) {
-          return state.byNamespace
-        }
-        return result
-      }, {})
-    },
-    allIdentifiers: state.allIdentifiers.concat(action.payload.result)
-  }),
+  [addPlugin]: (state, action) => {
+    console.log('addPlugin',action)
+    return {
+      ...state,
+      byIdentifier: {
+        ...state.byIdentifier,
+        ...action.payload.entities.plugins
+      },
+      allIdentifiers: state.allIdentifiers.concat(action.payload.result)
+    }
+  },
 
   [catalogRequest]: (state, action) => ({
     ...state,

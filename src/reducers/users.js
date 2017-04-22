@@ -6,7 +6,6 @@ import {reduce,filter,uniq} from 'lodash'
 
 export const addUser = createAction('ADD_ENTITIES')
 
-
 //- State
 
 const initialState = {

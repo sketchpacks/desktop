@@ -15,34 +15,7 @@ const {
   PLUGIN_PATHS
 } = require('../config')
 
-const sanitizeSemVer = (semver) => {
-  let semverStr
 
-  try {
-    semverStr = semver.toString()
-  } catch (err) {
-    semverStr = "0.0.0"
-  }
-
-	if (typeof semverStr === undefined) return "0.0.0"
-	if (typeof semverStr === 'integer') return "0.0.0"
-	if (semverStr === 0) return "0.0.0"
-  if (semverStr === "0") return "0.0.0"
-
-  const sanitize = (point) => parseInt(point.toString().replace(/[^0-9]/g, '')) || 0
-
-  const x = semverStr.split('.')
-
-  const major = x[0] || 0
-  const minor = x[1] || 0
-  const patch = x[2] || 0
-
-  return [
-			sanitize(major),
-			sanitize(minor),
-			sanitize(patch)
-		].join('.')
-}
 
 const getInstallPath = () => {
   const installPath = find(PLUGIN_PATHS, (installPath) => {
@@ -155,6 +128,44 @@ const removeAsset = (data) => new Promise((resolve, reject) => {
   })
 })
 
+const sanitizeSemVer = (semver) => {
+  let semverStr
+
+  try {
+    semverStr = semver.toString()
+  } catch (err) {
+    semverStr = "0.0.0"
+  }
+
+	if (typeof semverStr === undefined) return "0.0.0"
+	if (typeof semverStr === 'integer') return "0.0.0"
+	if (semverStr === 0) return "0.0.0"
+  if (semverStr === "0") return "0.0.0"
+
+  const sanitize = (point) => parseInt(point.toString().replace(/[^0-9]/g, '')) || 0
+
+  const x = semverStr.split('.')
+
+  const major = x[0] || 0
+  const minor = x[1] || 0
+  const patch = x[2] || 0
+
+  return [
+			sanitize(major),
+			sanitize(minor),
+			sanitize(patch)
+		].join('.')
+}
+
+const lockSemver = (semver) => `=${sanitizeSemVer(semver)}`
+
+const unlockSemver = (semver) => `^${sanitizeSemVer(semver)}`
+
+const isSemverLocked = (semver) => semver.indexOf('=') > -1
+
+const toggleSemverLock = (range) => isSemverLocked(range)
+  ? lockSemver(range)
+  : unlockSemver(range)
 
 const hasSemanticRange = (plugin) => {
   return /(\^|\~)/.test(plugin.version)
@@ -166,5 +177,9 @@ module.exports = {
   extractAsset,
   downloadAsset,
   removeAsset,
-  hasSemanticRange
+  hasSemanticRange,
+  lockSemver,
+  unlockSemver,
+  isSemverLocked,
+  toggleSemverLock,
 }

@@ -2,11 +2,16 @@ const {remote} = require('electron')
 const path = require('path')
 const {includes,values,reduce} = require('lodash')
 const jsonfile = require('jsonfile')
+const semver = require('semver')
 
 const writeSketchpack = require('lib/writeSketchpack')
-const {getReducedLibrary} = require('selectors')
 
 const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')
+
+const {
+  getSketchpackIdentifiers,
+  syncSketchpackContents
+} = require('reducers')
 
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,
@@ -20,28 +25,30 @@ const WATCHED_ACTIONS = {
   INSTALL_PLUGIN_SUCCESS,
   UPDATE_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_SUCCESS,
+  SKETCHPACK_SYNC_CONTENTS: 'sketchpack/SYNC_CONTENTS'
 }
 
-const {fetchLibraryReceived} = require('../actions/index')
-
 const sketchpackMiddleware = store => next => action => {
-  const prevState = store.getState().sketchpack.items
+  const prevState = store.getState().sketchpack.plugins.byIdentifier
   next(action)
-  const nextState = store.getState().sketchpack.items
+  const nextState = store.getState().sketchpack.plugins.byIdentifier
 
-  const createNamespace = (contents) => reduce(nextState, ((result, value, key) => {
-    result[`${value.owner}/${value.name}`] = value
-    return result
-  }), {})
+  const identifiers = getSketchpackIdentifiers(store.getState())
 
-  // If no sketchpack present, generate one from the library contents
-  const contents = nextState.length > 0
-    ? createNamespace(nextState)
-    : getReducedLibrary(store.getState())
+  if (identifiers.length > 0) {
+    const sketchpack = reduce(identifiers, (plugins, identifier) => {
+      plugins[identifier] = {
+        ...store.getState().sketchpack.plugins.byIdentifier[identifier]
+      }
+      return plugins
+    }, {})
 
-  if (includes(values(WATCHED_ACTIONS),action.type)) {
-    writeSketchpack(sketchpackPath,contents || {})
+    writeSketchpack(
+      sketchpackPath,
+      sketchpack
+    )
   }
+
 }
 
 export default sketchpackMiddleware

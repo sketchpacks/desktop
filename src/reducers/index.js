@@ -29,7 +29,7 @@ const getStateTree = (state) => state
 
 export const getLibrary = (state) => state.library
 
-export const getLibraryIdentifiers = (state) => state.library.allIdentifiers
+export const getLibraryIdentifiers = (state) => state.library.plugins.allIdentifiers
 
 export const getPlugins = (state) => state.plugins.byIdentifier
 

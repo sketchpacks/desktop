@@ -2,7 +2,7 @@ import { createAction, handleActions } from 'redux-actions'
 
 import {uniq} from 'lodash'
 
-import {sanitizeSemVer} from 'lib/utils'
+import {sanitizeSemVer,isSemverLocked} from 'lib/utils'
 import semver from 'semver'
 
 import { normalize } from 'normalizr'
@@ -33,6 +33,7 @@ const initialState = {
 
 export default handleActions({
   [syncSketchpackContents]: (state, action) => {
+    console.log(syncSketchpackContents,action)
     return {
       ...state,
       name: action.payload.name,
@@ -60,9 +61,7 @@ export default handleActions({
           ...state.plugins.byIdentifier,
           [action.payload.identifier]: {
             ...plugin,
-            version: plugin.version.indexOf('=') > -1
-            ? `^${sanitizedVersion}`
-            : `=${sanitizedVersion}`
+            version: toggleSemverLock(plugin.version)
           }
         }
       }
@@ -79,8 +78,6 @@ export default handleActions({
 
     let identifier = plugin.identifier
 
-    const sanitizedVersion = sanitizeSemVer(plugin.version)
-
     return {
       ...state,
       plugins: {
@@ -88,9 +85,7 @@ export default handleActions({
         byIdentifier: {
           ...state.plugins.byIdentifier,
           [identifier]: {
-            version: plugin.version.indexOf('=') > -1
-              ? `^${sanitizedVersion}`
-              : `=${sanitizedVersion}`
+            version: sanitizeSemVer(plugin.version)
           }
         },
         allIdentifiers: uniq(

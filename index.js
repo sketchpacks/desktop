@@ -60,10 +60,7 @@ const {
   UPDATE_PLUGIN_ERROR,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
-  UNINSTALL_PLUGIN_ERROR,
-  TOGGLE_VERSION_LOCK_REQUEST,
-  TOGGLE_VERSION_LOCK_SUCCESS,
-  TOGGLE_VERSION_LOCK_ERROR
+  UNINSTALL_PLUGIN_ERROR
 } = require('./src/actions/plugin_manager')
 
 const {
@@ -163,11 +160,6 @@ ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
 })
 
 
-ipcMain.on(TOGGLE_VERSION_LOCK_REQUEST, (event, args) => {
-  mainWindow.webContents.send(TOGGLE_VERSION_LOCK_REQUEST, args)
-})
-
-
 ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
   if (externalPluginInstallQueue.length > 0) {
     forEach(externalPluginInstallQueue, (pluginId) => {
@@ -245,8 +237,7 @@ const identifyPluginTask = (manifestPath, callback) => {
         owner: {
           handle: manifestContents.name || manifestContents.author || manifestContents.authorName
         },
-        version: sanitizeSemVer(manifestContents.version || 0),
-        compatible_version: sanitizeSemVer(manifestContents.compatibleVersion || 0),
+        version: sanitizeSemVer(manifestContents.version || "0.0.0"),
         install_path,
         manifest_path
       }
@@ -270,60 +261,6 @@ const identifyPluginTask = (manifestPath, callback) => {
     })
 }
 
-function denormalizePlugins (plugins) {
-	return new Promise ((resolve, reject) => {
-  	try {
-      let denormalized = plugins.map(plugin => {
-      	return {
-        	name: plugin.name,
-          owner: plugin.owner.handle,
-          version: plugin.version,
-          compatible_version: plugin.compatible_version
-        }
-      })
-      log.debug('denormalizePlugins',denormalized)
-      resolve(denormalized)
-    } catch (err) {
-    	reject(err)
-    }
-  })
-}
-
-function mapSketchpack (plugins) {
-	return new Promise ((resolve, reject) => {
-  	try {
-      resolve(plugins)
-    } catch (err) {
-    	reject(err)
-    }
-  })
-}
-
-function getPluginNamespace (plugins) {
-	return new Promise((resolve, reject) => {
-  	try {
-    	const namespaces = plugins.map(plugin => `${plugin.owner}/${plugin.name}`)
-      log.debug('getPluginNamespace',namespaces)
-      resolve(namespaces)
-    } catch (err) {
-    	reject(err)
-    }
-  })
-}
-
-const syncTask = (sketchpack, callback) => {
-  readLibrary(path.join(app.getPath('userData'),'library.json'))
-    .then(library => {
-      const denormalizedLibrary = denormalizePlugins(library)
-      	.then(getPluginNamespace)
-
-      const mappedSketchpack = mapSketchpack(sketchpack)
-      	.then(getPluginNamespace)
-
-      Promise.all([mappedSketchpack,denormalizedLibrary])
-        .then(results => callback(null, results))
-    })
-}
 
 const triageTask = (task, callback) => {
   const { action,payload } = task
@@ -335,8 +272,6 @@ const triageTask = (task, callback) => {
       return updatePluginTask(payload,callback)
     case 'remove':
       return uninstallPluginTask(payload,callback)
-    case 'sync':
-      return syncTask(payload,callback)
     case 'identify':
       return identifyPluginTask(payload,callback)
   }

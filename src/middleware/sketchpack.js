@@ -1,6 +1,6 @@
 const {remote} = require('electron')
 const path = require('path')
-const {includes,values,reduce} = require('lodash')
+const {includes,values,reduce,isEqual} = require('lodash')
 const jsonfile = require('jsonfile')
 const semver = require('semver')
 
@@ -32,6 +32,8 @@ const sketchpackMiddleware = store => next => action => {
   const prevState = store.getState().sketchpack.plugins.byIdentifier
   next(action)
   const nextState = store.getState().sketchpack.plugins.byIdentifier
+
+  if (isEqual(prevState,nextState)) return
 
   const identifiers = getSketchpackIdentifiers(store.getState())
 

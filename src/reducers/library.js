@@ -6,6 +6,7 @@ import { pick } from 'lodash'
 
 export const installPlugin = createAction('manager/INSTALL_SUCCESS')
 export const detectPlugin = createAction('library/FETCH_RECEIVED')
+export const identifyPlugin = createAction('library/IDENTIFY_PLUGIN_SUCCESS')
 
 
 //- State

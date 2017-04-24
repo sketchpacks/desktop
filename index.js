@@ -447,11 +447,6 @@ const pluginWatcher = (watchPath) => {
     .on('ready', onWatcherReady)
 }
 
-
-setTimeout(() => {
-  pluginWatcher('**/(*.sketchplugin|manifest.json)')
-}, 2000)
-
 const sketchpackWatcher = (watchPath) => {
   log.debug('Syncing with ', watchPath)
   watcher = chokidar.watch(watchPath, {
@@ -495,6 +490,10 @@ setTimeout(() => {
   const librarySketchpackPath = path.join(app.getPath('userData'),'my-library.sketchpack')
   sketchpackWatcher(librarySketchpackPath)
 }, 1000)
+
+setTimeout(() => {
+  pluginWatcher('**/(*.sketchplugin|manifest.json)')
+}, 2000)
 
 app.on('before-quit', () => {
   log.info('Watcher stopped')

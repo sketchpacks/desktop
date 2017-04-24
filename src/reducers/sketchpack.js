@@ -1,14 +1,14 @@
 import { createAction, handleActions } from 'redux-actions'
 
-import {uniq} from 'lodash'
+import {uniq,includes,isObject,has} from 'lodash'
 
-import {sanitizeSemVer,isSemverLocked} from 'lib/utils'
+import {sanitizeSemVer,isSemverLocked,unlockSemver} from 'lib/utils'
 import semver from 'semver'
 
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 
-import {detectPlugin} from 'reducers/library'
+import {detectPlugin,identifyPlugin} from 'reducers/library'
 
 
 //- Actions
@@ -33,7 +33,6 @@ const initialState = {
 
 export default handleActions({
   [syncSketchpackContents]: (state, action) => {
-    console.log(syncSketchpackContents,action)
     return {
       ...state,
       name: action.payload.name,
@@ -68,7 +67,7 @@ export default handleActions({
     }
   },
 
-  [detectPlugin]: (state, action) => {
+  [identifyPlugin]: (state, action) => {
     let { entities, result } = action.payload
 
     if (entities.plugins[result].owner === undefined) return state
@@ -78,6 +77,12 @@ export default handleActions({
 
     let identifier = plugin.identifier
 
+    if (has(state.plugins.byIdentifier,identifier)) {
+      return {
+        ...state
+      }
+    }
+
     return {
       ...state,
       plugins: {
@@ -85,7 +90,7 @@ export default handleActions({
         byIdentifier: {
           ...state.plugins.byIdentifier,
           [identifier]: {
-            version: sanitizeSemVer(plugin.version)
+            version: unlockSemver(plugin.version)
           }
         },
         allIdentifiers: uniq(

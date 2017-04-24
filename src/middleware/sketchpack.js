@@ -38,10 +38,10 @@ const sketchpackMiddleware = store => next => action => {
   if (identifiers.length > 0) {
     const sketchpack = reduce(identifiers, (plugins, identifier) => {
       plugins[identifier] = {
-        ...store.getState().sketchpack.plugins.byIdentifier[identifier]
+        ...nextState[identifier]
       }
       return plugins
-    }, {})
+    }, nextState)
 
     writeSketchpack(
       sketchpackPath,

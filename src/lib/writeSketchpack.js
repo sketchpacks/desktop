@@ -6,7 +6,7 @@ const {sanitizeSemVer} = require('./utils')
 const writeSketchpack = (filepath, contents) => {
   const data = {
     name: "My Library",
-    schema_version: '0.1.0',
+    schema_version: '1.0.0',
     locked: false,
     plugins: contents
   }

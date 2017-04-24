@@ -1,7 +1,4 @@
-const {reduce} = require('lodash')
-const semver = require('semver')
 const jsonfile = require('jsonfile')
-const {sanitizeSemVer} = require('./utils')
 
 const writeSketchpack = (filepath, contents) => {
   const data = {

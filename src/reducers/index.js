@@ -43,11 +43,6 @@ export const getPluginByIdentifier = (state, identifier) => {
   }
 }
 
-export const getPluginByNamespace = (state, namespace) => {
-  const identifier = state.plugins.byNamespace[namespace]
-  return getPluginByIdentifier(state, identifier)
-}
-
 export const getUsers = (state) => state.users.byId
 
 export const getUserById = (state, id) => getUsers(state)[id]

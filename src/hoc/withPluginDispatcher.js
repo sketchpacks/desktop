@@ -12,9 +12,12 @@ import { connect } from 'react-redux'
 import {
   installPluginRequest,
   updatePluginRequest,
-  uninstallPluginRequest,
   toggleVersionLockRequest,
 } from 'actions/plugin_manager'
+
+import {
+  removePlugin
+} from 'reducers/library'
 
 import {
   setVersionRange
@@ -35,11 +38,13 @@ const withPluginDispatcher = (WrappedComponent) => {
     handlePluginEvent ({ type, plugin, author, isLocked }) {
       const {dispatch} = this.props
 
+      console.log('handlePluginEvent',type)
+
       switch (type) {
         case "install":
           return dispatch(installPluginRequest(plugin))
         case "remove":
-          return dispatch(uninstallPluginRequest(plugin))
+          return dispatch(removePlugin(plugin))
         case "update":
           return dispatch(updatePluginRequest(plugin))
         case "lock":

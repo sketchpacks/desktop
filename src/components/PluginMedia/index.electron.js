@@ -124,13 +124,13 @@ class PluginMedia extends Component {
     try {
       newState['isInstalled'] = nextPlugin.installed_version
     } catch (err) {
-      console.log(err)
+      newState['isInstalled'] = false
     }
 
     try {
       newState['isLocked'] = isSemverLocked(nextPlugin.version_range)
     } catch (err) {
-      console.log(err)
+      newState['isLocked'] = false
     }
 
     this.setState({ ...newState })
@@ -138,17 +138,18 @@ class PluginMedia extends Component {
 
   componentDidMount () {
     const newState = { ...this.state }
+    const {installed_version,version_range} = this.props.plugin
 
     try {
-      newState['isInstalled'] = this.props.plugin.installed_version
+      newState['isInstalled'] = installed_version
     } catch (err) {
-      console.log(err)
+      newState['isInstalled'] = false
     }
 
     try {
-      newState['isLocked'] = isSemverLocked(this.props.plugin.version_range)
+      newState['isLocked'] = isSemverLocked(version_range)
     } catch (err) {
-      console.log(err)
+      newState['isLocked'] = false
     }
 
     this.setState({ ...newState })

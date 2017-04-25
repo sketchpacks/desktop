@@ -1,7 +1,7 @@
 const fs = require('fs')
 const Promise = require('promise')
 const request = require('request')
-const {find,replace} = require('lodash')
+const {find,replace,difference} = require('lodash')
 const path = require('path')
 const IsThere = require("is-there")
 
@@ -111,11 +111,20 @@ const extractAsset = (data) => new Promise((resolve, reject) => {
 })
 
 const removeAsset = (data) => new Promise((resolve, reject) => {
-  log.debug('removeAsset', data)
   const {install_path} = data.plugin
-  log.debug('Removing asset: ', install_path)
 
-  exec(`rm -rf ${install_path.replace(/ /g, '\\ ')}`, (error, stdout, stderr) => {
+  const install_dir_path = getInstallPath()
+
+  const assetDirectoryPath = difference(
+    install_path.replace(/ /g, '\\ ').split('/'),
+    install_dir_path.split('/')
+  )[0]
+
+  const cleanAssetPath = [install_dir_path,assetDirectoryPath].join('/')
+
+  log.debug('Removing asset: ', cleanAssetPath)
+
+  exec(`rm -rf ${cleanAssetPath}`, (error, stdout, stderr) => {
     if (error) {
       log.error(`exec error: ${error}`)
       reject(data)

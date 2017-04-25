@@ -2,7 +2,12 @@ import React, {Component} from 'react'
 
 import PluginMedia from 'components/PluginMedia'
 
-import { getPluginByIdentifier,checkForPluginInstallation } from 'reducers'
+import {
+  getPluginByIdentifier,
+  checkForPluginInstallation,
+  checkPluginLockState,
+  selectPlugin
+} from 'reducers'
 
 import './styles.scss'
 
@@ -34,8 +39,7 @@ class PluginList extends Component {
         {plugins.map((identifier, idx) => {
           return <PluginMedia
             key={`${idx}-${identifier}`}
-            plugin={getPluginByIdentifier(state,identifier)}
-            isInstalled={checkForPluginInstallation(state,identifier)}
+            plugin={selectPlugin(state,identifier)}
             location={location}
             dispatch={dispatch}
             handlePluginEvent={handlePluginEvent} />

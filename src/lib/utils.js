@@ -164,12 +164,10 @@ const unlockSemver = (semver) => `^${sanitizeSemVer(semver)}`
 const isSemverLocked = (semver) => semver.indexOf('=') > -1
 
 const toggleSemverLock = (range) => isSemverLocked(range)
-  ? lockSemver(range)
-  : unlockSemver(range)
+  ? unlockSemver(range)
+  : lockSemver(range)
 
-const hasSemanticRange = (plugin) => {
-  return /(\^|\~)/.test(plugin.version)
-}
+const hasSemanticRange = (semver) => /(\^|\~)/.test(semver)
 
 module.exports = {
 	sanitizeSemVer,

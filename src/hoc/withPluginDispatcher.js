@@ -16,6 +16,14 @@ import {
   toggleVersionLockRequest,
 } from 'actions/plugin_manager'
 
+import {
+  setVersionRange
+} from 'reducers/sketchpack'
+
+import {
+  toggleSemverLock
+} from 'lib/utils'
+
 const withPluginDispatcher = (WrappedComponent) => {
   class ConnectedComponent extends Component {
     constructor (props) {
@@ -36,10 +44,7 @@ const withPluginDispatcher = (WrappedComponent) => {
           return dispatch(updatePluginRequest(plugin))
         case "lock":
           return dispatch(setVersionRange({
-            namespace: `${plugin.owner.handle}/${plugin.name}`,
-            identifier: plugin.identifier,
-            version: plugin.version,
-            compatible_version: plugin.compatible_version
+            identifier: plugin.identifier
           }))
         case "info":
           return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}`)

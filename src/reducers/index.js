@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 import { difference,filter,includes,intersection } from 'lodash'
 import { createSelector } from 'reselect'
+import { isSemverLocked } from 'lib/utils'
 
 import app from 'reducers/app'
 import plugins from 'reducers/plugins'
@@ -76,4 +77,41 @@ const pluginInstalled = (state,identifier) => {
 
 export const checkForPluginInstallation = createSelector(
   [ pluginInstalled ], (installed) => installed
+)
+
+const getSketchpackPluginByIdentifier = (state,identifier) => {
+  return state.sketchpack.plugins.byIdentifier[identifier]
+}
+
+const getLibraryPluginByIdentifier = (state,identifier) => {
+  return state.library.plugins.byIdentifier[identifier]
+}
+
+export const selectPlugin = createSelector(
+  [ getPluginByIdentifier, getLibraryPluginByIdentifier, getSketchpackPluginByIdentifier ],
+  (entity, lib, pack) => {
+    const data = entity
+
+    if (lib) {
+      data['installed_version'] = lib.version
+    }
+
+    if (pack) {
+      data['version_range'] = pack.version
+    }
+    return data
+  }
+)
+
+export const checkPluginLockState = createSelector(
+  [ getSketchpack ],
+  (pack) => {
+    try {
+      const plugin = pack.plugins.byIdentifier[identifier]
+      console.log('checkPluginLockState',plugin)
+      return isSemverLocked(plugin.version)
+    } catch (err) {
+      return false
+    }
+  }
 )

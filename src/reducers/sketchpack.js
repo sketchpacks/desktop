@@ -2,13 +2,20 @@ import { createAction, handleActions } from 'redux-actions'
 
 import {uniq,includes,isObject,has} from 'lodash'
 
-import {sanitizeSemVer,isSemverLocked,unlockSemver} from 'lib/utils'
+import {
+  sanitizeSemVer,
+  isSemverLocked,
+  unlockSemver,
+  toggleSemverLock
+} from 'lib/utils'
+
 import semver from 'semver'
 
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 
 import {detectPlugin,identifyPlugin} from 'reducers/library'
+
 
 
 //- Actions
@@ -42,23 +49,26 @@ export default handleActions({
         byIdentifier: {
           ...state.byIdentifier,
           ...action.payload.plugins
-        }
+        },
+        allIdentifiers: uniq(
+          state.plugins.allIdentifiers.concat(
+            Object.keys(action.payload.plugins)
+          )
+        )
       }
     }
   },
 
   [setVersionRange]: (state, action) => {
-    const sanitizedVersion = sanitizeSemVer(action.payload.version)
-
-    let plugin = state.plugins.byIdentifier[action.payload.identifier]
-
+    const {identifier,version} = action.payload
+    const plugin = state.plugins.byIdentifier[identifier]
     return {
       ...state,
       plugins: {
         ...state.plugins,
         byIdentifier: {
           ...state.plugins.byIdentifier,
-          [action.payload.identifier]: {
+          [identifier]: {
             ...plugin,
             version: toggleSemverLock(plugin.version)
           }

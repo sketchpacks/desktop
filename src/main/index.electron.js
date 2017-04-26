@@ -222,8 +222,6 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
     silent: true,
     icon: path.join(__dirname, 'src/static/images/icon.png'),
   })
-
-  // store.dispatch(uninstallPluginSuccess(plugin))
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {

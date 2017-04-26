@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions'
 
-import {uniq,includes,isObject,has} from 'lodash'
+import {uniq,includes,isObject,has,pickBy,filter} from 'lodash'
 
 import {
   sanitizeSemVer,
@@ -14,7 +14,11 @@ import semver from 'semver'
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 
-import {detectPlugin,identifyPlugin} from 'reducers/library'
+import {
+  detectPlugin,
+  identifyPlugin,
+  removePlugin
+} from 'reducers/library'
 
 
 
@@ -108,5 +112,21 @@ export default handleActions({
         )
       }
     }
-  }
+  },
+
+  [removePlugin]: (state,action) => ({
+    ...state,
+    plugins: {
+      ...state.plugins,
+      byIdentifier: {
+        ...pickBy(
+          state.plugins.byIdentifier,
+          (value,key) => key !== action.payload.identifier
+        )
+      },
+      allIdentifiers: filter(
+        state.plugins.allIdentifiers, p => p !== action.payload.identifier
+      )
+    }
+  })
 }, initialState)

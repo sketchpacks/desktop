@@ -1,16 +1,13 @@
 import { ipcRenderer } from 'electron'
 
 import { createAction, handleActions } from 'redux-actions'
-import { pick } from 'lodash'
-
+import { pick,pickBy,filter } from 'lodash'
 
 //- Actions
 
 export const installPlugin = createAction('manager/INSTALL_SUCCESS')
 export const detectPlugin = createAction('library/FETCH_RECEIVED')
 export const identifyPlugin = createAction('library/IDENTIFY_PLUGIN_SUCCESS')
-
-export const removePluginRequest = createAction('library/UNINSTALL_REQUEST')
 
 export const removePlugin = createAction('library/UNINSTALL_PLUGIN', plugin => {
   ipcRenderer.send('manager/UNINSTALL_REQUEST', plugin)
@@ -56,6 +53,22 @@ export default handleActions({
         )
       },
       allIdentifiers: state.plugins.allIdentifiers.concat(action.payload.result)
+    }
+  }),
+
+  [removePlugin]: (state,action) => ({
+    ...state,
+    plugins: {
+      ...state.plugins,
+      byIdentifier: {
+        ...pickBy(
+          state.plugins.byIdentifier,
+          (value,key) => key !== action.payload.identifier
+        )
+      },
+      allIdentifiers: filter(
+        state.plugins.allIdentifiers, p => p !== action.payload.identifier
+      )
     }
   })
 }, initialState)

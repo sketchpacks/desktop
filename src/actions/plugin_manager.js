@@ -10,7 +10,7 @@ const log = require('electron-log')
 const ms = require('ms')
 const axios = require('axios')
 const semver = require('semver')
-const {filter,find} = require('lodash')
+const {find} = require('lodash')
 
 const {sanitizeSemVer} = require('../lib/utils')
 
@@ -302,7 +302,7 @@ module.exports = {
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_ERROR,
-  
+
   webInstallPluginRequest,
   importSketchToolboxRequest,
   importSketchpackRequest,

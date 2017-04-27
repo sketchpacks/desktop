@@ -99,7 +99,8 @@ import {
 } from 'actions/index'
 
 import {
-  identifyPlugin
+  identifyPlugin,
+  detectPlugin
 } from 'reducers/library'
 
 import {
@@ -240,9 +241,9 @@ ipcRenderer.on('sketchpack/SYNC_CONTENTS', (evt,contents) => {
 ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
   if (!contents) return
   const normalizedPlugin = normalize(contents, schemas.pluginSchema)
-  store.dispatch(fetchLibraryReceived(normalizedPlugin))
+  log.debug('PLUGIN_DETECTED normalizedPlugin', normalizedPlugin.entities.plugins[normalizedPlugin.result])
   store.dispatch(addEntities(normalizedPlugin))
-  store.dispatch(identifyPlugin(normalizedPlugin))
+  store.dispatch(detectPlugin(normalizedPlugin))
 })
 
 

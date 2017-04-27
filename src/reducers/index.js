@@ -3,6 +3,7 @@ import { routerReducer } from 'react-router-redux'
 import { difference,filter,includes,intersection } from 'lodash'
 import { createSelector } from 'reselect'
 import { isSemverLocked } from 'lib/utils'
+import semver from 'semver'
 
 import app from 'reducers/app'
 import plugins from 'reducers/plugins'
@@ -66,17 +67,24 @@ export const getUnmanagedPlugins = createSelector(
 
 export const getUnlockedPlugins = (state) => filter(
   state.sketchpack.plugins.allIdentifiers,
-  (ns) => state.sketchpack.plugins.byIdentifier[ns].version.indexOf('=') === -1
+  (id) => !isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
 )
 
-export const getUpdatedPlugins = (state) => getPluginsList(state)
+export const getLockedPlugins = (state) => filter(
+  state.sketchpack.plugins.allIdentifiers,
+  (id) => isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+)
 
-const pluginInstalled = (state,identifier) => {
-  return includes(state.library.allIdentifiers,identifier)
-}
-
-export const checkForPluginInstallation = createSelector(
-  [ pluginInstalled ], (installed) => installed
+export const getOutdatedPlugins = createSelector(
+  [ getStateTree, getManagedPlugins ],
+  (state,identifiers) => filter(
+    identifiers,
+    (id) => isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+    && semver.lt(
+      state.library.plugins.byIdentifier[id].version,
+      state.plugins.byIdentifier[id].version
+    )
+  )
 )
 
 const getSketchpackPluginByIdentifier = (state,identifier) => {
@@ -94,11 +102,13 @@ export const selectPlugin = createSelector(
 
     if (lib) {
       data['installed_version'] = lib.version
+      data['install_path'] = lib.install_path
     }
 
     if (pack) {
       data['version_range'] = pack.version
     }
+
     return data
   }
 )

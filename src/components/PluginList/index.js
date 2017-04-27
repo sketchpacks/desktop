@@ -4,8 +4,6 @@ import PluginMedia from 'components/PluginMedia'
 
 import {
   getPluginByIdentifier,
-  checkForPluginInstallation,
-  checkPluginLockState,
   selectPlugin
 } from 'reducers'
 

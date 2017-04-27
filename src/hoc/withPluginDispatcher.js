@@ -16,6 +16,7 @@ import {
 } from 'actions/plugin_manager'
 
 import {
+  updatePlugin,
   removePlugin
 } from 'reducers/library'
 
@@ -38,15 +39,13 @@ const withPluginDispatcher = (WrappedComponent) => {
     handlePluginEvent ({ type, plugin, author, isLocked }) {
       const {dispatch} = this.props
 
-      console.log('handlePluginEvent',type)
-
       switch (type) {
         case "install":
           return dispatch(installPluginRequest(plugin))
         case "remove":
           return dispatch(removePlugin(plugin))
         case "update":
-          return dispatch(updatePluginRequest(plugin))
+          return dispatch(updatePlugin(plugin))
         case "lock":
           return dispatch(setVersionRange({
             identifier: plugin.identifier

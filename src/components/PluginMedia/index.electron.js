@@ -78,12 +78,15 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
-    const {version} = this.props.plugin
     const {location} = this.props
 
     const tooltip = (location.pathname === '/library/managed')
       ? 'Installed version'
       : 'Latest version'
+
+    const version = (location.pathname === '/library/managed')
+      ? this.props.plugin.installed_version
+      : this.props.plugin.version
 
     return <PluginMetric
       icon={'versions'}

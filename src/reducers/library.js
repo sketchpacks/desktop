@@ -14,6 +14,11 @@ export const removePlugin = createAction('library/UNINSTALL_PLUGIN', plugin => {
   return plugin
 })
 
+export const updatePlugin = createAction('library/UPDATE_PLUGIN', plugin => {
+  ipcRenderer.send('manager/UPDATE_REQUEST', plugin)
+  return plugin
+})
+
 
 //- State
 
@@ -41,20 +46,22 @@ export default handleActions({
     }
   }),
 
-  [detectPlugin]: (state, action) => ({
-    ...state,
-    plugins: {
-      ...state.plugins,
-      byIdentifier: {
-        ...state.plugins.byIdentifier,
-        [action.payload.result]: pick(
-          action.payload.entities.plugins[action.payload.result],
-          ['install_path', 'manifest_path', 'version', 'compatible_version']
-        )
-      },
-      allIdentifiers: state.plugins.allIdentifiers.concat(action.payload.result)
+  [detectPlugin]: (state, action) => {
+    return {
+      ...state,
+      plugins: {
+        ...state.plugins,
+        byIdentifier: {
+          ...state.plugins.byIdentifier,
+          [action.payload.result]: pick(
+            action.payload.entities.plugins[action.payload.result],
+            ['install_path', 'manifest_path', 'version', 'compatible_version']
+          )
+        },
+        allIdentifiers: state.plugins.allIdentifiers.concat(action.payload.result)
+      }
     }
-  }),
+  },
 
   [removePlugin]: (state,action) => ({
     ...state,

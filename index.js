@@ -150,8 +150,8 @@ ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
 
 
 ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
-  // log.debug(UPDATE_PLUGIN_REQUEST, arg)
-  queueUpdate(arg)
+  log.debug(UPDATE_PLUGIN_REQUEST, arg)
+  queueUpdate([arg])
 })
 
 ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
@@ -199,17 +199,17 @@ const installPluginTask = (plugin, callback) => {
 
 const updatePluginTask = (plugin, callback) => {
   if (typeof plugin === undefined) return
-  log.debug('updatePluginTask', plugin.identifier)
+  log.debug('updatePluginTask', plugin)
 
   downloadAsset({
-    plugin: Object.assign(plugin, {download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.version}`}),
+    plugin: Object.assign(plugin, {download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}`}),
     destinationPath: app.getPath('temp')
   })
     .then(removeAsset)
     .then(extractAsset)
     .then(result => callback(null, result.plugin))
     .catch(err => {
-      log.error(err)
+      log.error('Error while updating: ', err)
       callback(err)
     })
 }
@@ -225,19 +225,21 @@ const identifyPluginTask = (manifestPath, callback) => {
   const manifest_path = manifestPath
   let install_path
   let identifier
+  let version
 
   let unidentifiedPlugin
 
   const buildPlugin = (manifestContents) => new Promise((resolve,reject) => {
     try {
       install_path = manifestContents.install_path
+      version = sanitizeSemVer(manifestContents.version || "0.0.0")
       unidentifiedPlugin = {
         identifier: manifestContents.identifier,
         name: manifestContents.name,
         owner: {
           handle: manifestContents.name || manifestContents.author || manifestContents.authorName
         },
-        version: sanitizeSemVer(manifestContents.version || "0.0.0"),
+        version: version,
         install_path,
         manifest_path
       }
@@ -252,7 +254,7 @@ const identifyPluginTask = (manifestPath, callback) => {
     .then(buildPlugin)
     .then(getPluginByIdentifier)
     .then(response => {
-      const data = Object.assign({}, response.data, { install_path, manifest_path })
+      const data = Object.assign({}, response.data, { install_path, manifest_path, version })
       callback(null, data)
     })
     .catch(err => {

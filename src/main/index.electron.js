@@ -23,7 +23,7 @@ import readSketchpack from 'lib/readSketchpack'
 import ms from 'ms'
 import os from 'os'
 import fs from 'fs'
-import jsonfile from 'jsonfile'
+import jsonfile from 'jsonfile'x
 import {filter} from 'lodash'
 
 import { normalize } from 'normalizr'
@@ -42,21 +42,9 @@ import PluginDetails from 'views/PluginDetails'
 import UserProfile from 'views/UserProfile'
 import UserPlugins from 'views/UserPlugins'
 
-import {
-  appInstall,
-
-  pluginsRequest,
-  pluginsReceived,
-
-  fetchLibraryRequest,
-  fetchLibraryReceived,
-
-  FETCH_LIBRARY_REQUEST,
-  FETCH_LIBRARY_RECEIVED,
-} from 'actions'
+import { appInstall } from 'actions'
 
 import {
-  installPluginRequest,
   installPluginSuccess,
   installPluginError,
   INSTALL_PLUGIN_REQUEST,
@@ -68,7 +56,6 @@ import {
   UPDATE_PLUGIN_REQUEST,
   UPDATE_PLUGIN_SUCCESS,
 
-  uninstallPluginRequest,
   uninstallPluginSuccess,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,

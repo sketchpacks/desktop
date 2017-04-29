@@ -81,7 +81,7 @@ export default handleActions({
     }
   },
 
-  [identifyPlugin]: (state, action) => {
+  [detectPlugin]: (state, action) => {
     let { entities, result } = action.payload
 
     if (entities.plugins[result].owner === undefined) return state

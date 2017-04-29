@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import {getPluginIdentifiers} from 'reducers'
+import { getPluginIdentifiers } from 'reducers'
 
 import withSelector from 'hoc/withSelector'
 import withPluginDispatcher from 'hoc/withPluginDispatcher'
@@ -35,8 +35,6 @@ class BrowsePluginsContainer extends Component {
   }
 
   render () {
-    const {plugins} = this.props
-
     return (
       <div style={{position: 'relative'}}>
         <EnhancedPluginList

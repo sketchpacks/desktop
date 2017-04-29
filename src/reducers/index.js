@@ -5,21 +5,21 @@ import { createSelector } from 'reselect'
 import { isSemverLocked } from 'lib/utils'
 import semver from 'semver'
 
-import app from 'reducers/app'
 import plugins from 'reducers/plugins'
 import users from 'reducers/users'
 import library from 'reducers/library'
 import sketchpack from 'reducers/sketchpack'
+import search from 'reducers/search'
 
 //- Reducer
 
 const rootReducer = combineReducers({
   routing: routerReducer,
   library,
-  app,
   users,
   plugins,
-  sketchpack
+  sketchpack,
+  search
 })
 
 export default rootReducer
@@ -44,6 +44,8 @@ export const getPluginByIdentifier = (state, identifier) => {
     owner: getUserById(state, plugin.owner)
   }
 }
+
+export const getSearchResults = (state) => getPluginIdentifiers(state.search)
 
 export const getUsers = (state) => state.users.byId
 

@@ -26,87 +26,7 @@ const VALID_KEYS = [
   'identifier'
 ]
 
-const prunePluginData = (plugins) => plugins.map(p => pick(p, VALID_KEYS))
-
 export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE'
-
-//
-// ENTITIES
-//
-
-export const ADD_ENTITIES = 'ADD_ENTITIES'
-export const addEntities = (normalizedData) => {
-  return {
-    type: ADD_ENTITIES,
-    payload: normalizedData
-  }
-}
-
-
-//
-// CATALOG
-//
-
-export function fetchCatalog (query, append=true) {
-  return (dispatch, getState, {api}) => {
-
-    const defaults = getState().plugins.meta
-
-    const queryParams = qs.stringify({
-      sort: qs.parse(query).sort || [defaults.sortKey,defaults.sortDir].join(':'),
-      page: qs.parse(query).page || defaults.nextPage,
-      text: qs.parse(query).text,
-      perPage: qs.parse(query).perPage
-    })
-
-    dispatch(fetchCatalogRequest({ payload: queryParams, append: append }))
-
-    api.getCatalog({query: queryParams})
-      .then(response => {
-        const pageMeta = linkHeader(response.headers.link)
-        const normalizedPluginList = normalize(response.data, schemas.pluginListSchema)
-        dispatch(fetchCatalogReceived({ payload: normalizedPluginList, append }))
-
-        dispatch(addEntities(normalizedPluginList))
-
-
-        if (pageMeta) dispatch(catalogPaginate({ pageMeta, append }))
-      })
-      .catch(error => {
-        console.log(error)
-        dispatch(fetchCatalogError(error))
-      })
-  }
-}
-
-export const FETCH_CATALOG_REQUEST = 'catalog/FETCH_REQUEST'
-
-export function fetchCatalogRequest ({payload, append}) {
-  return {
-    type: FETCH_CATALOG_REQUEST,
-    payload,
-    append
-  }
-}
-
-export const FETCH_CATALOG_RECEIVED = 'catalog/FETCH_RECEIVED'
-
-export function fetchCatalogReceived ({payload, append, total}) {
-  return {
-    type: FETCH_CATALOG_RECEIVED,
-    payload,
-    append
-  }
-}
-
-export const FETCH_CATALOG_ERROR = 'catalog/FETCH_ERROR'
-
-export function fetchCatalogError (error) {
-  return {
-    type: FETCH_CATALOG_ERROR,
-    error
-  }
-}
 
 export const CATALOG_PAGINATE = 'catalog/PAGINATE'
 
@@ -148,66 +68,6 @@ export function catalogSortBy (sort) {
 }
 
 
-//
-// SEARCH
-//
-
-export function fetchSearch (keyword, append=false) {
-  return (dispatch, getState, {api}) => {
-    dispatch(fetchSearchRequest({keyword: keyword}))
-
-    api.getCatalog({query: `text=${keyword}`})
-      .then(response => {
-        const pageMeta = linkHeader(response.headers.link)
-
-        if (pageMeta) dispatch(catalogPaginate(pageMeta))
-
-        dispatch(fetchCatalogReceived({
-          payload: response.data,
-          append: append,
-          total: response.headers.total,
-        }))
-      })
-      .catch(error => dispatch(fetchCatalogError(error)))
-  }
-}
-
-export const FETCH_SEARCH_REQUEST = 'search/FETCH_REQUEST'
-
-export function fetchSearchRequest (payload) {
-  return {
-    type: FETCH_SEARCH_REQUEST,
-    payload,
-    meta: {
-      mixpanel: {
-        eventName: 'Registry',
-        type: 'Search',
-        props: {
-          source: 'desktop',
-          keyword: payload.keyword,
-        },
-      },
-    },
-  }
-}
-
-export const FETCH_SEARCH_RECEIVED = 'search/FETCH_RECEIVED'
-
-export function fetchSearchReceived (payload) {
-  return {
-    type: FETCH_SEARCH_RECEIVED,
-    payload: payload
-  }
-}
-
-export const FETCH_SEARCH_ERROR = 'search/FETCH_ERROR'
-
-export function fetchSearchError (error) {
-  return {
-    type: FETCH_SEARCH_ERROR,
-    error
-  }
-}
 
 
 //
@@ -290,7 +150,7 @@ export const FETCH_USER_PLUGINS_RECEIVED = 'user/FETCH_PLUGINS_RECEIVED'
 export function fetchUserPluginsReceived (plugins) {
   return {
     type: FETCH_USER_PLUGINS_RECEIVED,
-    payload: prunePluginData(plugins)
+    payload: plugins
   }
 }
 

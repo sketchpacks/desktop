@@ -32,12 +32,12 @@ import * as schemas from 'schemas'
 import App from 'containers/App'
 
 import BrowsePlugins from 'views/BrowsePlugins'
+import SearchResults from 'views/SearchResults'
 import ManagedPlugins from 'views/ManagedPlugins'
 import UnmanagedPlugins from 'views/UnmanagedPlugins'
 import UpdatedPlugins from 'views/UpdatedPlugins'
 
 import PluginDetails from 'views/PluginDetails'
-import SearchResults from 'views/SearchResults'
 
 import UserProfile from 'views/UserProfile'
 import UserPlugins from 'views/UserPlugins'
@@ -95,8 +95,8 @@ import {
 } from 'actions/sketchpack'
 
 import {
-  addEntities
-} from 'actions/index'
+  addPlugin
+} from 'reducers/plugins'
 
 import {
   identifyPlugin,
@@ -121,7 +121,7 @@ export const render = () => {
           <Route path="browse/newest" component={BrowsePlugins} />
           <Route path="browse/name" component={BrowsePlugins} />
 
-          <Route path="search" component={BrowsePlugins} />
+          <Route path="search" component={SearchResults} />
 
           <Route path="library/managed" component={ManagedPlugins} />
           <Route path="library/unmanaged" component={UnmanagedPlugins} />
@@ -242,7 +242,7 @@ ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
   if (!contents) return
   const normalizedPlugin = normalize(contents, schemas.pluginSchema)
   log.debug('PLUGIN_DETECTED normalizedPlugin', normalizedPlugin.entities.plugins[normalizedPlugin.result])
-  store.dispatch(addEntities(normalizedPlugin))
+  store.dispatch(addPlugin(normalizedPlugin))
   store.dispatch(detectPlugin(normalizedPlugin))
 })
 

@@ -8,13 +8,9 @@ import {remote} from 'electron'
 import React from 'react'
 
 import qs from 'qs'
-import {SketchpacksApi} from 'api'
 
 import Waypoint from 'react-waypoint'
-
-import {
-  fetchCatalog
-} from 'actions'
+import { browsePlugins } from 'reducers/plugins'
 
 const ConnectedPluginList = ComposedComponent =>
   class extends React.Component {
@@ -26,22 +22,21 @@ const ConnectedPluginList = ComposedComponent =>
 
     componentDidMount () {
       this.fetchData({
-        page: this.props.state.plugins.meta.nextPage || "1",
+        page: this.props.state.plugins.meta.page || "1",
         append: false,
-        q: this.props.location.query.q,
-        sort: this.props.location.query.sort,
+        sort: this.props.state.plugins.meta.sort,
       })
     }
 
     componentWillReceiveProps (nextProps) {
       // if (this.props.plugins.isLoading === true) return
 
-      if (this.props.location.query.sort !== nextProps.location.query.sort) {
+      if (this.props.state.plugins.meta.sort !== nextProps.state.plugins.meta.sort) {
         this.fetchData({
-          page: "1",
-          sort: nextProps.location.query.sort,
+          page: nextProps.state.plugins.meta.page,
+          sort: nextProps.state.plugins.meta.sort,
           append: false,
-          q: nextProps.location.query.q,
+          q: nextProps.state.plugins.meta.q,
         })
       }
     }
@@ -51,14 +46,20 @@ const ConnectedPluginList = ComposedComponent =>
 
       // if (this.props.state.plugins.isLoading === true) return
 
-      const queryParams = qs.stringify({
-        page: page,
-        per_page: "10",
-        sort: sort,
-        text: q || null
+      const request_params = qs.stringify({
+        sort,
+        page,
+        text: q
       })
+      const request_url = `/plugins?${request_params}`
 
-      dispatch(fetchCatalog(queryParams, append))
+      dispatch(
+        browsePlugins({
+          url: request_url,
+          append,
+          list: this.props.state.plugins.meta.sort
+        })
+      )
     }
 
     render () {
@@ -71,12 +72,16 @@ const ConnectedPluginList = ComposedComponent =>
             dispatch={this.props.dispatch}
           />
 
-          { (this.props.state.app.location !== '/library/installed'
-              || this.props.state.app.location !== '/library/updates')
+          { (this.props.location.pathname !== '/library/installed'
+              || this.props.location.pathname !== '/library/updates')
             // && !this.props.state.plugins.isLoading
             && this.props.state.plugins.allIdentifiers.length >= 9
             && <Waypoint
-              onEnter={() => this.fetchData({ sort: this.props.plugins.sort })} /> }
+              onEnter={() => this.fetchData({
+                sort: this.props.state.plugins.meta.sort,
+                page: this.props.state.plugins.meta.nextPage,
+                append: true
+              })} /> }
         </div>
       )
     }

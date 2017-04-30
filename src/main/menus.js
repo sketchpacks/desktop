@@ -95,13 +95,6 @@ const settingsMenu = [
   },
 
   {
-    label: 'Import from Sketch Toolbox',
-    click(item, window, event) {
-      window.webContents.send('IMPORT_FROM_SKETCH_TOOLBOX', null)
-    },
-  },
-
-  {
     type: 'separator'
   },
 

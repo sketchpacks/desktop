@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import {getOutdatedPlugins} from 'reducers/index'
+import {getManagedPlugins} from 'reducers/index'
 import withPluginDispatcher from 'hoc/withPluginDispatcher'
 import withSelector from 'hoc/withSelector'
 import PluginList from 'components/PluginList'
-const ConnectedPluginList = withPluginDispatcher(withSelector(PluginList,getOutdatedPlugins))
+const ConnectedPluginList = withPluginDispatcher(withSelector(PluginList,getManagedPlugins))
 
-class UpdatedPluginsContainer extends Component {
+class ManagedPluginsContainer extends Component {
   constructor (props) {
     super(props)
   }
@@ -40,4 +40,4 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)( UpdatedPluginsContainer )
+export default connect(mapStateToProps, mapDispatchToProps)( ManagedPluginsContainer )

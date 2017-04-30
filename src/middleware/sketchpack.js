@@ -1,13 +1,17 @@
 const {remote} = require('electron')
 const path = require('path')
-const {includes,values,reduce} = require('lodash')
-const os = require('os')
+const {includes,values,reduce,isEqual} = require('lodash')
 const jsonfile = require('jsonfile')
 const semver = require('semver')
 
-const {sanitizeSemVer} = require('lib/utils')
+const writeSketchpack = require('lib/writeSketchpack')
 
-const sketchpackPath = path.join(remote.app.getPath('userData'), 'my.sketchpack')
+const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')
+
+const {
+  getSketchpackIdentifiers,
+  syncSketchpackContents
+} = require('reducers')
 
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,
@@ -21,47 +25,32 @@ const WATCHED_ACTIONS = {
   INSTALL_PLUGIN_SUCCESS,
   UPDATE_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_SUCCESS,
+  SKETCHPACK_SYNC_CONTENTS: 'sketchpack/SYNC_CONTENTS'
 }
 
-const {fetchLibraryReceived} = require('../actions/index')
-
 const sketchpackMiddleware = store => next => action => {
-  const prevState = store.getState().library.items
+  const prevState = store.getState().sketchpack.plugins.byIdentifier
   next(action)
-  const nextState = store.getState().library.items
+  const nextState = store.getState().sketchpack.plugins.byIdentifier
 
-  if (includes(values(WATCHED_ACTIONS),action.type)) {
+  if (isEqual(prevState,nextState)) return
 
-    const reducedPlugins = (collection) => reduce(collection, ((result, value, key) => {
-    	result[`${value.owner.handle}/${value.name}`] = {
-        name: value.name,
-        owner: value.owner.handle,
-        version: value.version || "^0.0.0",
-        version_range: semver.toComparators(value.version || "^0.0.0")[0],
-    		compatible_version: value.compatible_version || "^0.0.0",
-        compatible_version_range: semver.toComparators(value.compatible_version || "^0.0.0")[0],
+  const identifiers = getSketchpackIdentifiers(store.getState())
+
+  if (identifiers.length > 0) {
+    const sketchpack = reduce(identifiers, (plugins, identifier) => {
+      plugins[identifier] = {
+        ...nextState[identifier]
       }
+      return plugins
+    }, nextState)
 
-    	return result
-    }), {})
-
-    const data = {
-      name: "My Sketchpack",
-      schema_version: '0.1.0',
-      locked: false,
-      plugins: reducedPlugins(store.getState().library.items)
-    }
-
-    const opts = {
-      spaces: 2,
-      flags: 'w',
-      encoding: 'utf8'
-    }
-
-    jsonfile.writeFile(sketchpackPath, data, opts, (err) => {
-      if (err) console.error(err)
-    })
+    writeSketchpack(
+      sketchpackPath,
+      sketchpack
+    )
   }
+
 }
 
 export default sketchpackMiddleware

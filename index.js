@@ -17,7 +17,7 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-const {forEach,filter} = require('lodash')
+const {forEach,filter,find,difference} = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
@@ -30,6 +30,7 @@ const menubar = require('menubar')
 const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
+const chokidar = require('chokidar')
 
 const firstRun = require('first-run')
 const AutoLaunch = require('auto-launch')
@@ -37,10 +38,18 @@ const autolauncher = new AutoLaunch({
 	name: 'Sketchpacks'
 })
 
-const {getInstallPath} = require('./src/lib/utils')
+const readManifest = require('./src/lib/readManifest')
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
-const PluginManager = require('./src/main/plugin_manager')
+const readLibrary = require('./src/lib/readLibrary')
+
+const {
+  getInstallPath,
+  extractAsset,
+  downloadAsset,
+  removeAsset,
+  sanitizeSemVer
+} = require('./src/lib/utils')
 
 const {
   INSTALL_PLUGIN_REQUEST,
@@ -51,11 +60,12 @@ const {
   UPDATE_PLUGIN_ERROR,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
-  UNINSTALL_PLUGIN_ERROR,
-  TOGGLE_VERSION_LOCK_REQUEST,
-  TOGGLE_VERSION_LOCK_SUCCESS,
-  TOGGLE_VERSION_LOCK_ERROR
+  UNINSTALL_PLUGIN_ERROR
 } = require('./src/actions/plugin_manager')
+
+const {
+  SYNC_CHANGE_RECEIVED
+} = require('./src/actions/sketchpack')
 
 const opts = {
   dir: __dirname,
@@ -76,6 +86,7 @@ const menuBar = menubar(opts)
 let mainWindow
 let updater
 let externalPluginInstallQueue = []
+let watcher
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
@@ -121,6 +132,7 @@ app.on('open-url', (event, resource) => {
     externalPluginInstallQueue.push(pluginId)
   }
   else {
+    // TODO: User pretty namespaces in place of pluginID
     mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
   }
 })
@@ -131,34 +143,20 @@ ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
 
 
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
-  PluginManager.install(event, arg)
-    .then((plugin) => {
-      mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
-    })
+  log.debug(INSTALL_PLUGIN_REQUEST, arg)
+  const p = { owner: arg.owner.handle, name: arg.name }
+  queueInstall([p])
 })
 
 
 ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
-  PluginManager.install(event, arg.updatedPlugin)
-    .then((newPlugin) => {
-      PluginManager.uninstall(event, arg.outdatedPlugin)
-        .then((oldPlugin) => {
-          mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, newPlugin)
-        })
-    })
+  log.debug(UPDATE_PLUGIN_REQUEST, arg)
+  queueUpdate([arg])
 })
-
 
 ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
-  PluginManager.uninstall(event, arg)
-    .then((plugin) => {
-      mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, plugin)
-    })
-})
-
-
-ipcMain.on(TOGGLE_VERSION_LOCK_REQUEST, (event, args) => {
-  mainWindow.webContents.send(TOGGLE_VERSION_LOCK_REQUEST, args)
+  log.debug(UNINSTALL_PLUGIN_REQUEST, arg)
+  queueRemove([arg])
 })
 
 
@@ -177,89 +175,176 @@ ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
   updater.checkForUpdates(confirm)
 })
 
-const pluginData = (owner,slug) => new Promise((resolve,reject) => {
-  axios.get(`${API_URL}/v1/users/${owner}/plugins/${slug.toLowerCase()}`)
+const getPluginData = (plugin) => axios.get(`${API_URL}/v1/users/${plugin.owner}/plugins/${plugin.name.toLowerCase()}`)
+const getPluginByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
+const getPluginUpdateByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.version}`)
+
+const installPluginTask = (plugin, callback) => {
+  getPluginData(plugin)
+    .then(response => downloadAsset({
+      plugin: response.data,
+      destinationPath: app.getPath('temp'),
+      onProgress: (received,total) => {
+        let percentage = (received * 100) / total;
+        // log.debug(percentage + "% | " + received + " bytes out of " + total + " bytes.")
+      }
+    }))
+    .then(extractAsset)
+    .then(result => callback(null, result.plugin))
+    .catch(err => {
+      log.error('Error while installing: ', err)
+      callback(err)
+    })
+}
+
+const updatePluginTask = (plugin, callback) => {
+  if (typeof plugin === undefined) return
+  log.debug('updatePluginTask', plugin)
+
+  downloadAsset({
+    plugin: Object.assign(plugin, {download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}`}),
+    destinationPath: app.getPath('temp')
+  })
+    .then(removeAsset)
+    .then(extractAsset)
+    .then(result => callback(null, result.plugin))
+    .catch(err => {
+      log.error('Error while updating: ', err)
+      callback(err)
+    })
+}
+
+const uninstallPluginTask = (plugin, callback) => {
+  removeAsset({ plugin: plugin })
+    .then(result => callback(null, result.plugin))
+    .catch(err => callback(err))
+}
+
+
+const identifyPluginTask = (manifestPath, callback) => {
+  const manifest_path = manifestPath
+  let install_path
+  let identifier
+  let version
+
+  let unidentifiedPlugin
+
+  const buildPlugin = (manifestContents) => new Promise((resolve,reject) => {
+    try {
+      install_path = manifestContents.install_path
+      version = sanitizeSemVer(manifestContents.version || "0.0.0")
+      unidentifiedPlugin = {
+        identifier: manifestContents.identifier,
+        name: manifestContents.name,
+        owner: {
+          handle: manifestContents.name || manifestContents.author || manifestContents.authorName
+        },
+        version: version,
+        install_path,
+        manifest_path
+      }
+      resolve(unidentifiedPlugin)
+    } catch (err) {
+      log.error(err)
+      reject(err)
+    }
+  })
+
+  readManifest(manifest_path)
+    .then(buildPlugin)
+    .then(getPluginByIdentifier)
     .then(response => {
-      resolve(response.data)
+      const data = Object.assign({}, response.data, { install_path, manifest_path, version })
+      callback(null, data)
     })
-    .catch(response => {
-      resolve({})
+    .catch(err => {
+      // log.error('Error while identifying: ', err)
+      callback(null, unidentifiedPlugin)
     })
-})
-
-const installQueue = (plugins) => {
-  if (plugins.length === 0) return
-  const queue = filter(plugins, (p) => Object.keys(p).length > 0)
-
-  async.series(queue.map(plugin => (callback) => {
-      PluginManager.install(null, plugin)
-        .then((result) => {
-          mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
-          callback(null, result)
-        })
-    }), (error, results) => console.log(results))
 }
 
-const uninstallQueue = (plugins) => {
-  if (plugins.length === 0) return
 
-  async.series(plugins.map(plugin => (callback) => {
-    PluginManager.uninstall(null, Object.assign({}, {install_path: path.join(getInstallPath(),plugin.directory_name.replace(/ /g, '\\ ')) }))
-    .then((result) => {
-      callback(null, result)
-    })
-  }), (error, results) => console.log(results))
+const triageTask = (task, callback) => {
+  const { action,payload } = task
+
+  switch (action) {
+    case 'install':
+      return installPluginTask(payload,callback)
+    case 'update':
+      return updatePluginTask(payload,callback)
+    case 'remove':
+      return uninstallPluginTask(payload,callback)
+    case 'identify':
+      return identifyPluginTask(payload,callback)
+  }
 }
 
-const importFromSketchToolbox = (dbPath) => {
-  const db = dblite(dbPath)
+const WORK_QUEUE_CONCURRENCY = 1
+const workQueue = async.queue((task, callback) => triageTask(task, callback), WORK_QUEUE_CONCURRENCY)
 
-  mainWindow.webContents.send('IMPORT_START')
-  db.query('SELECT ZDIRECTORYNAME,ZNAME,ZOWNER FROM ZPLUGIN WHERE ZSTATE = 1', {directory_name: String, slug: String, owner: String}, (rows) => {
-    if (rows.length === 0) return
+workQueue.drain = () => {
+  log.debug('Work Complete')
+}
 
-    Promise.all(rows.map(row => pluginData(row.owner,row.slug)))
-      .then(data => {
-        const importables = _.filter(rows, row => {
-          return _.find(data, d => {
-          	return d.name === row.name && d.owner.handle === row.owner
-          })
-        })
+const queueInstall = (plugins) => {
+  if (typeof plugins === undefined) return
+  if (plugins.length === 0) return
 
-        installQueue(importables)
-        uninstallQueue(importables)
+  log.debug(`Enqueueing ${plugins.length} plugins`)
+  plugins.map(plugin => workQueue.push({ action: 'install', payload: plugin }, (err, result) => {
+    if (err) {
+      mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err, plugin)
+      return callback(err)
+    }
+    log.debug('Install complete', result.name)
+    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
+  }))
+}
 
-        db.close()
-      })
+const queueUpdate = (plugins) => {
+  if (typeof plugins === undefined) return
+  if (plugins.length === 0) return
+
+  log.debug(`Enqueueing ${plugins.length} plugins`)
+  plugins.map(plugin => workQueue.push({ action: 'update', payload: plugin }, (err, result) => {
+    if (err) return callback(err)
+    log.debug('Update complete', result)
+    mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, result.plugin)
+  }))
+}
+
+const queueRemove = (plugins) => {
+  if (typeof plugins === undefined) return
+  if (plugins.length === 0) return
+
+  log.debug(`Enqueueing ${plugins.length} plugins`)
+  plugins.map(plugin => workQueue.push({ action: 'remove', payload: plugin }, (err, result) => {
+    if (err) return callback(err)
+    log.debug('Uninstall complete', result)
+    mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, result)
+  }))
+}
+
+const queueSync = (sketchpackContents) => {
+  workQueue.push({ action: 'sync', payload: sketchpackContents }, (err, result) => {
+    if (err) return callback(err)
+    mainWindow.webContents.send(SYNC_CHANGE_RECEIVED, sketchpackContents)
   })
 }
 
+const queueIdentify = (plugins) => {
+  if (typeof plugins === undefined) return
+  if (plugins.length === 0) return
 
-ipcMain.on('IMPORT_FROM_SKETCH_TOOLBOX', (event, args) => {
-  const homepath = os.homedir()
-  const dbPath = path.join(homepath, SKETCH_TOOLBOX_DB_PATH)
+  log.debug(`Enqueueing ${plugins.length} plugins`)
+  plugins.map(plugin => workQueue.push({ action: 'identify', payload: plugin }, (err, result) => {
+    if (err) return callback(err)
 
-  if (fs.existsSync(dbPath)) {
-    dialog.showMessageBox(null, {
-      buttons: ['Cancel', 'Import plugins'],
-      defaultId: 1,
-      cancelId: 0,
-      message: '🚚 Import from Sketch Toolbox',
-      detail: 'Import installed plugins from Sketch Toolbox. Plugins not found in the Sketchpacks Registry will be excluded.',
-    }, (response, checkboxChecked) => {
-      if (response) importFromSketchToolbox(dbPath)
-    })
-  }
-  else {
-    dialog.showMessageBox(null, {
-      buttons: ['Ok'],
-      defaultId: 0,
-      cancelId: 0,
-      message: '🤔 Import Failed',
-      detail: 'We had trouble finding the location of Sketch Toolbox. No plugins were imported.',
-    }, (response, checkboxChecked) => {})
-  }
-})
+    if (typeof result !== undefined) {
+      mainWindow.webContents.send('PLUGIN_DETECTED', result)
+    }
+  }))
+}
 
 
 ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
@@ -275,12 +360,7 @@ ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
     if (filePaths) {
       try {
         readSketchpack(filePaths[0])
-        .then(plugins => {
-          Promise.all(plugins.map(plugin => pluginData(plugin.owner,plugin.name)))
-          .then(data => {
-            installQueue(data)
-          })
-        })
+          .then(plugins => queueInstall(plugins))
       } catch (err) {
         log.error(err)
       }
@@ -321,3 +401,103 @@ process.on('uncaughtException', (err) => {
 if (firstRun({name: pkg.name})) {
   autolauncher.enable()
 }
+
+
+const pluginWatcher = (watchPath) => {
+  log.debug('Watching for ', watchPath)
+  watcher = chokidar.watch(watchPath, {
+    ignored: /[\/\\]\./,
+    persistent: true,
+    cwd: path.normalize(getInstallPath().replace(/\\/g, ''))
+  })
+
+  const onWatcherReady = () => {
+    log.info('From here can you check for real changes, the initial scan has been completed.')
+  }
+
+  watcher
+    .on('add', (watchPath) => {
+      if (path.parse(watchPath).base === 'manifest.json') {
+        log.debug('Manifest Detected', watchPath)
+        let manifestPath = path.join(getInstallPath().replace(/\\/g, ''),watchPath)
+        queueIdentify([manifestPath])
+      }
+    })
+    .on('addDir', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchplugin') {
+        log.debug('Plugin Bundle Detected', watchPath)
+      }
+    })
+    .on('change', (watchPath) => {
+      if (path.parse(watchPath).base === 'manifest.json') {
+        log.debug('Manifest Changed', watchPath)
+      }
+    })
+    .on('unlink', (watchPath) => {
+      if (path.parse(watchPath).base === 'manifest.json') {
+        log.debug('Manifest Removed', watchPath)
+      }
+    })
+    .on('unlinkDir', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchplugin') {
+        log.debug('Plugin Bundle Removed', watchPath)
+      }
+    })
+    .on('error', (error) => {
+      log.debug('Error happened', error)
+    })
+    .on('ready', onWatcherReady)
+}
+
+const sketchpackWatcher = (watchPath) => {
+  log.debug('Syncing with ', watchPath)
+  watcher = chokidar.watch(watchPath, {
+    ignored: /[\/\\]\./,
+    persistent: true
+  })
+
+  const onWatcherReady = () => {
+    log.info('From here can you check for real changes, the initial scan has been completed.')
+  }
+
+  watcher
+    .on('add', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchpack') {
+        log.debug('Sketchpack Detected', watchPath)
+
+        readSketchpack(watchPath)
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
+      }
+    })
+    .on('change', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchpack') {
+        log.debug('Sketchpack Changed', watchPath)
+
+        readSketchpack(watchPath)
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
+      }
+    })
+    .on('unlink', (watchPath) => {
+      if (path.parse(watchPath).ext === '.sketchpack') {
+        log.debug('Sketchpack Removed', watchPath)
+      }
+    })
+    .on('error', (error) => {
+      log.debug('Error happened', error)
+    })
+    .on('ready', onWatcherReady)
+}
+
+setTimeout(() => {
+  const librarySketchpackPath = path.join(app.getPath('userData'),'my-library.sketchpack')
+  sketchpackWatcher(librarySketchpackPath)
+}, 1000)
+
+setTimeout(() => {
+  pluginWatcher('**/(*.sketchplugin|manifest.json)')
+}, 2000)
+
+app.on('before-quit', () => {
+  log.info('Watcher stopped')
+  watcher.close()
+})

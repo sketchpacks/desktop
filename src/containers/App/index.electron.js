@@ -8,11 +8,10 @@ import 'css/milligram.scss'
 
 import './app.scss'
 
+import {getOutdatedPlugins} from 'reducers/index'
 import SVGIcon from 'components/SVGIcon'
 import SideBarMenu from 'components/electron/SideBarMenu'
 import SearchBar from 'components/SearchBar'
-
-import {getUpdatesCount} from 'selectors'
 
 class App extends Component {
   constructor (props) {
@@ -102,7 +101,7 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   return {
     state,
-    availableUpdates: getUpdatesCount(state)
+    availableUpdates: getOutdatedPlugins(state).length
   }
 }
 

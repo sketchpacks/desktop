@@ -10,12 +10,8 @@ import { push } from 'react-router-redux'
 import SVGIcon from 'components/SVGIcon'
 
 import qs from 'qs'
-import linkHeader from 'parse-link-header'
-import {SketchpacksApi} from 'api'
 
-import {
-  fetchSearch
-} from 'actions'
+import { searchPlugins } from 'reducers/search'
 
 import './styles.scss'
 
@@ -30,7 +26,21 @@ class SearchBar extends Component {
   fetchData ({ sort, page, append, q }) {
     const {dispatch} = this.props
 
-    dispatch(fetchSearch(q, false))
+    const request_params = qs.stringify({
+      sort: 'score:desc',
+      page,
+      text: q
+    })
+    const request_url = `/plugins?${request_params}`
+
+    dispatch(
+      searchPlugins({
+        url: request_url,
+        append: false,
+        list: 'search'
+      })
+    )
+
     browserHistory.push(`/search?q=${q}`)
   }
 

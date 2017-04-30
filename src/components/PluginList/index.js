@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 
 import PluginMedia from 'components/PluginMedia'
+import BrowseError from 'components/BrowseError'
 
 import {
   getPluginByIdentifier,
@@ -20,8 +21,16 @@ class PluginList extends Component {
       location,
       dispatch,
       handlePluginEvent,
-      state
+      state,
+      errorMessage,
+      onRetry
     } = this.props
+
+    if (errorMessage && plugins.length === 0) {
+      return <BrowseError
+        message={errorMessage}
+        onRetry={onRetry} />
+    }
 
     if (plugins.length === 0) {
       return (

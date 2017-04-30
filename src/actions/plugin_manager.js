@@ -14,46 +14,6 @@ const {find} = require('lodash')
 
 const {sanitizeSemVer} = require('../lib/utils')
 
-const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
-
-function toggleVersionLockRequest (plugin, isLocked) {
-  return (dispatch, getState) => {
-    dispatch(toggleVersionLockSuccess(plugin, isLocked))
-  }
-}
-
-
-const TOGGLE_VERSION_LOCK_SUCCESS = 'manager/TOGGLE_VERSION_LOCK_SUCCESS'
-
-function toggleVersionLockSuccess (plugin, isLocked) {
-
-  return {
-    type: TOGGLE_VERSION_LOCK_SUCCESS,
-    plugin,
-    meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: isLocked ? 'Lock Plugin Version' : 'Unlock Plugin Version',
-        props: {
-          source: 'desktop',
-          pluginId: `${plugin.owner.handle}/${plugin.name}`,
-          pluginVersion: plugin.version
-        },
-      },
-    },
-  }
-}
-
-
-const TOGGLE_VERSION_LOCK_ERROR = 'manager/TOGGLE_VERSION_LOCK_ERROR'
-
-function toggleVersionLockError (plugin) {
-  return {
-    type: TOGGLE_VERSION_LOCK_ERROR,
-    plugin
-  }
-}
-
 
 const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
 
@@ -282,14 +242,6 @@ module.exports = {
   uninstallPluginRequest,
   uninstallPluginSuccess,
   uninstallPluginError,
-
-  toggleVersionLockRequest,
-  toggleVersionLockSuccess,
-  toggleVersionLockError,
-
-  TOGGLE_VERSION_LOCK_REQUEST,
-  TOGGLE_VERSION_LOCK_SUCCESS,
-  TOGGLE_VERSION_LOCK_ERROR,
 
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,

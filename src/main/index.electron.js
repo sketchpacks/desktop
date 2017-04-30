@@ -60,11 +60,6 @@ import {
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
 
-  toggleVersionLockRequest,
-  toggleVersionLockSuccess,
-  TOGGLE_VERSION_LOCK_REQUEST,
-  TOGGLE_VERSION_LOCK_SUCCESS,
-
   webInstallPluginRequest,
   importSketchToolboxRequest,
   importSketchpackRequest,
@@ -74,12 +69,6 @@ import {
 import {
   autoUpdatePluginsRequest,
 } from 'actions/auto_updater'
-
-import {
-  SYNC_FILE_RECEIVED,
-  SYNC_CHANGE_RECEIVED,
-  syncChangeReceived
-} from 'actions/sketchpack'
 
 import {
   addPlugin
@@ -165,10 +154,6 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
   })
 })
 
-
-ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
-  store.dispatch(toggleVersionLockSuccess(args))
-})
 
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
   const msgBody = plugin.title || plugin.name

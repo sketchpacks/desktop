@@ -63,10 +63,6 @@ const {
   UNINSTALL_PLUGIN_ERROR
 } = require('./src/actions/plugin_manager')
 
-const {
-  SYNC_CHANGE_RECEIVED
-} = require('./src/actions/sketchpack')
-
 const opts = {
   dir: __dirname,
   icon: __dirname + '/src/IconTemplate.png',
@@ -86,7 +82,8 @@ const menuBar = menubar(opts)
 let mainWindow
 let updater
 let externalPluginInstallQueue = []
-let watcher
+let libraryWatcher
+let sketchpackWatcher
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
@@ -328,7 +325,7 @@ const queueRemove = (plugins) => {
 const queueSync = (sketchpackContents) => {
   workQueue.push({ action: 'sync', payload: sketchpackContents }, (err, result) => {
     if (err) return callback(err)
-    mainWindow.webContents.send(SYNC_CHANGE_RECEIVED, sketchpackContents)
+    mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', sketchpackContents)
   })
 }
 
@@ -403,9 +400,9 @@ if (firstRun({name: pkg.name})) {
 }
 
 
-const pluginWatcher = (watchPath) => {
-  log.debug('Watching for ', watchPath)
-  watcher = chokidar.watch(watchPath, {
+const watchLibrary = (watchPath) => {
+  log.debug('Watching Library at ', watchPath)
+  libraryWatcher = chokidar.watch(watchPath, {
     ignored: /[\/\\]\./,
     persistent: true,
     cwd: path.normalize(getInstallPath().replace(/\\/g, ''))
@@ -415,7 +412,7 @@ const pluginWatcher = (watchPath) => {
     log.info('From here can you check for real changes, the initial scan has been completed.')
   }
 
-  watcher
+  libraryWatcher
     .on('add', (watchPath) => {
       if (path.parse(watchPath).base === 'manifest.json') {
         log.debug('Manifest Detected', watchPath)
@@ -449,9 +446,9 @@ const pluginWatcher = (watchPath) => {
     .on('ready', onWatcherReady)
 }
 
-const sketchpackWatcher = (watchPath) => {
-  log.debug('Syncing with ', watchPath)
-  watcher = chokidar.watch(watchPath, {
+const watchSketchpack = (watchPath) => {
+  log.debug('Watching Sketchpack at ', watchPath)
+  sketchpackWatcher = chokidar.watch(watchPath, {
     ignored: /[\/\\]\./,
     persistent: true
   })
@@ -460,7 +457,7 @@ const sketchpackWatcher = (watchPath) => {
     log.info('From here can you check for real changes, the initial scan has been completed.')
   }
 
-  watcher
+  sketchpackWatcher
     .on('add', (watchPath) => {
       if (path.parse(watchPath).ext === '.sketchpack') {
         log.debug('Sketchpack Detected', watchPath)
@@ -490,14 +487,15 @@ const sketchpackWatcher = (watchPath) => {
 
 setTimeout(() => {
   const librarySketchpackPath = path.join(app.getPath('userData'),'my-library.sketchpack')
-  sketchpackWatcher(librarySketchpackPath)
+  watchSketchpack(librarySketchpackPath)
 }, 1000)
 
 setTimeout(() => {
-  pluginWatcher('**/(*.sketchplugin|manifest.json)')
+  watchLibrary('**/(*.sketchplugin|manifest.json)')
 }, 2000)
 
 app.on('before-quit', () => {
   log.info('Watcher stopped')
-  watcher.close()
+  libraryWatcher.close()
+  sketchpackWatcher.close()
 })

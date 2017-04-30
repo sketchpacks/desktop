@@ -46,9 +46,9 @@ const ConnectedPluginList = ComposedComponent =>
 
     retryFetchData ({ sort, page, append, q }) {
       this.fetchData({
-        sort,
-        page,
-        q,
+        sort: this.props.state.plugins.meta.sort,
+        page: this.props.state.plugins.meta.nextPage,
+        q: this.props.state.plugins.meta.q,
         append: true
       })
     }
@@ -85,16 +85,13 @@ const ConnectedPluginList = ComposedComponent =>
             location={this.props.location}
             dispatch={this.props.dispatch}
             errorMessage={this.props.state.plugins.errorMessage}
-            onRetry={this.fetchData}
+            onRetry={this.retryFetchData}
           />
 
           { this.props.state.plugins.isError &&
             <BrowseError
               message={this.props.state.plugins.errorMessage}
-              onRetry={() => this.retryFetchData({
-                page: this.props.state.plugins.meta.nextPage,
-                append: true
-              })} /> }
+              onRetry={this.retryFetchData} /> }
 
           { (this.props.location.pathname !== '/library/installed'
               || this.props.location.pathname !== '/library/updates')

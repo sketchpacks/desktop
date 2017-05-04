@@ -1,4 +1,4 @@
-const jsonfile = require('jsonfile')
+const json5file = require('@sketchpacks/json5file')
 
 const writeSketchpack = (filepath, contents) => {
   const data = {
@@ -14,7 +14,7 @@ const writeSketchpack = (filepath, contents) => {
     encoding: 'utf8'
   }
 
-  jsonfile.writeFile(filepath, data, opts, (err) => {
+  json5file.writeFile(filepath, data, opts, (err) => {
     if (err) console.error(err)
   })
 }

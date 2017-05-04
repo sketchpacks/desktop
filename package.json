@@ -86,6 +86,7 @@
     "webpack-target-electron-renderer": "^0.3.0"
   },
   "dependencies": {
+    "@sketchpacks/json5file": "^3.1.0",
     "adm-zip": "^0.4.7",
     "async": "^2.1.4",
     "auto-launch": "^5.0.1",
@@ -99,7 +100,6 @@
     "immutability-helper": "^2.1.2",
     "is-electron-renderer": "^2.0.0",
     "is-there": "^4.3.6",
-    "jsonfile": "^2.4.0",
     "lodash": "^4.17.2",
     "marky-markdown": "^9.0.1",
     "menubar": "^5.1.0",

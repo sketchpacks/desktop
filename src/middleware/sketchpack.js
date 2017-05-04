@@ -1,7 +1,7 @@
 const {remote} = require('electron')
 const path = require('path')
 const {includes,values,reduce,isEqual} = require('lodash')
-const jsonfile = require('jsonfile')
+const json5file = require('@sketchpacks/json5file')
 const semver = require('semver')
 
 const writeSketchpack = require('lib/writeSketchpack')

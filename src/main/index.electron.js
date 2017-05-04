@@ -23,7 +23,7 @@ import readSketchpack from 'lib/readSketchpack'
 import ms from 'ms'
 import os from 'os'
 import fs from 'fs'
-import jsonfile from 'jsonfile'
+import json5file from '@sketchpacks/json5file'
 import {filter} from 'lodash'
 
 import { normalize } from 'normalizr'

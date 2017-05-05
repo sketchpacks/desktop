@@ -7,6 +7,7 @@ import mixpanelMiddleware from 'remimi'
 import rootReducer from 'reducers'
 import sketchpackMiddleware from 'middleware/sketchpack'
 import exportMiddleware from 'middleware/export'
+import importMiddleware from 'middleware/import'
 import notificationMiddleware from 'middleware/notification'
 
 import {SketchpacksApi} from 'api'
@@ -20,6 +21,7 @@ const enhancer = composeEnhancers(
     thunk.withExtraArgument({api: SketchpacksApi}),
     logger,
     sketchpackMiddleware,
+    importMiddleware,
     exportMiddleware,
     notificationMiddleware,
     mixpanelMiddleware(MIXPANEL_TOKEN),

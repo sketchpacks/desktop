@@ -33,9 +33,6 @@ export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE')
 export const importSketchpackRequest = createAction('sketchpack/IMPORT_REQUEST')
 export const importSketchpackSuccess = createAction('sketchpack/IMPORT_SUCCESS')
 export const importSketchpackError = createAction('sketchpack/IMPORT_ERROR')
-export const importSketchpack = () => {
-  // ...
-}
 
 export const exportSketchpackRequest = createAction('sketchpack/EXPORT_REQUEST')
 export const exportSketchpackSuccess = createAction('sketchpack/EXPORT_SUCCESS')

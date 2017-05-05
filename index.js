@@ -17,7 +17,7 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-const {forEach,filter,find,difference} = require('lodash')
+const {forEach,filter,find,difference,isArray} = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
@@ -137,15 +137,9 @@ ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
 })
 
 
-ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
-  log.debug(INSTALL_PLUGIN_REQUEST, arg)
-  const p = {
-    owner: arg.owner.handle,
-    name: arg.name,
-    identifier: arg.identifier
-  }
-
-  queueInstall([p])
+ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, plugins) => {
+  log.debug(INSTALL_PLUGIN_REQUEST, plugins)
+  queueInstall(plugins)
 })
 
 
@@ -175,24 +169,26 @@ ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
   updater.checkForUpdates(confirm)
 })
 
+const getPluginAssetByIdentifier = (identifier) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}/download`)
+
 const getPluginData = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
 const getPluginByIdentifier = (plugin) => {
   return axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
 }
 const getPluginUpdateByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.version}`)
 
-const installPluginTask = (plugin, callback) => {
-  if (typeof plugin === undefined) return
+const installPluginTask = (identifier, callback) => {
+  if (typeof identifier === undefined) return
 
   downloadAsset(Object.assign({},
-    plugin,
     {
+      identifier: identifier,
       destinationPath: app.getPath('temp'),
-      download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download`
+      download_url: `${API_URL}/v1/plugins/${identifier}/download`
     }
   ))
     .then(extractAsset)
-    .then(result => callback(null, result.plugin))
+    .then(result => callback(null))
     .catch(err => {
       log.debug(err.message)
       callback(err)
@@ -295,19 +291,19 @@ workQueue.drain = () => {
   log.debug('Work Complete')
 }
 
-const queueInstall = (plugins) => {
-  if (typeof plugins === undefined) return
-  if (plugins.length === 0) return
+const queueInstall = (identifiers) => {
+  if (typeof identifiers === undefined) return
 
-  log.debug(`Enqueueing ${plugins.length} plugins`)
-  plugins.map(plugin => workQueue.push({ action: 'install', payload: plugin }, (err, result) => {
-    log.debug(err, result)
+  const ids = isArray(identifiers) ? identifiers : [identifiers]
+  if (ids.length === 0) return
+
+  log.debug(`Enqueueing ${ids.length} plugins`)
+
+  ids.map(id => workQueue.push({ action: 'install', payload: id }, (err, result) => {
     if (err) {
-      mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err.message, plugin)
+      mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err.message, id)
       return
     }
-    log.debug('Install complete', result)
-    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
   }))
 }
 
@@ -361,7 +357,7 @@ const queueIdentify = (plugins) => {
 }
 
 
-ipcMain.on('sketchpack/IMPORT', (event, args) => {
+ipcMain.on('sketchpack/IMPORT_REQUEST', (event, args) => {
   dialog.showOpenDialog(null, {
     properties: ['openFile'],
     filters: [
@@ -373,19 +369,16 @@ ipcMain.on('sketchpack/IMPORT', (event, args) => {
   }, (filePaths) => {
     if (filePaths) {
       try {
-        readSketchpack(filePaths[0])
-          .then(plugins => queueInstall(plugins))
+        mainWindow.webContents.send('sketchpack/IMPORT', filePaths[0])
       } catch (err) {
         log.error(err)
       }
-
     }
-
   })
 })
 
 
-ipcMain.on('sketchpack/EXPORT', (event) => {
+ipcMain.on('sketchpack/EXPORT_REQUEST', (event, args) => {
   try {
     dialog.showSaveDialog(null, {
       nameFieldLabel: 'my-library',

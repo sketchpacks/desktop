@@ -61,10 +61,7 @@ import {
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
 
-  webInstallPluginRequest,
-  importSketchToolboxRequest,
-  importSketchpackRequest,
-  exportLibraryRequest
+  webInstallPluginRequest
 } from 'actions/plugin_manager'
 
 import {
@@ -82,7 +79,7 @@ import {
 
 import {
   syncSketchpackRequest,
-  importSketchpack,
+  importSketchpackRequest,
   exportSketchpackRequest
 } from 'reducers/sketchpack'
 
@@ -126,18 +123,31 @@ const loadSketchpack = () => {
 }
 loadSketchpack()
 
+ipcRenderer.on('sketchpack/IMPORT_REQUEST', (evt,args) => {
+  ipcRenderer.send('sketchpack/IMPORT_REQUEST')
+})
 
 ipcRenderer.on('sketchpack/IMPORT', (evt,filepath) => {
-  browserHistory.push('library/installed')
-  store.dispatch(importSketchpack(filepath))
+  browserHistory.push('/library/managed')
+  store.dispatch(importSketchpackRequest(filepath))
+})
+
+
+ipcRenderer.on('sketchpack/EXPORT_REQUEST', (evt,args) => {
+  ipcRenderer.send('sketchpack/EXPORT_REQUEST')
 })
 
 ipcRenderer.on('sketchpack/EXPORT', (evt,filepath) => {
   store.dispatch(exportSketchpackRequest(filepath))
 })
 
-ipcRenderer.on('sketchpack/SYNC', (evt,contents) => {
-  store.dispatch(syncSketchpackRequest(contents))
+ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,plugin) => {
+  ipcRenderer.send(INSTALL_PLUGIN_REQUEST,plugin)
+})
+
+ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt,filepath) => {
+  browserHistory.push('/library/managed')
+  store.dispatch(importSketchpackRequest(filepath))
 })
 
 

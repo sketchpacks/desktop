@@ -24,11 +24,11 @@ class App extends Component {
   }
 
   handleImportClick () {
-    ipcRenderer.send('sketchpack/IMPORT')
+    ipcRenderer.send('sketchpack/IMPORT_REQUEST')
   }
 
   handleExportClick () {
-    ipcRenderer.send('sketchpack/EXPORT')
+    ipcRenderer.send('sketchpack/EXPORT_REQUEST')
   }
 
   renderLibraryActions () {

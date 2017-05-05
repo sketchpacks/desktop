@@ -35,24 +35,12 @@ function webInstallPluginRequest (pluginId) {
 
 const INSTALL_PLUGIN_SUCCESS = 'manager/INSTALL_SUCCESS'
 
-function installPluginSuccess (plugin) {
+function installPluginSuccess (identifier) {
   return {
     type: INSTALL_PLUGIN_SUCCESS,
-    plugin,
+    payload: identifier,
     meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: 'Install Plugin',
-        props: {
-          source: 'desktop',
-          pluginId: `${plugin.owner.handle}/${plugin.name}`,
-          pluginVersion: plugin.version
-        },
-      },
-      notification: {
-        title: 'Sketchpacks',
-        message: `${plugin.name} ${plugin.version} installed`
-      }
+      notification: true
     }
   }
 }
@@ -171,42 +159,6 @@ function uninstallPluginError (error, plugin) {
 }
 
 
-const IMPORT_FROM_SKETCHPACK_REQUEST = 'manager/IMPORT_FROM_SKETCHPACK_REQUEST'
-
-function importSketchpackRequest () {
-  return {
-    type: IMPORT_FROM_SKETCHPACK_REQUEST,
-    meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: 'Import',
-        props: {
-          source: 'Sketchpack'
-        },
-      },
-    },
-  }
-}
-
-
-const EXPORT_LIBRARY_REQUEST = 'manager/EXPORT_LIBRARY'
-
-function exportLibraryRequest () {
-  return {
-    type: EXPORT_LIBRARY_REQUEST,
-    meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: 'Export',
-        props: {
-          source: 'My Library'
-        },
-      },
-    },
-  }
-}
-
-
 module.exports = {
   installPluginRequest,
   installPluginSuccess,
@@ -232,7 +184,5 @@ module.exports = {
   UNINSTALL_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_ERROR,
 
-  webInstallPluginRequest,
-  importSketchpackRequest,
-  exportLibraryRequest
+  webInstallPluginRequest
 }

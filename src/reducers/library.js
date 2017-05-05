@@ -9,14 +9,14 @@ export const installPlugin = createAction('manager/INSTALL_SUCCESS')
 export const detectPlugin = createAction('library/FETCH_RECEIVED')
 export const identifyPlugin = createAction('library/IDENTIFY_PLUGIN_SUCCESS')
 
-export const removePlugin = createAction('library/UNINSTALL_PLUGIN', plugin => {
-  ipcRenderer.send('manager/UNINSTALL_REQUEST', plugin)
-  return plugin
+export const removePlugin = createAction('library/UNINSTALL_PLUGIN', identifier => {
+  ipcRenderer.send('manager/UNINSTALL_REQUEST', identifier)
+  return identifier
 })
 
-export const updatePlugin = createAction('library/UPDATE_PLUGIN', plugin => {
-  ipcRenderer.send('manager/UPDATE_REQUEST', plugin)
-  return plugin
+export const updatePlugin = createAction('library/UPDATE_PLUGIN', identifier => {
+  ipcRenderer.send('manager/UPDATE_REQUEST', identifier)
+  return identifier
 })
 
 export const installPluginRequest = createAction('library/INSTALL_PLUGIN_REQUEST')

@@ -1,6 +1,6 @@
 const json5file = require('@sketchpacks/json5file')
 
-const writeSketchpack = (filepath, contents) => {
+const writeSketchpack = (filepath, contents, callback) => {
   const data = {
     name: "My Library",
     schema_version: '1.0.0',
@@ -16,6 +16,8 @@ const writeSketchpack = (filepath, contents) => {
 
   json5file.writeFile(filepath, data, opts, (err) => {
     if (err) console.error(err)
+
+    callback()
   })
 }
 

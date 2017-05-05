@@ -30,6 +30,7 @@ import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 
 import App from 'containers/App'
+import AppError from 'errors/AppError'
 
 import BrowsePlugins from 'views/BrowsePlugins'
 import SearchResults from 'views/SearchResults'
@@ -80,7 +81,9 @@ import {
 } from 'reducers/library'
 
 import {
-  syncSketchpackContents
+  syncSketchpackRequest,
+  importSketchpack,
+  exportSketchpackRequest
 } from 'reducers/sketchpack'
 
 let store = configureStore()
@@ -118,28 +121,23 @@ const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat
 const loadSketchpack = () => {
   readSketchpack(path.join(remote.app.getPath('userData'), 'my-library.sketchpack'))
     .then(contents => {
-      if (contents.length > 0) store.dispatch(syncSketchpackContents(contents))
+      if (contents.length > 0) store.dispatch(syncSketchpackRequest(contents))
     })
 }
 loadSketchpack()
 
 
-ipcRenderer.on('IMPORT_FROM_SKETCHPACK', (evt, args) => {
+ipcRenderer.on('sketchpack/IMPORT', (evt,filepath) => {
   browserHistory.push('library/installed')
-  ipcRenderer.send('IMPORT_FROM_SKETCHPACK')
-  store.dispatch(importSketchpackRequest())
+  store.dispatch(importSketchpack(filepath))
 })
 
-
-ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, args) => {
-  browserHistory.push('library/installed')
-  ipcRenderer.send('IMPORT_FROM_SKETCH_TOOLBOX')
-  store.dispatch(importSketchToolboxRequest())
+ipcRenderer.on('sketchpack/EXPORT', (evt,filepath) => {
+  store.dispatch(exportSketchpackRequest(filepath))
 })
 
-ipcRenderer.on('EXPORT_LIBRARY', (evt, args) => {
-  ipcRenderer.send('EXPORT_LIBRARY', store.getState().library.items)
-  store.dispatch(exportLibraryRequest())
+ipcRenderer.on('sketchpack/SYNC', (evt,contents) => {
+  store.dispatch(syncSketchpackRequest(contents))
 })
 
 
@@ -156,18 +154,10 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
 
 
 ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  const msgBody = plugin.title || plugin.name
-
-  const notif = new window.Notification('Sketchpacks', {
-    body: `${msgBody} v${plugin.version} installed`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
-
   store.dispatch(installPluginSuccess(plugin))
 })
 
-ipcRenderer.on(INSTALL_PLUGIN_ERROR, (error, plugin) => {
+ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt, err, plugin) => {
   const msgBody = plugin.title || plugin.name
 
   const notif = new window.Notification('Sketchpacks', {
@@ -176,7 +166,12 @@ ipcRenderer.on(INSTALL_PLUGIN_ERROR, (error, plugin) => {
     icon: path.join(__dirname, 'src/static/images/icon.png'),
   })
 
-  store.dispatch(installPluginError(error, plugin))
+  store.dispatch({
+    type: INSTALL_PLUGIN_ERROR,
+    error: true,
+    payload: new AppError(err),
+    meta: { plugin }
+  })
 })
 
 ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
@@ -203,11 +198,6 @@ ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
 
 ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
-})
-
-ipcRenderer.on('sketchpack/SYNC_CONTENTS', (evt,contents) => {
-  log.debug('sketchpack/SYNC_CONTENTS',contents)
-  store.dispatch(syncSketchpackContents(contents))
 })
 
 ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {

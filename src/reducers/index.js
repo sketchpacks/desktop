@@ -10,6 +10,7 @@ import users from 'reducers/users'
 import library from 'reducers/library'
 import sketchpack from 'reducers/sketchpack'
 import search from 'reducers/search'
+import queue from 'reducers/queue'
 
 //- Reducer
 
@@ -19,7 +20,8 @@ const rootReducer = combineReducers({
   users,
   plugins,
   sketchpack,
-  search
+  search,
+  queue
 })
 
 export default rootReducer
@@ -67,9 +69,12 @@ export const getUnmanagedPlugins = createSelector(
   (lib, pack) => difference(lib,pack)
 )
 
-export const getUnlockedPlugins = (state) => filter(
-  state.sketchpack.plugins.allIdentifiers,
-  (id) => !isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+export const getUnlockedPlugins = createSelector(
+  [ getStateTree, getManagedPlugins ],
+  (state,ids) => filter(
+    ids,
+    (id) => !isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+  )
 )
 
 export const getLockedPlugins = (state) => filter(
@@ -97,9 +102,18 @@ const getLibraryPluginByIdentifier = (state,identifier) => {
   return state.library.plugins.byIdentifier[identifier]
 }
 
+const getPluginInstallActivity = (state,identifier) => {
+  return includes(state.queue.installing, identifier)
+}
+
 export const selectPlugin = createSelector(
-  [ getPluginByIdentifier, getLibraryPluginByIdentifier, getSketchpackPluginByIdentifier ],
-  (entity, lib, pack) => {
+  [
+    getPluginByIdentifier,
+    getLibraryPluginByIdentifier,
+    getSketchpackPluginByIdentifier,
+    getPluginInstallActivity
+  ],
+  (entity, lib, pack, isInstalling) => {
     const data = entity
 
     if (lib) {
@@ -110,6 +124,8 @@ export const selectPlugin = createSelector(
     if (pack) {
       data['version_range'] = pack.version
     }
+
+    data['isInstalling'] = isInstalling
 
     return data
   }

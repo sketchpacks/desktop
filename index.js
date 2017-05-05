@@ -39,9 +39,7 @@ const autolauncher = new AutoLaunch({
 })
 
 const readManifest = require('./src/lib/readManifest')
-const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
-const readLibrary = require('./src/lib/readLibrary')
 
 const {
   getInstallPath,
@@ -141,14 +139,19 @@ ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
 
 ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
   log.debug(INSTALL_PLUGIN_REQUEST, arg)
-  const p = { owner: arg.owner.handle, name: arg.name }
+  const p = {
+    owner: arg.owner.handle,
+    name: arg.name,
+    identifier: arg.identifier
+  }
+
   queueInstall([p])
 })
 
 
 ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
   log.debug(UPDATE_PLUGIN_REQUEST, arg)
-  queueUpdate([arg])
+  queueUpdate(arg)
 })
 
 ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
@@ -172,47 +175,51 @@ ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
   updater.checkForUpdates(confirm)
 })
 
-const getPluginData = (plugin) => axios.get(`${API_URL}/v1/users/${plugin.owner}/plugins/${plugin.name.toLowerCase()}`)
-const getPluginByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
+const getPluginData = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
+const getPluginByIdentifier = (plugin) => {
+  return axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
+}
 const getPluginUpdateByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.version}`)
 
 const installPluginTask = (plugin, callback) => {
-  getPluginData(plugin)
-    .then(response => downloadAsset({
-      plugin: response.data,
+  if (typeof plugin === undefined) return
+
+  downloadAsset(Object.assign({},
+    plugin,
+    {
       destinationPath: app.getPath('temp'),
-      onProgress: (received,total) => {
-        let percentage = (received * 100) / total;
-        // log.debug(percentage + "% | " + received + " bytes out of " + total + " bytes.")
-      }
-    }))
+      download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download`
+    }
+  ))
     .then(extractAsset)
     .then(result => callback(null, result.plugin))
     .catch(err => {
-      log.error('Error while installing: ', err)
+      log.debug(err.message)
       callback(err)
     })
 }
 
 const updatePluginTask = (plugin, callback) => {
   if (typeof plugin === undefined) return
-  log.debug('updatePluginTask', plugin)
 
-  downloadAsset({
-    plugin: Object.assign(plugin, {download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}`}),
-    destinationPath: app.getPath('temp')
-  })
+  downloadAsset(Object.assign({},
+    plugin,
+    {
+      destinationPath: app.getPath('temp'),
+      download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}`
+    }
+  ))
     .then(removeAsset)
     .then(extractAsset)
     .then(result => callback(null, result.plugin))
     .catch(err => {
-      log.error('Error while updating: ', err)
+      log.debug(err.message)
       callback(err)
     })
 }
 
 const uninstallPluginTask = (plugin, callback) => {
-  removeAsset({ plugin: plugin })
+  removeAsset(plugin)
     .then(result => callback(null, result.plugin))
     .catch(err => callback(err))
 }
@@ -242,7 +249,7 @@ const identifyPluginTask = (manifestPath, callback) => {
       }
       resolve(unidentifiedPlugin)
     } catch (err) {
-      log.error(err)
+      log.error('buildPlugin', err)
       reject(err)
     }
   })
@@ -253,9 +260,14 @@ const identifyPluginTask = (manifestPath, callback) => {
     .then(response => {
       const data = Object.assign({}, response.data, { install_path, manifest_path, version })
       callback(null, data)
+    },
+    err => {
+      const error = new Error(`Failed to identify plugin - ${manifest_path}`)
+      const data = Object.assign({}, { install_path, manifest_path, version })
+      callback(error, data)
     })
     .catch(err => {
-      // log.error('Error while identifying: ', err)
+      log.error('Failed to identify plugin: ', err)
       callback(null, unidentifiedPlugin)
     })
 }
@@ -289,12 +301,13 @@ const queueInstall = (plugins) => {
 
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'install', payload: plugin }, (err, result) => {
+    log.debug(err, result)
     if (err) {
-      mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err, plugin)
-      return callback(err)
+      mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err.message, plugin)
+      return
     }
-    log.debug('Install complete', result.name)
-    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
+    log.debug('Install complete', result)
+    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, plugin)
   }))
 }
 
@@ -304,7 +317,10 @@ const queueUpdate = (plugins) => {
 
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'update', payload: plugin }, (err, result) => {
-    if (err) return callback(err)
+    if (err) {
+      log.error(err)
+      return
+    }
     log.debug('Update complete', result)
     mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, result.plugin)
   }))
@@ -316,7 +332,7 @@ const queueRemove = (plugins) => {
 
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'remove', payload: plugin }, (err, result) => {
-    if (err) return callback(err)
+    if (err) return
     log.debug('Uninstall complete', result)
     mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, result)
   }))
@@ -324,8 +340,11 @@ const queueRemove = (plugins) => {
 
 const queueSync = (sketchpackContents) => {
   workQueue.push({ action: 'sync', payload: sketchpackContents }, (err, result) => {
-    if (err) return callback(err)
-    mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', sketchpackContents)
+    if (err) {
+      log.error(err)
+      return
+    }
+    mainWindow.webContents.send('sketchpack/SYNC', sketchpackContents)
   })
 }
 
@@ -335,8 +354,6 @@ const queueIdentify = (plugins) => {
 
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'identify', payload: plugin }, (err, result) => {
-    if (err) return callback(err)
-
     if (typeof result !== undefined) {
       mainWindow.webContents.send('PLUGIN_DETECTED', result)
     }
@@ -344,7 +361,7 @@ const queueIdentify = (plugins) => {
 }
 
 
-ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
+ipcMain.on('sketchpack/IMPORT', (event, args) => {
   dialog.showOpenDialog(null, {
     properties: ['openFile'],
     filters: [
@@ -368,7 +385,7 @@ ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
 })
 
 
-ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
+ipcMain.on('sketchpack/EXPORT', (event) => {
   try {
     dialog.showSaveDialog(null, {
       nameFieldLabel: 'my-library',
@@ -379,14 +396,11 @@ ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
       tags: false,
       title: 'Export My Library'
     }, (filepath) => {
-      if (libraryContents.length === 0) return
-
-      log.info(`My Library exported to ${filepath}`)
-
-      if (filepath) writeSketchpack(filepath,libraryContents)
+      if (filepath) mainWindow.webContents.send('sketchpack/EXPORT', filepath)
     })
   } catch (err) {
     log.error(err)
+    if (err) mainWindow.webContents.send('sketchpack/EXPORT_ERROR')
   }
 })
 

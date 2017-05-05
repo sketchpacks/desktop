@@ -24,11 +24,11 @@ class App extends Component {
   }
 
   handleImportClick () {
-    ipcRenderer.send('IMPORT_FROM_SKETCHPACK', null)
+    ipcRenderer.send('sketchpack/IMPORT')
   }
 
   handleExportClick () {
-    ipcRenderer.send('EXPORT_LIBRARY', this.props.state.library.items)
+    ipcRenderer.send('sketchpack/EXPORT')
   }
 
   renderLibraryActions () {
@@ -76,7 +76,7 @@ class App extends Component {
 
         <div className="app__body">
           <header className='app__header'>
-            { this.props.location.pathname === '/library/installed'
+            { this.props.location.pathname === '/library/managed'
               && this.renderLibraryActions()  }
 
             <SearchBar {...this.props} classNames={'searchBar'} />

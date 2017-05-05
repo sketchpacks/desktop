@@ -24,9 +24,22 @@ import {
 
 //- Actions
 
-export const syncSketchpackContents = createAction('sketchpack/SYNC_CONTENTS')
+export const syncSketchpackRequest = createAction('sketchpack/SYNC_REQUEST')
+export const syncSketchpackSuccess = createAction('sketchpack/SYNC_SUCCESS')
+export const syncSketchpackError = createAction('sketchpack/SYNC_ERROR')
 
 export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE')
+
+export const importSketchpackRequest = createAction('sketchpack/IMPORT_REQUEST')
+export const importSketchpackSuccess = createAction('sketchpack/IMPORT_SUCCESS')
+export const importSketchpackError = createAction('sketchpack/IMPORT_ERROR')
+export const importSketchpack = () => {
+  // ...
+}
+
+export const exportSketchpackRequest = createAction('sketchpack/EXPORT_REQUEST')
+export const exportSketchpackSuccess = createAction('sketchpack/EXPORT_SUCCESS')
+export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 
 
 //- State
@@ -43,7 +56,7 @@ const initialState = {
 //- Reducers
 
 export default handleActions({
-  [syncSketchpackContents]: (state, action) => {
+  [syncSketchpackRequest]: (state, action) => {
     return {
       ...state,
       name: action.payload.name,

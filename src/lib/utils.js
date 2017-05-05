@@ -26,7 +26,7 @@ const getInstallPath = () => {
 }
 
 const downloadAsset = (opts) => new Promise((resolve, reject) => {
-  log.debug('Downloading: ', opts.plugin.name)
+  log.debug('Downloading: ', opts)
   let received_bytes = 0
   let total_bytes = 0
   let disposition
@@ -36,19 +36,19 @@ const downloadAsset = (opts) => new Promise((resolve, reject) => {
 
   const req = request({
     method: 'GET',
-    uri: opts.plugin.download_url,
+    uri: opts.download_url,
     timeout: 1500
   })
 
   req.on('error', (err) => {
     if (err.code === 'ETIMEDOUT') log.debug('Timeout')
     if (err.connect === true) log.debug('Connection Timeout')
-    reject(err)
+    reject(new Error('Download failed'))
   })
 
   req.on('response', (data) => {
     if (data.statusCode !== 200) {
-      reject(Error('No update found'))
+      reject(new Error('No update found'))
     }
 
     total_bytes = parseInt(data.headers['content-length' ])
@@ -57,8 +57,8 @@ const downloadAsset = (opts) => new Promise((resolve, reject) => {
       disposition = data.headers['content-disposition']
       filename = contentDisposition.parse(disposition)['parameters']['filename']
     } catch (err) {
-      log.error(err)
-      filename = `sketch-plugin-${opts.plugin.id}.zip`
+      // log.debug(err)
+      filename = `sketch-plugin-${opts.identifier}.zip`
     }
 
     savePath = path.join(opts.destinationPath,filename)
@@ -67,13 +67,18 @@ const downloadAsset = (opts) => new Promise((resolve, reject) => {
     req.pipe(out)
 
     out.on('close', () => {
-      resolve({
-        plugin: opts.plugin,
-        asset: {
-          savePath: savePath,
-          filename: filename
-        }
-      })
+      resolve(
+        Object.assign(
+          {},
+          opts,
+          {
+            asset: {
+              savePath: savePath,
+              filename: filename
+            }
+          }
+        )
+      )
     })
   })
 
@@ -95,7 +100,7 @@ const extractAsset = (data) => new Promise((resolve, reject) => {
   const extractionPath = getInstallPath()
   const {entryName} = new AdmZip(archivePath).getEntries()[0]
 
-  data.plugin['install_path'] = path.join(extractionPath, entryName)
+  data['install_path'] = path.join(extractionPath, entryName)
 
   exec(`unzip -o -a ${archivePath} -d ${extractionPath}`, (error, stdout, stderr) => {
     if (error) {
@@ -111,7 +116,8 @@ const extractAsset = (data) => new Promise((resolve, reject) => {
 })
 
 const removeAsset = (data) => new Promise((resolve, reject) => {
-  const {install_path} = data.plugin
+  log.debug('removeAsset', data)
+  const {install_path} = data
 
   const install_dir_path = getInstallPath()
 

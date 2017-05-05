@@ -6,6 +6,8 @@ import createLogger from 'redux-logger'
 import mixpanelMiddleware from 'remimi'
 import rootReducer from 'reducers'
 import sketchpackMiddleware from 'middleware/sketchpack'
+import exportMiddleware from 'middleware/export'
+import notificationMiddleware from 'middleware/notification'
 
 import {SketchpacksApi} from 'api'
 
@@ -18,6 +20,8 @@ const enhancer = composeEnhancers(
     thunk.withExtraArgument({api: SketchpacksApi}),
     logger,
     sketchpackMiddleware,
+    exportMiddleware,
+    notificationMiddleware,
     mixpanelMiddleware(MIXPANEL_TOKEN),
   )
 )

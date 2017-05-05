@@ -8,8 +8,6 @@ const { ipcRenderer } = require('electron')
 
 const log = require('electron-log')
 const ms = require('ms')
-const axios = require('axios')
-const semver = require('semver')
 const {find} = require('lodash')
 
 const {sanitizeSemVer} = require('../lib/utils')
@@ -19,6 +17,10 @@ const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
 
 function installPluginRequest (plugin) {
   return (dispatch, getState) => {
+    dispatch({
+      type: 'library/INSTALL_PLUGIN_REQUEST',
+      payload: plugin
+    })
     ipcRenderer.send(INSTALL_PLUGIN_REQUEST, plugin)
   }
 }
@@ -47,7 +49,11 @@ function installPluginSuccess (plugin) {
           pluginVersion: plugin.version
         },
       },
-    },
+      notification: {
+        title: 'Sketchpacks',
+        message: `${plugin.name} ${plugin.version} installed`
+      }
+    }
   }
 }
 
@@ -58,7 +64,7 @@ function installPluginError (error, plugin) {
   return {
     type: INSTALL_PLUGIN_ERROR,
     error: error,
-    plugin
+    payload: plugin
   }
 }
 
@@ -101,6 +107,10 @@ function updatePluginSuccess (plugin) {
           pluginVersion: plugin.version
         },
       },
+      notification: {
+        title: 'Sketchpacks',
+        message: `${plugin.name} updated to ${plugin.version}`
+      }
     },
   }
 }
@@ -160,23 +170,6 @@ function uninstallPluginError (error, plugin) {
   }
 }
 
-const pluginData = (owner,slug) => new Promise((resolve,reject) => {
-  axios.get(`${API_URL}/v1/users/${owner}/plugins/${slug.toLowerCase()}`)
-    .then(response => {
-      resolve(response.data)
-    })
-    .catch(response => {
-      resolve({})
-    })
-})
-
-function updateAvailable (remote,local) {
-  let remoteVersion = sanitizeSemVer(plugin.version)
-  let localVersion = sanitizeSemVer(plugin.installed_version)
-
-  return semver.lt(localVersion,remoteVersion)
-}
-
 
 const IMPORT_FROM_SKETCHPACK_REQUEST = 'manager/IMPORT_FROM_SKETCHPACK_REQUEST'
 
@@ -195,22 +188,6 @@ function importSketchpackRequest () {
   }
 }
 
-const IMPORT_FROM_SKETCH_TOOLBOX_REQUEST = 'manager/IMPORT_FROM_SKETCH_TOOLBOX_REQUEST'
-
-function importSketchToolboxRequest () {
-  return {
-    type: IMPORT_FROM_SKETCH_TOOLBOX_REQUEST,
-    meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: 'Import',
-        props: {
-          source: 'Sketch Toolbox'
-        },
-      },
-    },
-  }
-}
 
 const EXPORT_LIBRARY_REQUEST = 'manager/EXPORT_LIBRARY'
 
@@ -256,7 +233,6 @@ module.exports = {
   UNINSTALL_PLUGIN_ERROR,
 
   webInstallPluginRequest,
-  importSketchToolboxRequest,
   importSketchpackRequest,
   exportLibraryRequest
 }

@@ -13,8 +13,6 @@ const {
   syncSketchpackContents
 } = require('reducers')
 
-const { exportSketchpackRequest } = require('reducers/sketchpack')
-
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,
   INSTALL_PLUGIN_SUCCESS,
@@ -27,7 +25,7 @@ const WATCHED_ACTIONS = {
   INSTALL_PLUGIN_SUCCESS,
   UPDATE_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_SUCCESS,
-  SKETCHPACK_SYNC_CONTENTS: 'sketchpack/SYNC'
+  SKETCHPACK_SYNC_CONTENTS: 'sketchpack/SYNC_CONTENTS'
 }
 
 const sketchpackMiddleware = store => next => action => {
@@ -40,7 +38,17 @@ const sketchpackMiddleware = store => next => action => {
   const identifiers = getSketchpackIdentifiers(store.getState())
 
   if (identifiers.length > 0) {
-    store.dispatch(exportSketchpackRequest(sketchpackPath))
+    const sketchpack = reduce(identifiers, (plugins, identifier) => {
+      plugins[identifier] = {
+        ...nextState[identifier]
+      }
+      return plugins
+    }, nextState)
+
+    writeSketchpack(
+      sketchpackPath,
+      sketchpack
+    )
   }
 
 }

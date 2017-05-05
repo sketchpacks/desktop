@@ -4,9 +4,9 @@ import {
   PLUGIN_AUTOUPDATE_INTERVAL
 } from '../config'
 
-import {ipcRenderer} from 'electron'
+import { ipcRenderer } from 'electron'
 
-import {getUnlockedPlugins} from 'reducers'
+import { getUnlockedPlugins,selectPlugin } from 'reducers'
 
 const AUTOUPDATE_PLUGINS_REQUEST = 'manager/AUTOUPDATE_PLUGINS'
 
@@ -15,6 +15,7 @@ export const autoUpdatePluginsRequest = ({repeat}) => {
     dispatch({ type: AUTOUPDATE_PLUGINS_REQUEST })
 
     const unlockedPlugins = getUnlockedPlugins(getState())
+      .map(id => selectPlugin(getState(),id))
 
     ipcRenderer.send('manager/UPDATE_REQUEST', unlockedPlugins)
 

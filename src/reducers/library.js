@@ -19,6 +19,10 @@ export const updatePlugin = createAction('library/UPDATE_PLUGIN', plugin => {
   return plugin
 })
 
+export const installPluginRequest = createAction('library/INSTALL_PLUGIN_REQUEST')
+export const installPluginSuccess = createAction('library/INSTALL_PLUGIN_SUCCESS')
+export const installPluginError = createAction('manager/INSTALL_ERROR')
+
 
 //- State
 
@@ -77,5 +81,10 @@ export default handleActions({
         state.plugins.allIdentifiers, p => p !== action.payload.identifier
       )
     }
-  })
+  }),
+
+  [installPluginError]: (state, action) => {
+    console.log(action)
+    return state
+  }
 }, initialState)

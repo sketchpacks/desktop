@@ -37,7 +37,8 @@ class PluginMedia extends Component {
     this.state = {
       clicked: false,
       isInstalled: false,
-      isLocked: false
+      isLocked: false,
+      isInstalling: false
     }
   }
 
@@ -98,7 +99,7 @@ class PluginMedia extends Component {
   renderButton () {
     const {location,handlePluginEvent} = this.props
 
-    if (this.state.clicked) return <button className='button'><BeatLoader fill="#ffffff" count={3} /></button>
+    if (this.state.isInstalling) return <button className='button'><BeatLoader fill="#ffffff" count={3} /></button>
 
     return <Button
       onClick={!this.state.isInstalled
@@ -131,6 +132,12 @@ class PluginMedia extends Component {
     }
 
     try {
+      newState['isInstalling'] = nextPlugin.isInstalling
+    } catch (err) {
+      newState['isInstalling'] = false
+    }
+
+    try {
       newState['isLocked'] = isSemverLocked(nextPlugin.version_range)
     } catch (err) {
       newState['isLocked'] = false
@@ -141,12 +148,22 @@ class PluginMedia extends Component {
 
   componentDidMount () {
     const newState = { ...this.state }
-    const {installed_version,version_range} = this.props.plugin
+    const {
+      installed_version,
+      version_range,
+      isInstalling
+    } = this.props.plugin
 
     try {
       newState['isInstalled'] = installed_version
     } catch (err) {
       newState['isInstalled'] = false
+    }
+
+    try {
+      newState['isInstalling'] = isInstalling
+    } catch (err) {
+      newState['isInstalling'] = false
     }
 
     try {

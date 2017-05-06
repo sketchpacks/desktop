@@ -5,7 +5,7 @@ import {uniq,includes,isObject,has,pickBy,filter} from 'lodash'
 import {
   sanitizeSemVer,
   isSemverLocked,
-  unlockSemver,
+  lockSemver,
   toggleSemverLock
 } from 'lib/utils'
 
@@ -24,9 +24,19 @@ import {
 
 //- Actions
 
-export const syncSketchpackContents = createAction('sketchpack/SYNC_CONTENTS')
+export const syncSketchpackRequest = createAction('sketchpack/SYNC_REQUEST')
+export const syncSketchpackSuccess = createAction('sketchpack/SYNC_SUCCESS')
+export const syncSketchpackError = createAction('sketchpack/SYNC_ERROR')
 
 export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE')
+
+export const importSketchpackRequest = createAction('sketchpack/IMPORT_REQUEST')
+export const importSketchpackSuccess = createAction('sketchpack/IMPORT_SUCCESS')
+export const importSketchpackError = createAction('sketchpack/IMPORT_ERROR')
+
+export const exportSketchpackRequest = createAction('sketchpack/EXPORT_REQUEST')
+export const exportSketchpackSuccess = createAction('sketchpack/EXPORT_SUCCESS')
+export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 
 
 //- State
@@ -43,7 +53,7 @@ const initialState = {
 //- Reducers
 
 export default handleActions({
-  [syncSketchpackContents]: (state, action) => {
+  [syncSketchpackRequest]: (state, action) => {
     return {
       ...state,
       name: action.payload.name,
@@ -84,10 +94,7 @@ export default handleActions({
   [detectPlugin]: (state, action) => {
     let { entities, result } = action.payload
 
-    if (entities.plugins[result].owner === undefined) return state
-
     let plugin = entities.plugins[result]
-    let owner = entities.users[plugin.owner].handle
 
     let identifier = plugin.identifier
 
@@ -104,7 +111,7 @@ export default handleActions({
         byIdentifier: {
           ...state.plugins.byIdentifier,
           [identifier]: {
-            version: unlockSemver(plugin.version)
+            version: lockSemver(plugin.version)
           }
         },
         allIdentifiers: uniq(

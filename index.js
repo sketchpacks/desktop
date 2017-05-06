@@ -17,7 +17,7 @@ const pkg = require('./package.json')
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-const {forEach,filter,find,difference} = require('lodash')
+const {forEach,filter,find,difference,isArray} = require('lodash')
 const electron = require('electron')
 const app = electron.app
 const dialog = electron.dialog
@@ -39,9 +39,7 @@ const autolauncher = new AutoLaunch({
 })
 
 const readManifest = require('./src/lib/readManifest')
-const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
-const readLibrary = require('./src/lib/readLibrary')
 
 const {
   getInstallPath,
@@ -56,16 +54,11 @@ const {
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
   UPDATE_PLUGIN_REQUEST,
-  UPDATE_PLUGIN_SUCCESS,
   UPDATE_PLUGIN_ERROR,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_ERROR
 } = require('./src/actions/plugin_manager')
-
-const {
-  SYNC_CHANGE_RECEIVED
-} = require('./src/actions/sketchpack')
 
 const opts = {
   dir: __dirname,
@@ -86,7 +79,8 @@ const menuBar = menubar(opts)
 let mainWindow
 let updater
 let externalPluginInstallQueue = []
-let watcher
+let libraryWatcher
+let sketchpackWatcher
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
@@ -142,10 +136,9 @@ ipcMain.on('APP_WINDOW_OPEN', (event, arg) => {
 })
 
 
-ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, arg) => {
-  log.debug(INSTALL_PLUGIN_REQUEST, arg)
-  const p = { owner: arg.owner.handle, name: arg.name }
-  queueInstall([p])
+ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, plugins) => {
+  log.debug(INSTALL_PLUGIN_REQUEST, plugins)
+  queueInstall(plugins)
 })
 
 
@@ -175,48 +168,54 @@ ipcMain.on('CHECK_FOR_CLIENT_UPDATES', (evt, arg) => {
   updater.checkForUpdates(confirm)
 })
 
-const getPluginData = (plugin) => axios.get(`${API_URL}/v1/users/${plugin.owner}/plugins/${plugin.name.toLowerCase()}`)
-const getPluginByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
+const getPluginAssetByIdentifier = (identifier) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}/download`)
+
+const getPluginData = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
+const getPluginByIdentifier = (plugin) => {
+  return axios.get(`${API_URL}/v1/plugins/${plugin.identifier}`)
+}
 const getPluginUpdateByIdentifier = (plugin) => axios.get(`${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.version}`)
 
-const installPluginTask = (plugin, callback) => {
-  getPluginData(plugin)
-    .then(response => downloadAsset({
-      plugin: response.data,
+const installPluginTask = (identifier, callback) => {
+  if (typeof identifier === undefined) return
+
+  downloadAsset(Object.assign({},
+    {
+      identifier: identifier,
       destinationPath: app.getPath('temp'),
-      onProgress: (received,total) => {
-        let percentage = (received * 100) / total;
-        // log.debug(percentage + "% | " + received + " bytes out of " + total + " bytes.")
-      }
-    }))
+      download_url: `${API_URL}/v1/plugins/${identifier}/download`
+    }
+  ))
     .then(extractAsset)
-    .then(result => callback(null, result.plugin))
+    .then(result => callback(null))
     .catch(err => {
-      log.error('Error while installing: ', err)
+      log.debug(err.message)
       callback(err)
     })
 }
 
 const updatePluginTask = (plugin, callback) => {
   if (typeof plugin === undefined) return
-  log.debug('updatePluginTask', plugin)
 
-  downloadAsset({
-    plugin: Object.assign(plugin, {download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}`}),
-    destinationPath: app.getPath('temp')
-  })
+  downloadAsset(Object.assign({},
+    plugin,
+    {
+      destinationPath: app.getPath('temp'),
+      download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}`
+    }
+  ))
     .then(removeAsset)
     .then(extractAsset)
-    .then(result => callback(null, result.plugin))
+    .then(result => callback(null, result))
     .catch(err => {
-      log.error('Error while updating: ', err)
+      log.debug(err.message)
       callback(err)
     })
 }
 
 const uninstallPluginTask = (plugin, callback) => {
-  removeAsset({ plugin: plugin })
-    .then(result => callback(null, result.plugin))
+  removeAsset(plugin)
+    .then(result => callback(null, result))
     .catch(err => callback(err))
 }
 
@@ -245,7 +244,7 @@ const identifyPluginTask = (manifestPath, callback) => {
       }
       resolve(unidentifiedPlugin)
     } catch (err) {
-      log.error(err)
+      log.error('buildPlugin', err)
       reject(err)
     }
   })
@@ -256,9 +255,14 @@ const identifyPluginTask = (manifestPath, callback) => {
     .then(response => {
       const data = Object.assign({}, response.data, { install_path, manifest_path, version })
       callback(null, data)
+    },
+    err => {
+      const error = new Error(`Failed to identify plugin - ${manifest_path}`)
+      const data = Object.assign({}, { install_path, manifest_path, version })
+      callback(error, data)
     })
     .catch(err => {
-      // log.error('Error while identifying: ', err)
+      log.error('Failed to identify plugin: ', err)
       callback(null, unidentifiedPlugin)
     })
 }
@@ -283,21 +287,22 @@ const WORK_QUEUE_CONCURRENCY = 1
 const workQueue = async.queue((task, callback) => triageTask(task, callback), WORK_QUEUE_CONCURRENCY)
 
 workQueue.drain = () => {
-  log.debug('Work Complete')
+  log.debug('Work queue drained')
 }
 
-const queueInstall = (plugins) => {
-  if (typeof plugins === undefined) return
-  if (plugins.length === 0) return
+const queueInstall = (identifiers) => {
+  if (typeof identifiers === undefined) return
 
-  log.debug(`Enqueueing ${plugins.length} plugins`)
-  plugins.map(plugin => workQueue.push({ action: 'install', payload: plugin }, (err, result) => {
+  const ids = isArray(identifiers) ? identifiers : [identifiers]
+  if (ids.length === 0) return
+
+  log.debug(`Enqueueing ${ids.length} plugins`)
+
+  ids.map(id => workQueue.push({ action: 'install', payload: id }, (err, result) => {
     if (err) {
-      mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err, plugin)
-      return callback(err)
+      mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err.message, id)
+      return
     }
-    log.debug('Install complete', result.name)
-    mainWindow.webContents.send(INSTALL_PLUGIN_SUCCESS, result)
   }))
 }
 
@@ -307,9 +312,12 @@ const queueUpdate = (plugins) => {
 
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'update', payload: plugin }, (err, result) => {
-    if (err) return callback(err)
+    if (err) {
+      log.error(err)
+      return
+    }
     log.debug('Update complete', result)
-    mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, result.plugin)
+    mainWindow.webContents.send('library/UPDATE_PLUGIN_SUCCESS', result.plugin)
   }))
 }
 
@@ -319,7 +327,7 @@ const queueRemove = (plugins) => {
 
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'remove', payload: plugin }, (err, result) => {
-    if (err) return callback(err)
+    if (err) return
     log.debug('Uninstall complete', result)
     mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, result)
   }))
@@ -327,8 +335,11 @@ const queueRemove = (plugins) => {
 
 const queueSync = (sketchpackContents) => {
   workQueue.push({ action: 'sync', payload: sketchpackContents }, (err, result) => {
-    if (err) return callback(err)
-    mainWindow.webContents.send(SYNC_CHANGE_RECEIVED, sketchpackContents)
+    if (err) {
+      log.error(err)
+      return
+    }
+    mainWindow.webContents.send('sketchpack/SYNC', sketchpackContents)
   })
 }
 
@@ -338,8 +349,6 @@ const queueIdentify = (plugins) => {
 
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'identify', payload: plugin }, (err, result) => {
-    if (err) return callback(err)
-
     if (typeof result !== undefined) {
       mainWindow.webContents.send('PLUGIN_DETECTED', result)
     }
@@ -347,7 +356,7 @@ const queueIdentify = (plugins) => {
 }
 
 
-ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
+ipcMain.on('sketchpack/IMPORT_REQUEST', (event, args) => {
   dialog.showOpenDialog(null, {
     properties: ['openFile'],
     filters: [
@@ -359,19 +368,16 @@ ipcMain.on('IMPORT_FROM_SKETCHPACK', (event, args) => {
   }, (filePaths) => {
     if (filePaths) {
       try {
-        readSketchpack(filePaths[0])
-          .then(plugins => queueInstall(plugins))
+        mainWindow.webContents.send('sketchpack/IMPORT', filePaths[0])
       } catch (err) {
         log.error(err)
       }
-
     }
-
   })
 })
 
 
-ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
+ipcMain.on('sketchpack/EXPORT_REQUEST', (event, args) => {
   try {
     dialog.showSaveDialog(null, {
       nameFieldLabel: 'my-library',
@@ -382,14 +388,11 @@ ipcMain.on('EXPORT_LIBRARY', (event, libraryContents) => {
       tags: false,
       title: 'Export My Library'
     }, (filepath) => {
-      if (libraryContents.length === 0) return
-
-      log.info(`My Library exported to ${filepath}`)
-
-      if (filepath) writeSketchpack(filepath,libraryContents)
+      if (filepath) mainWindow.webContents.send('sketchpack/EXPORT', filepath)
     })
   } catch (err) {
     log.error(err)
+    if (err) mainWindow.webContents.send('sketchpack/EXPORT_ERROR')
   }
 })
 
@@ -403,9 +406,9 @@ if (firstRun({name: pkg.name})) {
 }
 
 
-const pluginWatcher = (watchPath) => {
-  log.debug('Watching for ', watchPath)
-  watcher = chokidar.watch(watchPath, {
+const watchLibrary = (watchPath) => {
+  log.debug('Watching Library at ', watchPath)
+  libraryWatcher = chokidar.watch(watchPath, {
     ignored: /[\/\\]\./,
     persistent: true,
     cwd: path.normalize(getInstallPath().replace(/\\/g, ''))
@@ -415,7 +418,7 @@ const pluginWatcher = (watchPath) => {
     log.info('From here can you check for real changes, the initial scan has been completed.')
   }
 
-  watcher
+  libraryWatcher
     .on('add', (watchPath) => {
       if (path.parse(watchPath).base === 'manifest.json') {
         log.debug('Manifest Detected', watchPath)
@@ -449,9 +452,9 @@ const pluginWatcher = (watchPath) => {
     .on('ready', onWatcherReady)
 }
 
-const sketchpackWatcher = (watchPath) => {
-  log.debug('Syncing with ', watchPath)
-  watcher = chokidar.watch(watchPath, {
+const watchSketchpack = (watchPath) => {
+  log.debug('Watching Sketchpack at ', watchPath)
+  sketchpackWatcher = chokidar.watch(watchPath, {
     ignored: /[\/\\]\./,
     persistent: true
   })
@@ -460,7 +463,7 @@ const sketchpackWatcher = (watchPath) => {
     log.info('From here can you check for real changes, the initial scan has been completed.')
   }
 
-  watcher
+  sketchpackWatcher
     .on('add', (watchPath) => {
       if (path.parse(watchPath).ext === '.sketchpack') {
         log.debug('Sketchpack Detected', watchPath)
@@ -490,14 +493,15 @@ const sketchpackWatcher = (watchPath) => {
 
 setTimeout(() => {
   const librarySketchpackPath = path.join(app.getPath('userData'),'my-library.sketchpack')
-  sketchpackWatcher(librarySketchpackPath)
+  watchSketchpack(librarySketchpackPath)
 }, 1000)
 
 setTimeout(() => {
-  pluginWatcher('**/(*.sketchplugin|manifest.json)')
+  watchLibrary('**/(*.sketchplugin|manifest.json)')
 }, 2000)
 
 app.on('before-quit', () => {
   log.info('Watcher stopped')
-  watcher.close()
+  libraryWatcher.close()
+  sketchpackWatcher.close()
 })

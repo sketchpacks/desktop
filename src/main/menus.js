@@ -79,7 +79,7 @@ const settingsMenu = [
   {
     label: 'Export My Library',
     click(item, window, event) {
-      window.webContents.send('EXPORT_LIBRARY', null)
+      window.webContents.send('sketchpack/EXPORT_REQUEST', null)
     },
   },
 
@@ -90,7 +90,7 @@ const settingsMenu = [
   {
     label: 'Import a Sketchpack',
     click(item, window, event) {
-      window.webContents.send('IMPORT_FROM_SKETCHPACK', null)
+      window.webContents.send('sketchpack/IMPORT_REQUEST', null)
     },
   },
 

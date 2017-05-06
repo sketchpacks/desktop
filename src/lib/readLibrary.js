@@ -1,8 +1,8 @@
 const Promise = require('promise')
-const jsonfile = require('jsonfile')
+const json5file = require('@sketchpacks/json5file')
 
 const readLibrary = (filepath) => new Promise((resolve,reject) => {
-  jsonfile.readFile(filepath, (err, contents) => {
+  json5file.readFile(filepath, (err, contents) => {
     if (err) reject(err)
 
     resolve(contents.plugins)

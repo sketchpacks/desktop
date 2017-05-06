@@ -12,19 +12,22 @@ import qs from 'qs'
 import Waypoint from 'react-waypoint'
 import { browsePlugins } from 'reducers/plugins'
 
+import BrowseError from 'components/BrowseError'
+
 const ConnectedPluginList = ComposedComponent =>
   class extends React.Component {
     constructor (props) {
       super(props)
 
       this.fetchData = this.fetchData.bind(this)
+      this.retryFetchData = this.retryFetchData.bind(this)
     }
 
     componentDidMount () {
       this.fetchData({
-        page: this.props.state.plugins.meta.page || "1",
-        append: false,
+        page: this.props.state.plugins.meta.page,
         sort: this.props.state.plugins.meta.sort,
+        append: false
       })
     }
 
@@ -35,21 +38,32 @@ const ConnectedPluginList = ComposedComponent =>
         this.fetchData({
           page: nextProps.state.plugins.meta.page,
           sort: nextProps.state.plugins.meta.sort,
-          append: false,
           q: nextProps.state.plugins.meta.q,
+          append: false,
         })
       }
     }
 
+    retryFetchData ({ sort, page, append, q }) {
+      this.fetchData({
+        sort: this.props.state.plugins.meta.sort,
+        page: this.props.state.plugins.meta.nextPage,
+        q: this.props.state.plugins.meta.q,
+        append: true
+      })
+    }
+
     fetchData ({ sort, page, append, q }) {
+      if (this.props.state.plugins.isLoading) return
+
       const {dispatch,plugins} = this.props
 
       // if (this.props.state.plugins.isLoading === true) return
 
       const request_params = qs.stringify({
-        sort,
-        page,
-        text: q
+        sort: sort || this.props.state.plugins.meta.sort,
+        page: page || this.props.state.plugins.meta.page,
+        text: q ||  this.props.state.plugins.meta.q
       })
       const request_url = `/plugins?${request_params}`
 
@@ -70,7 +84,14 @@ const ConnectedPluginList = ComposedComponent =>
             state={this.props.state}
             location={this.props.location}
             dispatch={this.props.dispatch}
+            errorMessage={this.props.state.plugins.errorMessage}
+            onRetry={this.retryFetchData}
           />
+
+          { this.props.state.plugins.isError &&
+            <BrowseError
+              message={this.props.state.plugins.errorMessage}
+              onRetry={this.retryFetchData} /> }
 
           { (this.props.location.pathname !== '/library/installed'
               || this.props.location.pathname !== '/library/updates')
@@ -78,7 +99,6 @@ const ConnectedPluginList = ComposedComponent =>
             && this.props.state.plugins.allIdentifiers.length >= 9
             && <Waypoint
               onEnter={() => this.fetchData({
-                sort: this.props.state.plugins.meta.sort,
                 page: this.props.state.plugins.meta.nextPage,
                 append: true
               })} /> }

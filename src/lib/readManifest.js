@@ -1,10 +1,11 @@
 const Promise = require('promise')
-const jsonfile = require('jsonfile')
+const json5file = require('@sketchpacks/json5file')
 const log = require('electron-log')
 
 const readManifest = (filepath) => new Promise((resolve,reject) => {
   // log.debug('readManifest')
-  jsonfile.readFile(filepath, (err, contents) => {
+  json5file.readFile(filepath, (err, contents) => {
+    log.debug('Reading manifest at ', filepath)
     if (err) reject(err)
 
     try {
@@ -13,6 +14,7 @@ const readManifest = (filepath) => new Promise((resolve,reject) => {
       })
       resolve(plugin)
     } catch (err) {
+      console.log(err, contents)
       reject(err)
     }
 

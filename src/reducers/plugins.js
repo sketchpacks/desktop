@@ -59,6 +59,7 @@ export const browsePlugins = ({ url, list, append}) => (dispatch,getState) => {
 
 const initialState = {
   isLoading: false,
+  isError: false,
   byIdentifier: {},
   allIdentifiers: [],
   meta: {
@@ -84,6 +85,13 @@ export default handleActions({
     }
   },
 
+  [browseError]: (state, action) => ({
+    ...state,
+    isLoading: false,
+    isError: true,
+    errorMessage: action.payload.message
+  }),
+
   [browseRequest]: (state, action) => ({
     ...state,
     isLoading: true
@@ -92,6 +100,8 @@ export default handleActions({
   [browseSuccess]: (state, action) => ({
     ...state,
     isLoading: false,
+    isError: false,
+    errorMessage: null,
     byIdentifier: {
       ...state.byIdentifier,
       ...action.payload.entities.plugins

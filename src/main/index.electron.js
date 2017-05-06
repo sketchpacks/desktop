@@ -23,13 +23,14 @@ import readSketchpack from 'lib/readSketchpack'
 import ms from 'ms'
 import os from 'os'
 import fs from 'fs'
-import jsonfile from 'jsonfile'
+import json5file from '@sketchpacks/json5file'
 import {filter} from 'lodash'
 
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 
 import App from 'containers/App'
+import AppError from 'errors/AppError'
 
 import BrowsePlugins from 'views/BrowsePlugins'
 import SearchResults from 'views/SearchResults'
@@ -45,30 +46,18 @@ import UserPlugins from 'views/UserPlugins'
 import { appInstall } from 'actions'
 
 import {
-  installPluginSuccess,
   installPluginError,
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
 
-  updatePluginRequest,
-  updatePluginSuccess,
   UPDATE_PLUGIN_REQUEST,
   UPDATE_PLUGIN_SUCCESS,
 
-  uninstallPluginSuccess,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
 
-  toggleVersionLockRequest,
-  toggleVersionLockSuccess,
-  TOGGLE_VERSION_LOCK_REQUEST,
-  TOGGLE_VERSION_LOCK_SUCCESS,
-
-  webInstallPluginRequest,
-  importSketchToolboxRequest,
-  importSketchpackRequest,
-  exportLibraryRequest
+  webInstallPluginRequest
 } from 'actions/plugin_manager'
 
 import {
@@ -76,22 +65,21 @@ import {
 } from 'actions/auto_updater'
 
 import {
-  SYNC_FILE_RECEIVED,
-  SYNC_CHANGE_RECEIVED,
-  syncChangeReceived
-} from 'actions/sketchpack'
-
-import {
   addPlugin
 } from 'reducers/plugins'
 
 import {
   identifyPlugin,
-  detectPlugin
+  detectPlugin,
+  installPluginSuccess,
+  uninstallPluginSuccess,
+  updatePluginSuccess
 } from 'reducers/library'
 
 import {
-  syncSketchpackContents
+  syncSketchpackRequest,
+  importSketchpackRequest,
+  exportSketchpackRequest
 } from 'reducers/sketchpack'
 
 let store = configureStore()
@@ -122,35 +110,44 @@ export const render = () => {
   ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
 
   ipcRenderer.send('APP_WINDOW_OPEN', null)
+
+  loadSketchpack()
 }
 
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true}))
 
 const loadSketchpack = () => {
-  readSketchpack(path.join(remote.app.getPath('userData'), 'my-library.sketchpack'))
-    .then(contents => {
-      if (contents.length > 0) store.dispatch(syncSketchpackContents(contents))
-    })
+  const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')
+  readSketchpack(sketchpackPath)
+    .then(contents => store.dispatch(syncSketchpackRequest(contents)))
+
 }
-loadSketchpack()
 
+ipcRenderer.on('sketchpack/IMPORT_REQUEST', (evt,args) => {
+  ipcRenderer.send('sketchpack/IMPORT_REQUEST')
+})
 
-ipcRenderer.on('IMPORT_FROM_SKETCHPACK', (evt, args) => {
-  browserHistory.push('library/installed')
-  ipcRenderer.send('IMPORT_FROM_SKETCHPACK')
-  store.dispatch(importSketchpackRequest())
+ipcRenderer.on('sketchpack/IMPORT', (evt,filepath) => {
+  browserHistory.push('/library/managed')
+  store.dispatch(importSketchpackRequest(filepath))
 })
 
 
-ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, args) => {
-  browserHistory.push('library/installed')
-  ipcRenderer.send('IMPORT_FROM_SKETCH_TOOLBOX')
-  store.dispatch(importSketchToolboxRequest())
+ipcRenderer.on('sketchpack/EXPORT_REQUEST', (evt,args) => {
+  ipcRenderer.send('sketchpack/EXPORT_REQUEST')
 })
 
-ipcRenderer.on('EXPORT_LIBRARY', (evt, args) => {
-  ipcRenderer.send('EXPORT_LIBRARY', store.getState().library.items)
-  store.dispatch(exportLibraryRequest())
+ipcRenderer.on('sketchpack/EXPORT', (evt,filepath) => {
+  store.dispatch(exportSketchpackRequest(filepath))
+})
+
+ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,plugin) => {
+  ipcRenderer.send(INSTALL_PLUGIN_REQUEST,plugin)
+})
+
+ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt,filepath) => {
+  browserHistory.push('/library/managed')
+  store.dispatch(importSketchpackRequest(filepath))
 })
 
 
@@ -165,24 +162,7 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
   })
 })
 
-
-ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
-  store.dispatch(toggleVersionLockSuccess(args))
-})
-
-ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  const msgBody = plugin.title || plugin.name
-
-  const notif = new window.Notification('Sketchpacks', {
-    body: `${msgBody} v${plugin.version} installed`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
-
-  store.dispatch(installPluginSuccess(plugin))
-})
-
-ipcRenderer.on(INSTALL_PLUGIN_ERROR, (error, plugin) => {
+ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt, err, plugin) => {
   const msgBody = plugin.title || plugin.name
 
   const notif = new window.Notification('Sketchpacks', {
@@ -191,25 +171,17 @@ ipcRenderer.on(INSTALL_PLUGIN_ERROR, (error, plugin) => {
     icon: path.join(__dirname, 'src/static/images/icon.png'),
   })
 
-  store.dispatch(installPluginError(error, plugin))
+  store.dispatch({
+    type: INSTALL_PLUGIN_ERROR,
+    error: true,
+    payload: new AppError(err),
+    meta: { plugin }
+  })
 })
 
-ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
-  const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} updated to v${plugin.version}`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
-
-  store.dispatch(updatePluginSuccess(plugin))
-})
-
-ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} uninstalled`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
+ipcRenderer.on('library/UPDATE_PLUGIN_SUCCESS', (evt,plugin) => {
+  const normalizedPlugin = normalize(plugin, schemas.pluginSchema)
+  store.dispatch(updatePluginSuccess(normalizedPlugin, { notification: true }))
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
@@ -220,19 +192,19 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
 
-ipcRenderer.on('sketchpack/SYNC_CONTENTS', (evt,contents) => {
-  log.debug('sketchpack/SYNC_CONTENTS',contents)
-  store.dispatch(syncSketchpackContents(contents))
-})
-
 ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
   if (!contents) return
   const normalizedPlugin = normalize(contents, schemas.pluginSchema)
   log.debug('PLUGIN_DETECTED normalizedPlugin', normalizedPlugin.entities.plugins[normalizedPlugin.result])
   store.dispatch(addPlugin(normalizedPlugin))
-  store.dispatch(detectPlugin(normalizedPlugin))
+  store.dispatch(detectPlugin(normalizedPlugin, { notification: true }))
 })
 
+
+ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
+  const normalizedPlugin = normalize(plugin, schemas.pluginSchema)
+  store.dispatch(uninstallPluginSuccess(normalizedPlugin, { notification: true }))
+})
 
 
 if (firstRun({name: `${pkg.name}-${pkg.version}`})) {

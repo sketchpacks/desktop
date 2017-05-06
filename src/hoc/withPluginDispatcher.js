@@ -41,7 +41,7 @@ const withPluginDispatcher = (WrappedComponent) => {
 
       switch (type) {
         case "install":
-          return dispatch(installPluginRequest(plugin))
+          return dispatch(installPluginRequest(plugin.identifier))
         case "remove":
           return dispatch(removePlugin(plugin))
         case "update":

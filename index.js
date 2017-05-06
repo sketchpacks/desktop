@@ -145,7 +145,7 @@ ipcMain.on(INSTALL_PLUGIN_REQUEST, (event, plugins) => {
 
 ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, arg) => {
   log.debug(UPDATE_PLUGIN_REQUEST, arg)
-  queueUpdate(arg)
+  queueUpdate([arg])
 })
 
 ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {

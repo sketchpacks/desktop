@@ -46,18 +46,14 @@ import UserPlugins from 'views/UserPlugins'
 import { appInstall } from 'actions'
 
 import {
-  installPluginSuccess,
   installPluginError,
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
 
-  updatePluginRequest,
-  updatePluginSuccess,
   UPDATE_PLUGIN_REQUEST,
   UPDATE_PLUGIN_SUCCESS,
 
-  uninstallPluginSuccess,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
 
@@ -74,7 +70,10 @@ import {
 
 import {
   identifyPlugin,
-  detectPlugin
+  detectPlugin,
+  installPluginSuccess,
+  uninstallPluginSuccess,
+  updatePluginSuccess
 } from 'reducers/library'
 
 import {
@@ -163,11 +162,6 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
   })
 })
 
-
-ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  store.dispatch(installPluginSuccess(plugin))
-})
-
 ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt, err, plugin) => {
   const msgBody = plugin.title || plugin.name
 
@@ -185,22 +179,9 @@ ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt, err, plugin) => {
   })
 })
 
-ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
-  const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} updated to v${plugin.version}`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
-
-  store.dispatch(updatePluginSuccess(plugin))
-})
-
-ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} uninstalled`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
+ipcRenderer.on('library/UPDATE_PLUGIN_SUCCESS', (evt,plugin) => {
+  const normalizedPlugin = normalize(plugin, schemas.pluginSchema)
+  store.dispatch(updatePluginSuccess(normalizedPlugin, { notification: true }))
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
@@ -216,9 +197,14 @@ ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
   const normalizedPlugin = normalize(contents, schemas.pluginSchema)
   log.debug('PLUGIN_DETECTED normalizedPlugin', normalizedPlugin.entities.plugins[normalizedPlugin.result])
   store.dispatch(addPlugin(normalizedPlugin))
-  store.dispatch(detectPlugin(normalizedPlugin))
+  store.dispatch(detectPlugin(normalizedPlugin, { notification: true }))
 })
 
+
+ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
+  const normalizedPlugin = normalize(plugin, schemas.pluginSchema)
+  store.dispatch(uninstallPluginSuccess(normalizedPlugin, { notification: true }))
+})
 
 
 if (firstRun({name: `${pkg.name}-${pkg.version}`})) {

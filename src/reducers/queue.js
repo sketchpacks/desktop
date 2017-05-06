@@ -6,7 +6,8 @@ import {
   installPluginRequest,
   installPluginSuccess,
   installPluginError,
-  installPlugin
+  installPlugin,
+  detectPlugin
 } from 'reducers/library'
 
 //- State
@@ -23,15 +24,15 @@ export default handleActions({
   [installPluginRequest]: (state, action) => {
     return {
       ...state,
-      installing: state.installing.concat(action.payload.identifier)
+      installing: state.installing.concat(action.payload)
     }
   },
 
   // Remove reference to identifier after install
-  [installPlugin]: (state, action) => {
+  [detectPlugin]: (state, action) => {
     return {
       ...state,
-      installing: without(state.installing, action.plugin.identifier)
+      installing: without(state.installing, action.payload.result)
     }
   },
 

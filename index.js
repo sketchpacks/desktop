@@ -54,7 +54,6 @@ const {
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
   UPDATE_PLUGIN_REQUEST,
-  UPDATE_PLUGIN_SUCCESS,
   UPDATE_PLUGIN_ERROR,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
@@ -207,7 +206,7 @@ const updatePluginTask = (plugin, callback) => {
   ))
     .then(removeAsset)
     .then(extractAsset)
-    .then(result => callback(null, result.plugin))
+    .then(result => callback(null, result))
     .catch(err => {
       log.debug(err.message)
       callback(err)
@@ -216,7 +215,7 @@ const updatePluginTask = (plugin, callback) => {
 
 const uninstallPluginTask = (plugin, callback) => {
   removeAsset(plugin)
-    .then(result => callback(null, result.plugin))
+    .then(result => callback(null, result))
     .catch(err => callback(err))
 }
 
@@ -288,7 +287,7 @@ const WORK_QUEUE_CONCURRENCY = 1
 const workQueue = async.queue((task, callback) => triageTask(task, callback), WORK_QUEUE_CONCURRENCY)
 
 workQueue.drain = () => {
-  log.debug('Work Complete')
+  log.debug('Work queue drained')
 }
 
 const queueInstall = (identifiers) => {
@@ -318,7 +317,7 @@ const queueUpdate = (plugins) => {
       return
     }
     log.debug('Update complete', result)
-    mainWindow.webContents.send(UPDATE_PLUGIN_SUCCESS, result.plugin)
+    mainWindow.webContents.send('library/UPDATE_PLUGIN_SUCCESS', result.plugin)
   }))
 }
 

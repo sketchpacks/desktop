@@ -6,7 +6,7 @@ import { pick,pickBy,filter } from 'lodash'
 //- Actions
 
 export const installPlugin = createAction('manager/INSTALL_SUCCESS')
-export const detectPlugin = createAction('library/FETCH_RECEIVED')
+export const detectPlugin = createAction('library/FETCH_RECEIVED', (payload) => payload, (_,meta) => meta)
 export const identifyPlugin = createAction('library/IDENTIFY_PLUGIN_SUCCESS')
 
 export const removePlugin = createAction('library/UNINSTALL_PLUGIN', identifier => {
@@ -22,6 +22,14 @@ export const updatePlugin = createAction('library/UPDATE_PLUGIN', identifier => 
 export const installPluginRequest = createAction('library/INSTALL_PLUGIN_REQUEST')
 export const installPluginSuccess = createAction('library/INSTALL_PLUGIN_SUCCESS')
 export const installPluginError = createAction('manager/INSTALL_ERROR')
+
+export const uninstallPluginRequest = createAction('library/UNINSTALL_PLUGIN_REQUEST')
+export const uninstallPluginSuccess = createAction('library/UNINSTALL_PLUGIN_SUCCESS', (payload) => payload, (_,meta) => meta)
+export const uninstallPluginError = createAction('library/UNINSTALL_PLUGIN_ERROR')
+
+export const updatePluginRequest = createAction('library/UPDATE_PLUGIN_REQUEST')
+export const updatePluginSuccess = createAction('library/UPDATE_PLUGIN_SUCCESS', (payload) => payload, (_,meta) => meta)
+export const updatePluginError = createAction('library/UPDATE_PLUGIN_ERROR')
 
 
 //- State

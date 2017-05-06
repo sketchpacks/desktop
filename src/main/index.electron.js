@@ -111,17 +111,18 @@ export const render = () => {
   ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
 
   ipcRenderer.send('APP_WINDOW_OPEN', null)
+
+  loadSketchpack()
 }
 
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true}))
 
 const loadSketchpack = () => {
-  readSketchpack(path.join(remote.app.getPath('userData'), 'my-library.sketchpack'))
-    .then(contents => {
-      if (contents.length > 0) store.dispatch(syncSketchpackRequest(contents))
-    })
+  const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')
+  readSketchpack(sketchpackPath)
+    .then(contents => store.dispatch(syncSketchpackRequest(contents)))
+
 }
-loadSketchpack()
 
 ipcRenderer.on('sketchpack/IMPORT_REQUEST', (evt,args) => {
   ipcRenderer.send('sketchpack/IMPORT_REQUEST')

@@ -5,7 +5,7 @@ import {uniq,includes,isObject,has,pickBy,filter} from 'lodash'
 import {
   sanitizeSemVer,
   isSemverLocked,
-  unlockSemver,
+  lockSemver,
   toggleSemverLock
 } from 'lib/utils'
 
@@ -94,10 +94,7 @@ export default handleActions({
   [detectPlugin]: (state, action) => {
     let { entities, result } = action.payload
 
-    if (entities.plugins[result].owner === undefined) return state
-
     let plugin = entities.plugins[result]
-    let owner = entities.users[plugin.owner].handle
 
     let identifier = plugin.identifier
 
@@ -114,7 +111,7 @@ export default handleActions({
         byIdentifier: {
           ...state.plugins.byIdentifier,
           [identifier]: {
-            version: unlockSemver(plugin.version)
+            version: lockSemver(plugin.version)
           }
         },
         allIdentifiers: uniq(

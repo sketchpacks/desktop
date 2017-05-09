@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
-import { difference,filter,includes,intersection } from 'lodash'
+import { difference,filter,includes,intersection,pick } from 'lodash'
 import { createSelector } from 'reselect'
 import { isSemverLocked } from 'lib/utils'
 import semver from 'semver'
@@ -41,10 +41,24 @@ export const getPluginIdentifiers = (state) => state.plugins.allIdentifiers
 
 export const getPluginByIdentifier = (state, identifier) => {
   const plugin = getPlugins(state)[identifier]
-  return {
+
+  const data = {
     ...plugin,
     owner: getUserById(state, plugin.owner)
   }
+
+  return data
+}
+
+export const getPluginBasicsByIdentifier = (state, identifier) => {
+  const plugin = getPlugins(state)[identifier]
+
+  const data = pick(
+    plugin,
+    ['name', 'title', 'identifier', 'compatible_version', 'version', 'installed_version', 'install_path', 'manifest_path']
+  )
+
+  return data
 }
 
 export const getSearchResults = (state) => getPluginIdentifiers(state.search)
@@ -109,6 +123,31 @@ const getPluginInstallActivity = (state,identifier) => {
 export const selectPlugin = createSelector(
   [
     getPluginByIdentifier,
+    getLibraryPluginByIdentifier,
+    getSketchpackPluginByIdentifier,
+    getPluginInstallActivity
+  ],
+  (entity, lib, pack, isInstalling) => {
+    const data = entity
+
+    if (lib) {
+      data['installed_version'] = lib.version
+      data['install_path'] = lib.install_path
+    }
+
+    if (pack) {
+      data['version_range'] = pack.version
+    }
+
+    data['isInstalling'] = isInstalling
+
+    return data
+  }
+)
+
+export const selectPluginBasics = createSelector(
+  [
+    getPluginBasicsByIdentifier,
     getLibraryPluginByIdentifier,
     getSketchpackPluginByIdentifier,
     getPluginInstallActivity

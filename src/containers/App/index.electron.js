@@ -79,7 +79,10 @@ class App extends Component {
             { this.props.location.pathname === '/library/managed'
               && this.renderLibraryActions()  }
 
-            <SearchBar {...this.props} classNames={'searchBar'} />
+             { this.props.location.pathname !== '/library/managed'
+               && this.props.location.pathname !== '/library/unmanaged'
+              && this.props.location.pathname !== '/library/updates'
+                && <SearchBar {...this.props} classNames={'searchBar'} /> }
           </header>
 
           <div className="app__viewport">

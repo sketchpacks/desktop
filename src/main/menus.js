@@ -1,7 +1,5 @@
 const {remote, shell} = require('electron')
 const {Menu, MenuItem} = remote
-const AutoLaunch = require('auto-launch')
-
 
 const appPath = process.platform === 'darwin'
   ? remote.app.getPath('exe').replace(/\.app\/Content.*/, '.app')

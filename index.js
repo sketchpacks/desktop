@@ -51,10 +51,15 @@ const autolauncher = new AutoLaunch({
   isHidden: true
 })
 
-const {getInstallPath} = require('./src/lib/utils')
+const {
+  getInstallPath,
+  sanitizeSemVer,
+  downloadAsset,
+  extractAsset
+} = require('./src/lib/utils')
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
-const PluginManager = require('./src/main/plugin_manager')
+const readManifest = require('./src/lib/readManifest')
 
 const {
   INSTALL_PLUGIN_REQUEST,

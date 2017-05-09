@@ -86,10 +86,6 @@ class PluginMedia extends Component {
       ? 'Installed version'
       : 'Latest version'
 
-    const version = (location.pathname === '/library/managed')
-      ? this.props.plugin.installed_version
-      : this.props.plugin.version
-
     return <PluginMetric
       icon={'versions'}
       shape={'path'}

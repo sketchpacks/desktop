@@ -55,7 +55,8 @@ const {
   getInstallPath,
   sanitizeSemVer,
   downloadAsset,
-  extractAsset
+  extractAsset,
+  removeAsset
 } = require('./src/lib/utils')
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')

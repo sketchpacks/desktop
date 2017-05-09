@@ -42,7 +42,6 @@ const sketchpackMiddleware = store => next => action => {
   if (identifiers.length > 0) {
     store.dispatch(exportSketchpackRequest(sketchpackPath))
   }
-
 }
 
 export default sketchpackMiddleware

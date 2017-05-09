@@ -79,6 +79,7 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
+    const {version} = this.props.plugin
     const {location} = this.props
 
     const tooltip = (location.pathname === '/library/managed')

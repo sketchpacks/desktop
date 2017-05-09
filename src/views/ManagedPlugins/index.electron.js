@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import {getManagedPlugins} from 'reducers/index'
 import withPluginDispatcher from 'hoc/withPluginDispatcher'
 import withSelector from 'hoc/withSelector'
-import PluginList from 'components/PluginList'
-const ConnectedPluginList = withPluginDispatcher(withSelector(PluginList,getManagedPlugins))
+import LibraryList from 'components/LibraryList'
+const ConnectedLibraryList = withPluginDispatcher(withSelector(LibraryList,getManagedPlugins))
 
 class ManagedPluginsContainer extends Component {
   constructor (props) {
@@ -17,7 +17,7 @@ class ManagedPluginsContainer extends Component {
 
     return (
       <div style={{position: 'relative'}}>
-        <ConnectedPluginList
+        <ConnectedLibraryList
           handlePluginEvent={this.handlePluginEvent}
           location={location}
           dispatch={dispatch}

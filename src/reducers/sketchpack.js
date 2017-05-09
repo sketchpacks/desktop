@@ -38,6 +38,21 @@ export const exportSketchpackRequest = createAction('sketchpack/EXPORT_REQUEST')
 export const exportSketchpackSuccess = createAction('sketchpack/EXPORT_SUCCESS')
 export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 
+const updateVersionLock = (version, strength) => {
+  switch(strength) {
+    case 'full':
+      return `=${version}`
+    case 'patch':
+      return `^${version}`
+    case 'minor':
+      return `~${version}`
+    case 'unlocked':
+      return `>${version}`
+    default:
+      return `=${version}`
+  }
+}
+
 
 //- State
 
@@ -74,7 +89,7 @@ export default handleActions({
   },
 
   [setVersionRange]: (state, action) => {
-    const {identifier,version} = action.payload
+    const {identifier,version,lock_strength} = action.payload
     const plugin = state.plugins.byIdentifier[identifier]
     return {
       ...state,
@@ -84,7 +99,7 @@ export default handleActions({
           ...state.plugins.byIdentifier,
           [identifier]: {
             ...plugin,
-            version: toggleSemverLock(plugin.version)
+            version: updateVersionLock(version,lock_strength)
           }
         }
       }

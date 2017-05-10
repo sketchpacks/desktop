@@ -99,7 +99,7 @@ class Dropdown extends Component {
               <strong>Full Lock</strong>
               <p>Lock at v{this.props.version}</p>
             </div>
-          </li>          
+          </li>
 
           <li onClick={this.handleMinorLock}>
             <div className="lock-select__option">

@@ -93,12 +93,13 @@ class Dropdown extends Component {
         <ul className={this.state.visible
             ? 'dropdown__menu is-visible'
             : 'dropdown__menu'}>
-          <li onClick={this.handleUnlocked}>
+
+          <li onClick={this.handleFullLock}>
             <div className="lock-select__option">
-              <strong>Unlocked</strong>
-              <p>Apply all updates automatically</p>
+              <strong>Full Lock</strong>
+              <p>Lock at v{this.props.version}</p>
             </div>
-          </li>
+          </li>          
 
           <li onClick={this.handleMinorLock}>
             <div className="lock-select__option">
@@ -114,12 +115,13 @@ class Dropdown extends Component {
             </div>
           </li>
 
-          <li onClick={this.handleFullLock}>
+          <li onClick={this.handleUnlocked}>
             <div className="lock-select__option">
-              <strong>Full Lock</strong>
-              <p>Lock at v{this.props.version}</p>
+              <strong>Unlocked</strong>
+              <p>Apply all updates automatically</p>
             </div>
           </li>
+
         </ul>
       </div>
 

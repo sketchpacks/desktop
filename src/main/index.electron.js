@@ -141,6 +141,11 @@ ipcRenderer.on('sketchpack/EXPORT', (evt,filepath) => {
   store.dispatch(exportSketchpackRequest(filepath))
 })
 
+ipcRenderer.on('sketchpack/SYNC_REQUEST', (evt,contents) => {
+  log.debug('sketchpack/SYNC_REQUEST',contents)
+  store.dispatch(syncSketchpackRequest(contents))
+})
+
 ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,plugin) => {
   ipcRenderer.send(INSTALL_PLUGIN_REQUEST,plugin)
 })

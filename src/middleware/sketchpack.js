@@ -35,6 +35,8 @@ const sketchpackMiddleware = store => next => action => {
   next(action)
   const nextState = store.getState().sketchpack.plugins.byIdentifier
 
+  if (store.getState().sketchpack.isLocked) return
+
   if (isEqual(prevState,nextState)) return
 
   const identifiers = getSketchpackIdentifiers(store.getState())

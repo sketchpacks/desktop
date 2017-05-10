@@ -493,7 +493,7 @@ const watchSketchpack = (watchPath) => {
         log.debug('Sketchpack Detected', watchPath)
 
         readSketchpack(watchPath)
-          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
       }
     })
     .on('change', (watchPath) => {
@@ -501,7 +501,7 @@ const watchSketchpack = (watchPath) => {
         log.debug('Sketchpack Changed', watchPath)
 
         readSketchpack(watchPath)
-          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
       }
     })
     .on('unlink', (watchPath) => {

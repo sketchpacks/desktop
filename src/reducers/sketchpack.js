@@ -40,26 +40,35 @@ export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 
 export const getPatchLevelLock = (version) => {
   const cleanSemVer = sanitizeSemVer(version)
-  return `^${semver.major(cleanSemVer)}.${semver.minor(cleanSemVer)}`
+
+  return (semver.major(cleanSemVer) === 0)
+    ? `^${semver.major(cleanSemVer)}.${semver.minor(cleanSemVer)}`
+    : `~${cleanSemVer}`
 }
 
 export const getMinorLevelLock = (version) => {
   const cleanSemVer = sanitizeSemVer(version)
-  return `^${semver.major(version)}`
+
+  return (semver.major(cleanSemVer) === 0)
+    ? `^${semver.major(cleanSemVer)}`
+    : `^${cleanSemVer}`
 }
+
+export const getFullLevelLock = (version) => `=${version}`
+export const getUnlockedLevelLock = (version) => `>=${version}`
 
 const updateVersionLock = (version, strength) => {
   switch(strength) {
     case 'full':
-      return `=${version}`
-    case 'patch': // ~X.Y, [ '>=0.5.0', '<0.6.0' ]
+      return getFullLevelLock(version)
+    case 'patch':
       return getPatchLevelLock(version)
-    case 'minor': // ~X, [ '>=0.0.0', '<1.0.0' ]
+    case 'minor':
       return getMinorLevelLock(version)
     case 'unlocked':
-      return `>=${version}`
+      return getUnlockedLevelLock(version)
     default:
-      return `=${version}`
+      return getFullLevelLock(version)
   }
 }
 

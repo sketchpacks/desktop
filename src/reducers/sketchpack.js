@@ -77,6 +77,7 @@ const updateVersionLock = (version, strength) => {
 
 const initialState = {
   isLocked: false,
+  isImporting: false,
   plugins: {
     allIdentifiers: [],
     byIdentifier: {}
@@ -169,5 +170,20 @@ export default handleActions({
         state.plugins.allIdentifiers, p => p !== action.payload.identifier
       )
     }
+  }),
+
+  [importSketchpackRequest]: (state,action) => ({
+    ...state,
+    isImporting: true
+  }),
+
+  [importSketchpackSuccess]: (state,action) => ({
+    ...state,
+    isImporting: false
+  }),
+
+  [importSketchpackError]: (state,action) => ({
+    ...state,
+    isImporting: false
   })
 }, initialState)

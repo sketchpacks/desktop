@@ -327,6 +327,8 @@ const queueInstall = (identifiers) => {
       mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err.message, id)
       return
     }
+
+    mainWindow.webContents.send('library/INSTALL_PLUGIN_SUCCESS', id)
   }))
 }
 
@@ -392,7 +394,8 @@ ipcMain.on('sketchpack/IMPORT_REQUEST', (event, args) => {
   }, (filePaths) => {
     if (filePaths) {
       try {
-        mainWindow.webContents.send('sketchpack/IMPORT', filePaths[0])
+        readSketchpack(filePaths[0])
+          .then(contents => mainWindow.webContents.send('sketchpack/IMPORT', contents))
       } catch (err) {
         log.error(err)
       }
@@ -522,7 +525,7 @@ setTimeout(() => {
 
 setTimeout(() => {
   watchLibrary('**/(*.sketchplugin|manifest.json)')
-}, 2000)
+}, 1000)
 
 app.on('before-quit', () => {
   log.info('Watcher stopped')

@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions'
 
-import { without } from 'lodash'
+import { without,uniq } from 'lodash'
 
 import {
   installPluginRequest,
@@ -9,6 +9,10 @@ import {
   installPlugin,
   detectPlugin
 } from 'reducers/library'
+
+import {
+  importSketchpackRequest
+} from 'reducers/sketchpack'
 
 //- State
 
@@ -20,15 +24,30 @@ const initialState = {
 //- Reducers
 
 export default handleActions({
+  ['sketchpack/IMPORT_REQUEST']: (state, action) => {
+    return {
+      ...state,
+      installing: uniq(state.installing.concat(Object.keys(action.payload.plugins)))
+    }
+  },
+
   // Add reference to identifier before install
   [installPluginRequest]: (state, action) => {
     return {
       ...state,
-      installing: state.installing.concat(action.payload)
+      installing: uniq(state.installing.concat(action.payload))
     }
   },
 
   // Remove reference to identifier after install
+  [installPluginSuccess]: (state, action) => {
+    return {
+      ...state,
+      installing: without(state.installing, action.payload)
+    }
+  },
+
+  // Remove reference to identifier after being detected
   [detectPlugin]: (state, action) => {
     return {
       ...state,

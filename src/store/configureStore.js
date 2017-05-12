@@ -20,10 +20,10 @@ const enhancer = composeEnhancers(
   applyMiddleware(
     thunk.withExtraArgument({api: SketchpacksApi}),
     logger,
-    sketchpackMiddleware,
     importMiddleware,
     exportMiddleware,
     notificationMiddleware,
+    sketchpackMiddleware,
     mixpanelMiddleware(MIXPANEL_TOKEN),
   )
 )

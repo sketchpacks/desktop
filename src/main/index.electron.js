@@ -123,15 +123,15 @@ const loadSketchpack = () => {
 
 }
 
+
+ipcRenderer.on('sketchpack/IMPORT', (evt,contents) => {
+  browserHistory.push('/library/managed')
+  store.dispatch(importSketchpackRequest(contents))
+})
+
 ipcRenderer.on('sketchpack/IMPORT_REQUEST', (evt,args) => {
   ipcRenderer.send('sketchpack/IMPORT_REQUEST')
 })
-
-ipcRenderer.on('sketchpack/IMPORT', (evt,filepath) => {
-  browserHistory.push('/library/managed')
-  store.dispatch(importSketchpackRequest(filepath))
-})
-
 
 ipcRenderer.on('sketchpack/EXPORT_REQUEST', (evt,args) => {
   ipcRenderer.send('sketchpack/EXPORT_REQUEST')
@@ -150,10 +150,14 @@ ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,plugin) => {
   ipcRenderer.send(INSTALL_PLUGIN_REQUEST,plugin)
 })
 
-ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt,filepath) => {
-  browserHistory.push('/library/managed')
-  store.dispatch(importSketchpackRequest(filepath))
+ipcRenderer.on('library/INSTALL_PLUGIN_SUCCESS', (evt,identifier) => {
+  store.dispatch(installPluginSuccess(identifier))
 })
+
+// ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt,filepath) => {
+//   browserHistory.push('/library/managed')
+//   store.dispatch(importSketchpackRequest(filepath))
+// })
 
 
 ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
@@ -200,7 +204,6 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
 ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
   if (!contents) return
   const normalizedPlugin = normalize(contents, schemas.pluginSchema)
-  log.debug('PLUGIN_DETECTED normalizedPlugin', normalizedPlugin.entities.plugins[normalizedPlugin.result])
   store.dispatch(addPlugin(normalizedPlugin))
   store.dispatch(detectPlugin(normalizedPlugin, { notification: true }))
 })

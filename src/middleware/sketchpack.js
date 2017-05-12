@@ -13,7 +13,10 @@ const {
   syncSketchpackContents
 } = require('reducers')
 
-const { exportSketchpackRequest } = require('reducers/sketchpack')
+const {
+  importSketchpackSuccess,
+  exportSketchpackRequest
+} = require('reducers/sketchpack')
 
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,

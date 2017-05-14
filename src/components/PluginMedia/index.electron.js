@@ -8,7 +8,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-import {sanitizeSemVer,isSemverLocked} from 'lib/utils'
+import {sanitizeSemVer} from 'lib/utils'
+
+import { isFullLocked } from 'lib/VersionLock'
 
 import Button from 'components/Button'
 import Nameplate from 'components/Nameplate'
@@ -136,7 +138,7 @@ class PluginMedia extends Component {
     }
 
     try {
-      newState['isLocked'] = isSemverLocked(nextPlugin.version_range)
+      newState['isLocked'] = isFullLocked(nextPlugin.version_range)
     } catch (err) {
       newState['isLocked'] = false
     }
@@ -165,7 +167,7 @@ class PluginMedia extends Component {
     }
 
     try {
-      newState['isLocked'] = isSemverLocked(version_range)
+      newState['isLocked'] = isFullLocked(version_range)
     } catch (err) {
       newState['isLocked'] = false
     }
@@ -228,7 +230,7 @@ class PluginMedia extends Component {
               </h3>
               <p className="o-plugin__logline">
                 {description}
-              </p>              
+              </p>
             </div>
           </div>
 

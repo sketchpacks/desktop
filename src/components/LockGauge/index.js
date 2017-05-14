@@ -1,5 +1,10 @@
 import React from 'react'
 
+import { getVersionLock } from 'lib/VersionLock'
+import { sanitizeSemVer } from 'lib/utils'
+
+import semver from 'semver'
+
 const LockGaugeFull = () => {
   return (
     <div className="lock-meter">
@@ -11,7 +16,7 @@ const LockGaugeFull = () => {
   )
 }
 
-const LockGaugeMinor = () => {
+const LockGaugePatch = () => {
   return (
     <div className="lock-meter">
       <span className="lock-meter__bar lock-meter__bar--filled"></span>
@@ -22,7 +27,7 @@ const LockGaugeMinor = () => {
   )
 }
 
-const LockGaugePatch = () => {
+const LockGaugeMinor = () => {
   return (
     <div className="lock-meter">
       <span className="lock-meter__bar lock-meter__bar--filled"></span>
@@ -45,14 +50,16 @@ const LockGaugeUnlocked = () => {
 }
 
 const GAUGES = {
-  full: LockGaugeFull,
+  locked: LockGaugeFull,
   minor: LockGaugeMinor,
   patch: LockGaugePatch,
   unlocked: LockGaugeUnlocked
 }
 
-const LockGauge = ({ gauge }) => {
-  const Gauge = GAUGES[gauge] || 'full'
+const LockGauge = ({ version_range }) => {
+  const lock_strength = getVersionLock(version_range)
+  const Gauge = GAUGES[lock_strength] || 'locked'
+
   return <Gauge />
 }
 

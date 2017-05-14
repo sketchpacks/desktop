@@ -8,7 +8,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
-import {sanitizeSemVer,isSemverLocked} from 'lib/utils'
+import { sanitizeSemVer } from 'lib/utils'
+import { isFullLocked } from 'lib/VersionLock'
 
 import Dropdown from 'components/Dropdown'
 import Button from 'components/Button'
@@ -103,7 +104,7 @@ class PluginMedia extends Component {
     }
 
     try {
-      newState['isLocked'] = isSemverLocked(nextPlugin.version_range)
+      newState['isLocked'] = isFullLocked(nextPlugin.version_range)
     } catch (err) {
       newState['isLocked'] = false
     }
@@ -132,7 +133,7 @@ class PluginMedia extends Component {
     }
 
     try {
-      newState['isLocked'] = isSemverLocked(version_range)
+      newState['isLocked'] = isFullLocked(version_range)
     } catch (err) {
       newState['isLocked'] = false
     }

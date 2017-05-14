@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 
 import semver from 'semver'
-import { setVersionRange,getPatchLevelLock,getMinorLevelLock } from 'reducers/sketchpack'
+import { setVersionRange } from 'reducers/sketchpack'
 import { sanitizeSemVer } from 'lib/utils'
+
+import { minorLockedSemver,patchLockedSemver,getVersionLock } from 'lib/VersionLock'
 
 import LockGauge from 'components/LockGauge'
 
@@ -15,7 +17,7 @@ class Dropdown extends Component {
 
     this.state = {
       visible: false,
-      lock_gauge: 'unlocked'
+      lock_strength: 'unlocked'
     }
 
     this.toggleVisibility = this.toggleVisibility.bind(this)
@@ -24,11 +26,19 @@ class Dropdown extends Component {
     this.handlePatchLock = this.handlePatchLock.bind(this)
     this.handleMinorLock = this.handleMinorLock.bind(this)
     this.handleUnlocked = this.handleUnlocked.bind(this)
+
+    this.renderTooltipText = this.renderTooltipText.bind(this)
   }
 
   toggleVisibility () {
     this.setState({
       visible: !this.state.visible
+    })
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.setState({
+      lock_strength: getVersionLock(nextProps.version_range)
     })
   }
 
@@ -38,10 +48,10 @@ class Dropdown extends Component {
       type: 'lock',
       version: installed_version,
       identifier: identifier,
-      lock_strength: 'full'
+      lock_strength: 'locked'
     })
     this.toggleVisibility()
-    this.setState({ lock_gauge: 'full' })
+    this.setState({ lock_strength: 'locked' })
   }
 
   handleMinorLock () {
@@ -53,7 +63,7 @@ class Dropdown extends Component {
       lock_strength: 'minor'
     })
     this.toggleVisibility()
-    this.setState({ lock_gauge: 'minor' })
+    this.setState({ lock_strength: 'minor' })
   }
 
   handlePatchLock () {
@@ -65,7 +75,7 @@ class Dropdown extends Component {
       lock_strength: 'patch'
     })
     this.toggleVisibility()
-    this.setState({ lock_gauge: 'patch' })
+    this.setState({ lock_strength: 'patch' })
   }
 
   handleUnlocked () {
@@ -77,15 +87,33 @@ class Dropdown extends Component {
       lock_strength: 'unlocked'
     })
     this.toggleVisibility()
-    this.setState({ lock_gauge: 'unlocked' })
+    this.setState({ lock_strength: 'unlocked' })
+  }
+
+  renderTooltipText () {
+    switch (this.state.lock_strength) {
+      case 'locked':
+        return `Locked at v${this.props.version}`
+      case 'unlocked':
+        return "Apply all updates automatically"
+      case 'minor':
+        return "Allow minor-level updates"
+      case 'patch':
+        return "Allow patch-level updates"
+      case 'custom':
+        return "Custom version lock"
+    }
   }
 
   render () {
     return (
 
-      <div className="lock-select">
-        <div className="lock-viewer button--dropdown" onClick={this.toggleVisibility}>
-          <LockGauge gauge={this.state.lock_gauge} />
+      <div className="lock-select tooltipped tooltipped-n" aria-label={this.renderTooltipText()}>
+        <div
+          className="lock-viewer button--dropdown"
+          onClick={this.toggleVisibility}
+        >
+          <LockGauge version_range={this.props.version_range} />
 
           <span className="lock__label">v{this.props.version}</span>
         </div>
@@ -101,17 +129,17 @@ class Dropdown extends Component {
             </div>
           </li>
 
-          <li onClick={this.handleMinorLock}>
-            <div className="lock-select__option">
-              <strong>Minor Updates</strong>
-              <p>Apply all updates less than v{sanitizeSemVer(semver.toComparators(getMinorLevelLock(this.props.version))[0][1])}</p>
-            </div>
-          </li>
-
           <li onClick={this.handlePatchLock}>
             <div className="lock-select__option">
               <strong>Patch Updates</strong>
-              <p>Apply all updates less than v{sanitizeSemVer(semver.toComparators(getPatchLevelLock(this.props.version))[0][1])}</p>
+              <p>Apply all updates less than v{sanitizeSemVer(semver.toComparators(patchLockedSemver(this.props.version))[0][1])}</p>
+            </div>
+          </li>
+
+          <li onClick={this.handleMinorLock}>
+            <div className="lock-select__option">
+              <strong>Minor Updates</strong>
+              <p>Apply all updates less than v{sanitizeSemVer(semver.toComparators(minorLockedSemver(this.props.version))[0][1])}</p>
             </div>
           </li>
 

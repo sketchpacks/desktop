@@ -2,7 +2,7 @@ import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 import { difference,filter,includes,intersection,pick } from 'lodash'
 import { createSelector } from 'reselect'
-import { isSemverLocked } from 'lib/utils'
+import { isFullLocked } from 'lib/VersionLock'
 import semver from 'semver'
 
 import plugins from 'reducers/plugins'
@@ -87,20 +87,20 @@ export const getUnlockedPlugins = createSelector(
   [ getStateTree, getManagedPlugins ],
   (state,ids) => filter(
     ids,
-    (id) => !isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+    (id) => !isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
   )
 )
 
 export const getLockedPlugins = (state) => filter(
   state.sketchpack.plugins.allIdentifiers,
-  (id) => isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+  (id) => isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
 )
 
 export const getOutdatedPlugins = createSelector(
   [ getStateTree, getManagedPlugins ],
   (state,identifiers) => filter(
     identifiers,
-    (id) => isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+    (id) => isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
     && semver.lt(
       state.library.plugins.byIdentifier[id].version,
       state.plugins.byIdentifier[id].version
@@ -176,7 +176,7 @@ export const checkPluginLockState = createSelector(
     try {
       const plugin = pack.plugins.byIdentifier[identifier]
       console.log('checkPluginLockState',plugin)
-      return isSemverLocked(plugin.version)
+      return isFullLocked(plugin.version)
     } catch (err) {
       return false
     }

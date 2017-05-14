@@ -17,6 +17,8 @@ class App extends Component {
   constructor (props) {
     super(props)
 
+    this.renderOverlay = this.renderOverlay.bind(this)
+
     this.handleImportClick = this.handleImportClick.bind(this)
     this.handleExportClick = this.handleExportClick.bind(this)
 
@@ -66,12 +68,22 @@ class App extends Component {
     )
   }
 
+  renderOverlay () {
+    return (
+      <div className="overlay">
+        <h2>Importing 🚚</h2>
+        <p>This might take a few minutes</p>
+      </div>
+    )
+  }
+
   render () {
-    const {availableUpdates} = this.props
+    const {availableUpdates,isImporting} = this.props
 
     return (
-
       <div className="app">
+        { isImporting && this.renderOverlay() }
+
         <SideBarMenu updatesCount={availableUpdates} />
 
         <div className="app__body">
@@ -79,7 +91,10 @@ class App extends Component {
             { this.props.location.pathname === '/library/managed'
               && this.renderLibraryActions()  }
 
-            <SearchBar {...this.props} classNames={'searchBar'} />
+             { this.props.location.pathname !== '/library/managed'
+               && this.props.location.pathname !== '/library/unmanaged'
+              && this.props.location.pathname !== '/library/updates'
+                && <SearchBar {...this.props} classNames={'searchBar'} /> }
           </header>
 
           <div className="app__viewport">
@@ -101,7 +116,8 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   return {
     state,
-    availableUpdates: getOutdatedPlugins(state).length
+    availableUpdates: getOutdatedPlugins(state).length,
+    isImporting: state.sketchpack.isImporting
   }
 }
 

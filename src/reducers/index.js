@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
-import { difference,filter,includes,intersection } from 'lodash'
+import { difference,filter,includes,intersection,pick } from 'lodash'
 import { createSelector } from 'reselect'
-import { isSemverLocked } from 'lib/utils'
+import { isFullLocked } from 'lib/VersionLock'
 import semver from 'semver'
 
 import plugins from 'reducers/plugins'
@@ -41,10 +41,24 @@ export const getPluginIdentifiers = (state) => state.plugins.allIdentifiers
 
 export const getPluginByIdentifier = (state, identifier) => {
   const plugin = getPlugins(state)[identifier]
-  return {
+
+  const data = {
     ...plugin,
     owner: getUserById(state, plugin.owner)
   }
+
+  return data
+}
+
+export const getPluginBasicsByIdentifier = (state, identifier) => {
+  const plugin = getPlugins(state)[identifier]
+
+  const data = pick(
+    plugin,
+    ['name', 'title', 'identifier', 'compatible_version', 'version', 'installed_version', 'install_path', 'manifest_path']
+  )
+
+  return data
 }
 
 export const getSearchResults = (state) => getPluginIdentifiers(state.search)
@@ -73,20 +87,20 @@ export const getUnlockedPlugins = createSelector(
   [ getStateTree, getManagedPlugins ],
   (state,ids) => filter(
     ids,
-    (id) => !isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+    (id) => !isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
   )
 )
 
 export const getLockedPlugins = (state) => filter(
   state.sketchpack.plugins.allIdentifiers,
-  (id) => isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+  (id) => isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
 )
 
 export const getOutdatedPlugins = createSelector(
   [ getStateTree, getManagedPlugins ],
   (state,identifiers) => filter(
     identifiers,
-    (id) => isSemverLocked(state.sketchpack.plugins.byIdentifier[id].version)
+    (id) => isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
     && semver.lt(
       state.library.plugins.byIdentifier[id].version,
       state.plugins.byIdentifier[id].version
@@ -131,13 +145,38 @@ export const selectPlugin = createSelector(
   }
 )
 
+export const selectPluginBasics = createSelector(
+  [
+    getPluginBasicsByIdentifier,
+    getLibraryPluginByIdentifier,
+    getSketchpackPluginByIdentifier,
+    getPluginInstallActivity
+  ],
+  (entity, lib, pack, isInstalling) => {
+    const data = entity
+
+    if (lib) {
+      data['installed_version'] = lib.version
+      data['install_path'] = lib.install_path
+    }
+
+    if (pack) {
+      data['version_range'] = pack.version
+    }
+
+    data['isInstalling'] = isInstalling
+
+    return data
+  }
+)
+
 export const checkPluginLockState = createSelector(
   [ getSketchpack ],
   (pack) => {
     try {
       const plugin = pack.plugins.byIdentifier[identifier]
       console.log('checkPluginLockState',plugin)
-      return isSemverLocked(plugin.version)
+      return isFullLocked(plugin.version)
     } catch (err) {
       return false
     }

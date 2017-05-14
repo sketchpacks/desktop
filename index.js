@@ -327,6 +327,8 @@ const queueInstall = (identifiers) => {
       mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err.message, id)
       return
     }
+
+    mainWindow.webContents.send('library/INSTALL_PLUGIN_SUCCESS', id)
   }))
 }
 
@@ -392,7 +394,24 @@ ipcMain.on('sketchpack/IMPORT_REQUEST', (event, args) => {
   }, (filePaths) => {
     if (filePaths) {
       try {
-        mainWindow.webContents.send('sketchpack/IMPORT', filePaths[0])
+        readSketchpack(filePaths[0])
+          .then(contents => {
+            if (contents.schema_version === "1.0.0") {
+              mainWindow.webContents.send('sketchpack/IMPORT', contents)
+              return
+            } else {
+              const opts = {
+                type: 'info',
+                title: 'Import failed',
+                message: 'Import failed',
+                detail: "Can't import sketchpacks with outdated schema versions",
+                buttons: ['Ok'],
+                defaultId: 0
+              }
+
+              dialog.showMessageBox(opts)
+            }
+          })
       } catch (err) {
         log.error(err)
       }
@@ -493,7 +512,7 @@ const watchSketchpack = (watchPath) => {
         log.debug('Sketchpack Detected', watchPath)
 
         readSketchpack(watchPath)
-          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
       }
     })
     .on('change', (watchPath) => {
@@ -501,7 +520,7 @@ const watchSketchpack = (watchPath) => {
         log.debug('Sketchpack Changed', watchPath)
 
         readSketchpack(watchPath)
-          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
       }
     })
     .on('unlink', (watchPath) => {
@@ -522,7 +541,7 @@ setTimeout(() => {
 
 setTimeout(() => {
   watchLibrary('**/(*.sketchplugin|manifest.json)')
-}, 2000)
+}, 1000)
 
 app.on('before-quit', () => {
   log.info('Watcher stopped')

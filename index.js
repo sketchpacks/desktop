@@ -395,7 +395,23 @@ ipcMain.on('sketchpack/IMPORT_REQUEST', (event, args) => {
     if (filePaths) {
       try {
         readSketchpack(filePaths[0])
-          .then(contents => mainWindow.webContents.send('sketchpack/IMPORT', contents))
+          .then(contents => {
+            if (contents.schema_version === "1.0.0") {
+              mainWindow.webContents.send('sketchpack/IMPORT', contents)
+              return
+            } else {
+              const opts = {
+                type: 'info',
+                title: 'Import failed',
+                message: 'Import failed',
+                detail: "Can't import sketchpacks with outdated schema versions",
+                buttons: ['Ok'],
+                defaultId: 0
+              }
+
+              dialog.showMessageBox(opts)
+            }
+          })
       } catch (err) {
         log.error(err)
       }

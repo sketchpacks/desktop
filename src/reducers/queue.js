@@ -59,7 +59,7 @@ export default handleActions({
   [installPluginError]: (state, action) => {
     return {
       ...state,
-      installing: without(state.installing, action.meta.plugin.identifier)
+      installing: without(state.installing, action.meta.plugin)
     }
   }
 }, initialState)

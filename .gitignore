@@ -2,6 +2,7 @@ gs
 logs
 *.log
 npm-debug.log*
+*.orig
 
 # Runtime data
 pids

@@ -19,35 +19,48 @@ const os = require('os')
 const fs = require('fs')
 const {forEach,filter,find,difference,isArray} = require('lodash')
 const electron = require('electron')
-const app = electron.app
-const dialog = electron.dialog
-const autoUpdater = electron.autoUpdater
-const protocol = electron.protocol
+const {
+  app,
+  dialog,
+  autoUpdater,
+  protocol,
+  Menu,
+  ipcMain,
+  ipcRenderer
+} = electron
 const url = require('url')
-const {ipcMain, ipcRenderer} = electron
 const log = require('electron-log')
 const menubar = require('menubar')
 const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
+const {appMenu} = require('./src/menus/appMenu')
+const {inputMenu} = require('./src/menus/inputMenu')
+const {selectionMenu} = require('./src/menus/selectionMenu')
 const chokidar = require('chokidar')
 
 const firstRun = require('first-run')
+
+const appPath = process.platform === 'darwin'
+  ? app.getPath('exe').replace(/\.app\/Content.*/, '.app')
+  : undefined
 const AutoLaunch = require('auto-launch')
 const autolauncher = new AutoLaunch({
-	name: 'Sketchpacks'
+	name: 'Sketchpacks',
+  path: appPath,
+  isHidden: true
 })
-
-const readManifest = require('./src/lib/readManifest')
-const readSketchpack = require('./src/lib/readSketchpack')
 
 const {
   getInstallPath,
-  extractAsset,
+  sanitizeSemVer,
   downloadAsset,
-  removeAsset,
-  sanitizeSemVer
+  extractAsset,
+  removeAsset
 } = require('./src/lib/utils')
+const writeSketchpack = require('./src/lib/writeSketchpack')
+const readSketchpack = require('./src/lib/readSketchpack')
+const readManifest = require('./src/lib/readManifest')
 
 const {
   INSTALL_PLUGIN_REQUEST,
@@ -96,6 +109,15 @@ menuBar.on('after-show', () => {
 menuBar.on('after-create-window', () => {
   menuBar.window.hide()
   mainWindow = menuBar.window
+
+  mainWindow.webContents.on('context-menu', (e, props) => {
+    const { selectionText, isEditable } = props;
+    if (isEditable) {
+      inputMenu.popup(mainWindow)
+    } else if (selectionText && selectionText.trim() !== '') {
+      selectionMenu.popup(mainWindow)
+    }
+  })
 })
 
 menuBar.on('show', () => {
@@ -114,6 +136,8 @@ app.on('ready', () => {
   }, (error) => {
     if (error) console.error('Failed to register protocol', error)
   })
+
+  Menu.setApplicationMenu(appMenu)
 })
 
 app.on('open-url', (event, resource) => {
@@ -303,6 +327,8 @@ const queueInstall = (identifiers) => {
       mainWindow.webContents.send(INSTALL_PLUGIN_ERROR, err.message, id)
       return
     }
+
+    mainWindow.webContents.send('library/INSTALL_PLUGIN_SUCCESS', id)
   }))
 }
 
@@ -368,7 +394,24 @@ ipcMain.on('sketchpack/IMPORT_REQUEST', (event, args) => {
   }, (filePaths) => {
     if (filePaths) {
       try {
-        mainWindow.webContents.send('sketchpack/IMPORT', filePaths[0])
+        readSketchpack(filePaths[0])
+          .then(contents => {
+            if (contents.schema_version === "1.0.0") {
+              mainWindow.webContents.send('sketchpack/IMPORT', contents)
+              return
+            } else {
+              const opts = {
+                type: 'info',
+                title: 'Import failed',
+                message: 'Import failed',
+                detail: "Can't import sketchpacks with outdated schema versions",
+                buttons: ['Ok'],
+                defaultId: 0
+              }
+
+              dialog.showMessageBox(opts)
+            }
+          })
       } catch (err) {
         log.error(err)
       }
@@ -469,7 +512,7 @@ const watchSketchpack = (watchPath) => {
         log.debug('Sketchpack Detected', watchPath)
 
         readSketchpack(watchPath)
-          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
       }
     })
     .on('change', (watchPath) => {
@@ -477,7 +520,7 @@ const watchSketchpack = (watchPath) => {
         log.debug('Sketchpack Changed', watchPath)
 
         readSketchpack(watchPath)
-          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_CONTENTS', contents))
+          .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
       }
     })
     .on('unlink', (watchPath) => {
@@ -498,7 +541,7 @@ setTimeout(() => {
 
 setTimeout(() => {
   watchLibrary('**/(*.sketchplugin|manifest.json)')
-}, 2000)
+}, 1000)
 
 app.on('before-quit', () => {
   log.info('Watcher stopped')

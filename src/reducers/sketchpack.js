@@ -2,12 +2,7 @@ import { createAction, handleActions } from 'redux-actions'
 
 import {uniq,includes,isObject,has,pickBy,filter} from 'lodash'
 
-import {
-  sanitizeSemVer,
-  isSemverLocked,
-  lockSemver,
-  toggleSemverLock
-} from 'lib/utils'
+import { sanitizeSemVer } from 'lib/utils'
 
 import semver from 'semver'
 
@@ -19,6 +14,10 @@ import {
   identifyPlugin,
   removePlugin
 } from 'reducers/library'
+
+import {
+  setVersionLock
+} from 'lib/VersionLock'
 
 
 
@@ -38,11 +37,11 @@ export const exportSketchpackRequest = createAction('sketchpack/EXPORT_REQUEST')
 export const exportSketchpackSuccess = createAction('sketchpack/EXPORT_SUCCESS')
 export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 
-
 //- State
 
 const initialState = {
   isLocked: false,
+  isImporting: false,
   plugins: {
     allIdentifiers: [],
     byIdentifier: {}
@@ -74,7 +73,7 @@ export default handleActions({
   },
 
   [setVersionRange]: (state, action) => {
-    const {identifier,version} = action.payload
+    const {identifier,version,lock_strength} = action.payload
     const plugin = state.plugins.byIdentifier[identifier]
     return {
       ...state,
@@ -84,7 +83,7 @@ export default handleActions({
           ...state.plugins.byIdentifier,
           [identifier]: {
             ...plugin,
-            version: toggleSemverLock(plugin.version)
+            version: setVersionLock({ semver: version, lock: lock_strength})
           }
         }
       }
@@ -111,7 +110,7 @@ export default handleActions({
         byIdentifier: {
           ...state.plugins.byIdentifier,
           [identifier]: {
-            version: lockSemver(plugin.version)
+            version: setVersionLock({ semver: plugin.version, lock: 'locked'})
           }
         },
         allIdentifiers: uniq(
@@ -135,5 +134,20 @@ export default handleActions({
         state.plugins.allIdentifiers, p => p !== action.payload.identifier
       )
     }
+  }),
+
+  [importSketchpackRequest]: (state,action) => ({
+    ...state,
+    isImporting: true
+  }),
+
+  [importSketchpackSuccess]: (state,action) => ({
+    ...state,
+    isImporting: false
+  }),
+
+  [importSketchpackError]: (state,action) => ({
+    ...state,
+    isImporting: false
   })
 }, initialState)

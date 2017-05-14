@@ -1,6 +1,7 @@
 import {remote} from 'electron'
 import {settingsMenu} from 'main/menus'
 const {Menu, MenuItem} = remote
+import log from 'electron-log'
 
 import React, {Component} from 'react'
 import { Link } from 'react-router'
@@ -9,6 +10,12 @@ import SVGIcon from 'components/SVGIcon'
 import Badge from 'components/Badge'
 
 import './sidebar.scss'
+
+import AutoLaunch from 'auto-launch'
+
+const autolauncher = new AutoLaunch({
+	name: 'Sketchpacks'
+})
 
 class SideBarMenu extends Component {
   constructor (props) {
@@ -22,6 +29,10 @@ class SideBarMenu extends Component {
   }
 
   render () {
+    autolauncher.isEnabled().then(isEnabled => {
+      settingsMenu.items[4].checked = isEnabled
+    })
+
     const {updatesCount} = this.props
 
     return (

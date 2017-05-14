@@ -13,7 +13,10 @@ const {
   syncSketchpackContents
 } = require('reducers')
 
-const { exportSketchpackRequest } = require('reducers/sketchpack')
+const {
+  importSketchpackSuccess,
+  exportSketchpackRequest
+} = require('reducers/sketchpack')
 
 const {
   TOGGLE_VERSION_LOCK_SUCCESS,
@@ -35,6 +38,8 @@ const sketchpackMiddleware = store => next => action => {
   next(action)
   const nextState = store.getState().sketchpack.plugins.byIdentifier
 
+  if (store.getState().sketchpack.isLocked) return
+
   if (isEqual(prevState,nextState)) return
 
   const identifiers = getSketchpackIdentifiers(store.getState())
@@ -42,7 +47,6 @@ const sketchpackMiddleware = store => next => action => {
   if (identifiers.length > 0) {
     store.dispatch(exportSketchpackRequest(sketchpackPath))
   }
-
 }
 
 export default sketchpackMiddleware

@@ -1,9 +1,14 @@
 const {remote, shell} = require('electron')
 const {Menu, MenuItem} = remote
-const AutoLaunch = require('auto-launch')
 
+const appPath = process.platform === 'darwin'
+  ? remote.app.getPath('exe').replace(/\.app\/Content.*/, '.app')
+  : undefined
+const AutoLaunch = require('auto-launch')
 const autolauncher = new AutoLaunch({
-	name: 'Sketchpacks'
+	name: 'Sketchpacks',
+  path: appPath,
+  isHidden: true
 })
 
 const settingsMenu = [
@@ -28,7 +33,6 @@ const settingsMenu = [
   {
     label: 'Launch at startup',
     type: 'checkbox',
-    checked: autolauncher.isEnabled().then(isEnabled => isEnabled),
     click(item, window, event) {
       autolauncher.isEnabled()
         .then(isEnabled => {
@@ -81,10 +85,6 @@ const settingsMenu = [
     click(item, window, event) {
       window.webContents.send('sketchpack/EXPORT_REQUEST', null)
     },
-  },
-
-  {
-    type: 'separator'
   },
 
   {

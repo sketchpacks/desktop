@@ -1,4 +1,3 @@
-import path from 'path'
 import { reduce } from 'lodash'
 import writeSketchpack from 'lib/writeSketchpack'
 import { exportSketchpackRequest,exportSketchpackSuccess } from 'reducers/sketchpack'

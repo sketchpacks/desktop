@@ -27,20 +27,3 @@ describe('sanitizeSemVer', () => {
     })
   })
 })
-
-describe('hasSemanticRange', () => {
-  it('should return true with a caret (^)', () => {
-    let plugin = { version: '^1.0.0' }
-    expect(hasSemanticRange(plugin)).toEqual(true)
-  })
-
-  it('should return true with a tilde (~)', () => {
-    let plugin = { version: '~1.0.0' }
-    expect(hasSemanticRange(plugin)).toEqual(true)
-  })
-
-  it('should return false without range flags', () => {
-    let plugin = { version: '1.0.0' }
-    expect(hasSemanticRange(plugin)).toEqual(false)
-  })
-})

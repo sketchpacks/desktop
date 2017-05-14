@@ -172,27 +172,10 @@ const sanitizeSemVer = (semver) => {
 		].join('.')
 }
 
-const lockSemver = (semver) => `=${sanitizeSemVer(semver)}`
-
-const unlockSemver = (semver) => `^${sanitizeSemVer(semver)}`
-
-const isSemverLocked = (semver) => semver.indexOf('=') > -1
-
-const toggleSemverLock = (range) => isSemverLocked(range)
-  ? unlockSemver(range)
-  : lockSemver(range)
-
-const hasSemanticRange = (semver) => /(\^|\~)/.test(semver)
-
 module.exports = {
 	sanitizeSemVer,
 	getInstallPath,
   extractAsset,
   downloadAsset,
-  removeAsset,
-  hasSemanticRange,
-  lockSemver,
-  unlockSemver,
-  isSemverLocked,
-  toggleSemverLock,
+  removeAsset
 }

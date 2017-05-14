@@ -24,10 +24,6 @@ import {
   setVersionRange
 } from 'reducers/sketchpack'
 
-import {
-  toggleSemverLock
-} from 'lib/utils'
-
 const withPluginDispatcher = (WrappedComponent) => {
   class ConnectedComponent extends Component {
     constructor (props) {

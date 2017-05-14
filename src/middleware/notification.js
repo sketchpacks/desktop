@@ -1,15 +1,17 @@
 import path from 'path'
 import { has } from 'lodash'
-import { selectPlugin } from 'reducers'
+import { selectPluginBasics } from 'reducers'
 
 const buildMessage = ({ type, name, version }) => {
   switch (type) {
     case "library/FETCH_RECEIVED":
-      return `${name} ${version} added`
+      return `Found ${name} ${version}`
     case "library/UNINSTALL_PLUGIN_SUCCESS":
-      return `${name} removed`
+      return `Removed ${name}`
     case "library/UPDATE_PLUGIN_SUCCESS":
-      return `${name} updated to ${version}`
+      return `Updated ${name} to v${version}`
+    case "library/INSTALL_PLUGIN_SUCCESS":
+      return `Installed ${name} ${version}`
   }
 }
 
@@ -27,14 +29,16 @@ const notificationMiddleware = store => next => action => {
   const nextState = store
 
   let notification
-  if (has(action, 'meta.notification')) {
+  if (has(action, 'meta.notification') && action.meta.notification) {
+    const identifier = action.payload.identifier || action.payload.result || action.payload
+
     const { message, title } = action.meta.notification
-    const plugin = selectPlugin(store.getState(),action.payload.result)
+    const plugin = selectPluginBasics(prevState.getState(), action.payload)
 
     desktopNotifier({
       type: action.type,
       name: plugin.title,
-      version: plugin.installed_version
+      version: plugin.installed_version || plugin.version
     })
   }
 }

@@ -20,7 +20,7 @@ export const updatePlugin = createAction('library/UPDATE_PLUGIN', identifier => 
 })
 
 export const installPluginRequest = createAction('library/INSTALL_PLUGIN_REQUEST')
-export const installPluginSuccess = createAction('library/INSTALL_PLUGIN_SUCCESS')
+export const installPluginSuccess = createAction('library/INSTALL_PLUGIN_SUCCESS', (payload) => payload, (_,meta) => meta)
 export const installPluginError = createAction('manager/INSTALL_ERROR')
 
 export const uninstallPluginRequest = createAction('library/UNINSTALL_PLUGIN_REQUEST')

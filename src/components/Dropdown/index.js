@@ -113,9 +113,11 @@ class Dropdown extends Component {
           className="lock-viewer button--dropdown"
           onClick={this.toggleVisibility}
         >
-          <LockGauge version_range={this.props.version_range} />
+          <LockGauge
+            version_range={this.props.version_range}
+          />
 
-          <span className="lock__label">v{this.props.version}</span>
+          <span className="lock__label">v{this.props.installed_version}</span>
         </div>
 
         <ul className={this.state.visible
@@ -125,7 +127,7 @@ class Dropdown extends Component {
           <li onClick={this.handleFullLock}>
             <div className="lock-select__option">
               <strong>Full Lock</strong>
-              <p>Lock at v{this.props.version}</p>
+              <p>Lock at v{this.props.installed_version}</p>
             </div>
           </li>
 

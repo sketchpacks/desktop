@@ -12,6 +12,8 @@ const buildMessage = ({ type, name, version }) => {
       return `Updated ${name} to v${version}`
     case "library/INSTALL_PLUGIN_SUCCESS":
       return `Installed ${name} ${version}`
+    case "manager/INSTALL_ERROR":
+      return `Failed to install ${name}`
   }
 }
 
@@ -29,11 +31,15 @@ const notificationMiddleware = store => next => action => {
   const nextState = store
 
   let notification
+  let identifier
+
   if (has(action, 'meta.notification') && action.meta.notification) {
-    const identifier = action.payload.identifier || action.payload.result || action.payload
+    identifier = action.payload.identifier || action.payload.result || action.payload
+
+    if (action.error) { identifier = action.meta.plugin }
 
     const { message, title } = action.meta.notification
-    const plugin = selectPluginBasics(prevState.getState(), action.payload)
+    const plugin = selectPluginBasics(prevState.getState(), identifier)
 
     desktopNotifier({
       type: action.type,

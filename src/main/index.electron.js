@@ -172,26 +172,21 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
 })
 
 ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt, err, plugin) => {
-  const msgBody = plugin.title || plugin.name
-
-  const notif = new window.Notification('Sketchpacks', {
-    body: `Could not install ${msgBody}`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
-
   store.dispatch({
     type: INSTALL_PLUGIN_ERROR,
     error: true,
     payload: new AppError(err),
-    meta: { plugin }
+    meta: {
+      plugin,
+      notification: true
+    }
   })
 })
 
 ipcRenderer.on('library/UPDATE_PLUGIN_SUCCESS', (evt,plugin) => {
   const normalizedPlugin = normalize(plugin, schemas.pluginSchema)
   store.dispatch(addPlugin(normalizedPlugin))
-  
+
   store.dispatch(updatePluginSuccess(plugin.identifier, { notification: true }))
 })
 

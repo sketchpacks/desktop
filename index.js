@@ -343,7 +343,7 @@ const queueUpdate = (plugins) => {
       return
     }
     log.debug('Update complete', result)
-    mainWindow.webContents.send('library/UPDATE_PLUGIN_SUCCESS', result.plugin)
+    mainWindow.webContents.send('library/UPDATE_PLUGIN_SUCCESS', result)
   }))
 }
 

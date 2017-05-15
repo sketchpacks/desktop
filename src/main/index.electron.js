@@ -151,7 +151,7 @@ ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,plugin) => {
 })
 
 ipcRenderer.on('library/INSTALL_PLUGIN_SUCCESS', (evt,identifier) => {
-  store.dispatch(installPluginSuccess(identifier))
+  store.dispatch(installPluginSuccess(identifier, { notification: true }))
 })
 
 // ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt,filepath) => {
@@ -172,25 +172,22 @@ ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
 })
 
 ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt, err, plugin) => {
-  const msgBody = plugin.title || plugin.name
-
-  const notif = new window.Notification('Sketchpacks', {
-    body: `Could not install ${msgBody}`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
-
   store.dispatch({
     type: INSTALL_PLUGIN_ERROR,
     error: true,
     payload: new AppError(err),
-    meta: { plugin }
+    meta: {
+      plugin,
+      notification: true
+    }
   })
 })
 
 ipcRenderer.on('library/UPDATE_PLUGIN_SUCCESS', (evt,plugin) => {
   const normalizedPlugin = normalize(plugin, schemas.pluginSchema)
-  store.dispatch(updatePluginSuccess(normalizedPlugin, { notification: true }))
+  store.dispatch(addPlugin(normalizedPlugin))
+
+  store.dispatch(updatePluginSuccess(plugin.identifier, { notification: true }))
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
@@ -205,13 +202,12 @@ ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
   if (!contents) return
   const normalizedPlugin = normalize(contents, schemas.pluginSchema)
   store.dispatch(addPlugin(normalizedPlugin))
-  store.dispatch(detectPlugin(normalizedPlugin, { notification: true }))
+  store.dispatch(detectPlugin(normalizedPlugin, { notification: false }))
 })
 
 
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  const normalizedPlugin = normalize(plugin, schemas.pluginSchema)
-  store.dispatch(uninstallPluginSuccess(normalizedPlugin, { notification: true }))
+  store.dispatch(uninstallPluginSuccess(plugin.identifier, { notification: true }))
 })
 
 

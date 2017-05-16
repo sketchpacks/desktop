@@ -10,7 +10,7 @@ import pkg from '../../package'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, Route, IndexRoute, IndexRedirect, browserHistory, hashHistory } from 'react-router'
-import { syncHistoryWithStore } from 'react-router-redux'
+import { syncHistoryWithStore,push } from 'react-router-redux'
 import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
 import { ipcRenderer, ipcMain, remote } from 'electron'
@@ -112,6 +112,8 @@ export const render = () => {
   ipcRenderer.send('APP_WINDOW_OPEN', null)
 
   loadSketchpack()
+
+  store.dispatch(push(`/browse/newest?page=1&sort=score%3Adesc`))
 }
 
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true}))
@@ -162,7 +164,7 @@ ipcRenderer.on('library/INSTALL_PLUGIN_SUCCESS', (evt,identifier) => {
 
 ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
   store.dispatch(webInstallPluginRequest(pluginId))
-  browserHistory.push('library/installed')
+  store.dispatch(push(`/library/installed`))
 
   const notif = new window.Notification('Sketchpacks', {
     body: `Starting install...`,

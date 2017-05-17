@@ -33,6 +33,8 @@ class SearchBar extends Component {
     })
     const request_url = `/plugins?${request_params}`
 
+    dispatch(push(`/search?q=${q}`))
+
     dispatch(
       searchPlugins({
         url: request_url,
@@ -40,8 +42,6 @@ class SearchBar extends Component {
         list: 'search'
       })
     )
-
-    browserHistory.push(`/search?q=${q}`)
   }
 
   handleEnterKey (e) {
@@ -49,10 +49,7 @@ class SearchBar extends Component {
 
     if (e.target.value.length <= 2) return
 
-    const {dispatch} = this.props
-    const keyword = e.target.value
-
-    this.fetchData({ q: keyword })
+    this.fetchData({ q: e.target.value })
   }
 
   render () {

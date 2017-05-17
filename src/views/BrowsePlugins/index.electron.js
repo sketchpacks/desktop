@@ -13,25 +13,6 @@ const EnhancedPluginList = ConnectedPluginList(withPluginDispatcher(withSelector
 class BrowsePluginsContainer extends Component {
   constructor (props) {
     super(props)
-
-    this.renderEmptyState = this.renderEmptyState.bind(this)
-    this.renderLoadingState = this.renderLoadingState.bind(this)
-  }
-
-  renderEmptyState () {
-    return (
-      <div className="empty-state--expanded">
-        <h4>No plugins found</h4>
-      </div>
-    )
-  }
-
-  renderLoadingState () {
-    return (
-      <div className="empty-state--expanded">
-        <h4>Loading plugins</h4>
-      </div>
-    )
   }
 
   render () {

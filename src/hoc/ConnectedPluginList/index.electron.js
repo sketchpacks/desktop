@@ -77,6 +77,14 @@ const ConnectedPluginList = ComposedComponent =>
     }
 
     render () {
+      if (this.props.state.plugins.isError
+        && (this.props.state.plugins.allIdentifiers.length === 0)) {
+        return <BrowseError
+          message={this.props.state.plugins.errorMessage}
+          onRetry={this.retryFetchData}
+        />
+      }
+
       return (
         <div>
           <ComposedComponent
@@ -87,11 +95,6 @@ const ConnectedPluginList = ComposedComponent =>
             errorMessage={this.props.state.plugins.errorMessage}
             onRetry={this.retryFetchData}
           />
-
-          { this.props.state.plugins.isError &&
-            <BrowseError
-              message={this.props.state.plugins.errorMessage}
-              onRetry={this.retryFetchData} /> }
 
           { (this.props.location.pathname !== '/library/installed'
               || this.props.location.pathname !== '/library/updates')

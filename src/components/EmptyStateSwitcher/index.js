@@ -2,7 +2,7 @@ import React from 'react'
 
 const EmptyManagedState = () => {
   return (
-    <div className="empty-state--expanded">
+    <div className="empty-state empty-state--expanded">
       <span className="o-emoji o-emoji--xl">😐</span>
       <h4>No installed plugins</h4>
 
@@ -13,7 +13,7 @@ const EmptyManagedState = () => {
 
 const EmptyUnmanagedState = () => {
   return (
-    <div className="empty-state--expanded">
+    <div className="empty-state empty-state--expanded">
       <span className="o-emoji o-emoji--xl">😐</span>
       <h4>No unmanaged plugins installed</h4>
 
@@ -24,7 +24,7 @@ const EmptyUnmanagedState = () => {
 
 const EmptyUpdatesState = () => {
   return (
-    <div className="empty-state--expanded">
+    <div className="empty-state empty-state--expanded">
       <span className="o-emoji o-emoji--xl">🖖🏽</span>
 
       <h4>No updates available</h4>
@@ -36,16 +36,16 @@ const EmptyUpdatesState = () => {
 
 const EmptyBrowseState = () => {
   return (
-    <div className="empty-state--expanded">
-      <span className="o-emoji o-emoji--xl">🙈</span>
-      <h4>No plugins found</h4>
+    <div className="empty-state empty-state--expanded">
+      <span className="o-emoji o-emoji--xl">⚡️</span>
+      <h4>Fetching plugins</h4>
     </div>
   )
 }
 
 const EmptySearchResultsState = () => {
   return (
-    <div className="empty-state--expanded">
+    <div className="empty-state empty-state--expanded">
       <span className="o-emoji o-emoji--xl">🔭</span>
       <h4>No results found</h4>
     </div>

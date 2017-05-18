@@ -34,7 +34,7 @@ class PluginList extends Component {
     }
 
     if (plugins.length === 0) {
-      return <EmptyStateSwitcher pathname={this.props.location.pathname} />
+      return <EmptyStateSwitcher pathname={location.pathname} />
     }
 
     return (

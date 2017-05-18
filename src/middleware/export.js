@@ -10,6 +10,8 @@ const {
 const exportMiddleware = store => next => action => {
   next(action)
 
+  const sketchpack = store.getState().sketchpack
+
   if (action.type === exportSketchpackRequest.toString()) {
     const identifiers = getSketchpackIdentifiers(store.getState())
 
@@ -24,7 +26,22 @@ const exportMiddleware = store => next => action => {
       action.payload,
       contents,
       () => {
-        store.dispatch(exportSketchpackSuccess())
+        store.dispatch(
+          exportSketchpackSuccess({}, {
+            total: identifiers.length,
+            plugins: identifiers,
+            mixpanel: {
+              eventName: 'Export',
+              props: {
+                source: 'desktop',
+                name: sketchpack.name,
+                isLocked: sketchpack.isLocked,
+                plugins: identifiers,
+                total: identifiers.length
+              }
+            }
+          })
+        )
       }
     )
   }

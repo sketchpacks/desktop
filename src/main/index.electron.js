@@ -153,7 +153,17 @@ ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,plugin) => {
 })
 
 ipcRenderer.on('library/INSTALL_PLUGIN_SUCCESS', (evt,identifier) => {
-  store.dispatch(installPluginSuccess(identifier, { notification: true }))
+  store.dispatch(installPluginSuccess(identifier, {
+    notification: true,
+    mixpanel: {
+      eventName: 'Manage',
+      type: 'Install Plugin',
+      props: {
+        source: 'desktop',
+        pluginId: identifier
+      }
+    }
+  }))
 })
 
 // ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt,filepath) => {

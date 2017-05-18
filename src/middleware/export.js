@@ -31,7 +31,8 @@ const exportMiddleware = store => next => action => {
             total: identifiers.length,
             plugins: identifiers,
             mixpanel: {
-              eventName: 'Export',
+              eventName: 'Manage',
+              type: 'Export',
               props: {
                 source: 'desktop',
                 name: sketchpack.name,

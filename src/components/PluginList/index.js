@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 
 import PluginMedia from 'components/PluginMedia'
 import BrowseError from 'components/BrowseError'
+import EmptyStateSwitcher from 'components/EmptyStateSwitcher'
 
 import {
   getPluginByIdentifier,
@@ -33,11 +34,7 @@ class PluginList extends Component {
     }
 
     if (plugins.length === 0) {
-      return (
-        <div>
-          <h1>empty...</h1>
-        </div>
-      )
+      return <EmptyStateSwitcher pathname={location.pathname} />
     }
 
     return (

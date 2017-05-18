@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import {getOutdatedPlugins} from 'reducers/index'
 import withPluginDispatcher from 'hoc/withPluginDispatcher'
 import withSelector from 'hoc/withSelector'
-import PluginList from 'components/PluginList'
-const ConnectedPluginList = withPluginDispatcher(withSelector(PluginList,getOutdatedPlugins))
+import LibraryList from 'components/LibraryList'
+const ConnectedLibraryList = withPluginDispatcher(withSelector(LibraryList,getOutdatedPlugins))
 
 class UpdatedPluginsContainer extends Component {
   constructor (props) {
@@ -17,7 +17,7 @@ class UpdatedPluginsContainer extends Component {
 
     return (
       <div style={{position: 'relative'}}>
-        <ConnectedPluginList
+        <ConnectedLibraryList
           handlePluginEvent={this.handlePluginEvent}
           location={location}
           dispatch={dispatch}

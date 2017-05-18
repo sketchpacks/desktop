@@ -13,6 +13,7 @@ import Waypoint from 'react-waypoint'
 import { browsePlugins } from 'reducers/plugins'
 
 import BrowseError from 'components/BrowseError'
+import EmptyStateSwitcher from 'components/EmptyStateSwitcher'
 
 const ConnectedPluginList = ComposedComponent =>
   class extends React.Component {
@@ -77,6 +78,19 @@ const ConnectedPluginList = ComposedComponent =>
     }
 
     render () {
+      if (this.props.state.plugins.isLoading
+        && (this.props.state.plugins.allIdentifiers.length === 0)) {
+        return <EmptyStateSwitcher pathname={'browse'} />
+      }
+
+      if (this.props.state.plugins.isError
+        && (this.props.state.plugins.allIdentifiers.length === 0)) {
+        return <BrowseError
+          message={this.props.state.plugins.errorMessage}
+          onRetry={this.retryFetchData}
+        />
+      }
+
       return (
         <div>
           <ComposedComponent
@@ -87,11 +101,6 @@ const ConnectedPluginList = ComposedComponent =>
             errorMessage={this.props.state.plugins.errorMessage}
             onRetry={this.retryFetchData}
           />
-
-          { this.props.state.plugins.isError &&
-            <BrowseError
-              message={this.props.state.plugins.errorMessage}
-              onRetry={this.retryFetchData} /> }
 
           { (this.props.location.pathname !== '/library/installed'
               || this.props.location.pathname !== '/library/updates')

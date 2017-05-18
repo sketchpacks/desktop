@@ -94,7 +94,8 @@ export default handleActions({
 
   [browseRequest]: (state, action) => ({
     ...state,
-    isLoading: true
+    isLoading: true,
+    allIdentifiers: []
   }),
 
   [browseSuccess]: (state, action) => ({

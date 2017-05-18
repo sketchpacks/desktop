@@ -199,7 +199,17 @@ ipcRenderer.on('library/UPDATE_PLUGIN_SUCCESS', (evt,plugin) => {
   const normalizedPlugin = normalize(plugin, schemas.pluginSchema)
   store.dispatch(addPlugin(normalizedPlugin))
 
-  store.dispatch(updatePluginSuccess(plugin.identifier, { notification: true }))
+  store.dispatch(updatePluginSuccess(plugin.identifier, {
+    notification: true,
+    mixpanel: {
+      eventName: 'Manage',
+      type: 'Update Plugin',
+      props: {
+        source: 'desktop',
+        pluginId: identifier
+      }
+    }
+  }))
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
@@ -219,7 +229,17 @@ ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
 
 
 ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  store.dispatch(uninstallPluginSuccess(plugin.identifier, { notification: true }))
+  store.dispatch(uninstallPluginSuccess(plugin.identifier, {
+    notification: true,
+    mixpanel: {
+      eventName: 'Manage',
+      type: 'Uninstall Plugin',
+      props: {
+        source: 'desktop',
+        pluginId: identifier
+      }
+    }
+  }))
 })
 
 

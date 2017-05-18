@@ -47,6 +47,17 @@ const withPluginDispatcher = (WrappedComponent) => {
             identifier,
             version,
             lock_strength
+          }, {
+            mixpanel: {
+              eventName: 'Manage',
+              type: 'Version Range',
+              props: {
+                source: 'desktop',
+                pluginId: identifier,
+                lock: lock_strength,
+                version
+              }
+            }
           }))
         case "info":
           return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}`)

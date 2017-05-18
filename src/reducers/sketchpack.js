@@ -27,14 +27,14 @@ export const syncSketchpackRequest = createAction('sketchpack/SYNC_REQUEST')
 export const syncSketchpackSuccess = createAction('sketchpack/SYNC_SUCCESS')
 export const syncSketchpackError = createAction('sketchpack/SYNC_ERROR')
 
-export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE')
+export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE', (payload) => payload, (_,meta) => meta)
 
 export const importSketchpackRequest = createAction('sketchpack/IMPORT_REQUEST')
-export const importSketchpackSuccess = createAction('sketchpack/IMPORT_SUCCESS')
+export const importSketchpackSuccess = createAction('sketchpack/IMPORT_SUCCESS', (payload) => payload, (_,meta) => meta)
 export const importSketchpackError = createAction('sketchpack/IMPORT_ERROR')
 
 export const exportSketchpackRequest = createAction('sketchpack/EXPORT_REQUEST')
-export const exportSketchpackSuccess = createAction('sketchpack/EXPORT_SUCCESS')
+export const exportSketchpackSuccess = createAction('sketchpack/EXPORT_SUCCESS', (payload) => payload, (_,meta) => meta)
 export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 
 //- State

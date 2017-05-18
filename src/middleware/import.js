@@ -12,6 +12,17 @@ const importMiddleware = store => next => action => {
 
   if (action.type === importSketchpackRequest.toString()) {
     const ids = Object.keys(action.payload.plugins)
+    store.dispatch(importSketchpackSuccess({}, {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Import',
+        props: {
+          source: 'desktop',
+          plugins: ids,
+          total: ids.length
+        }
+      }
+    }))
     store.dispatch(installPluginRequest(ids))
     ipcRenderer.send(INSTALL_PLUGIN_REQUEST,ids)
   }

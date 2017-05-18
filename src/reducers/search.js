@@ -12,18 +12,29 @@ const DEFAULT_TIMEOUT = 1500
 
 //- Actions
 
-export const searchRequest = createAction('search/FETCH_REQUEST')
+export const searchRequest = createAction('search/FETCH_REQUEST', (payload) => payload, (_,meta) => meta)
 export const searchSuccess = createAction('search/FETCH_SUCCESS')
 export const searchError = createAction('search/FETCH_ERROR')
 
-export const searchPlugins = ({ url, list, append}) => (dispatch,getState) => {
+export const searchPlugins = ({ url, list, append, keyword }) => (dispatch,getState) => {
   const client = axios.create({
     baseURL: `${API_URL}/v1`,
     timeout: DEFAULT_TIMEOUT,
     transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
   })
 
-  dispatch(searchRequest())
+  dispatch(
+    searchRequest({}, {
+      mixpanel: {
+        eventName: 'Registry',
+        type: 'Search',
+        props: {
+          source: 'desktop',
+          keyword
+        }
+      }
+    })
+  )
 
   client.get(url)
     .then(
@@ -61,7 +72,7 @@ const initialState = {
 //- Reducers
 
 export default handleActions({
-  [searchSuccess]: (state, action) => ({
+  [searchRequest]: (state, action) => ({
     ...state,
     keyword: action.payload.keyword
   }),

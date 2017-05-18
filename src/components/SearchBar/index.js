@@ -39,7 +39,8 @@ class SearchBar extends Component {
       searchPlugins({
         url: request_url,
         append: false,
-        list: 'search'
+        list: 'search',
+        keyword: q
       })
     )
   }

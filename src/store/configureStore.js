@@ -1,9 +1,13 @@
-import {MIXPANEL_TOKEN} from '../config'
+import {
+  MIXPANEL_TOKEN,
+  __PRODUCTION__,
+  __ELECTRON__
+} from '../config'
 
 import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { routerMiddleware } from 'react-router-redux'
-import { browserHistory } from 'react-router'
+import { browserHistory, hashHistory } from 'react-router'
 import createLogger from 'redux-logger'
 import mixpanelMiddleware from 'remimi'
 import rootReducer from 'reducers'
@@ -20,7 +24,7 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 const enhancer = composeEnhancers(
   applyMiddleware(
-    routerMiddleware(browserHistory),
+    routerMiddleware((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory),
     thunk.withExtraArgument({api: SketchpacksApi}),
     logger,
     importMiddleware,

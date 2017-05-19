@@ -3,6 +3,8 @@ import { importSketchpackRequest,importSketchpackSuccess } from 'reducers/sketch
 
 import { INSTALL_PLUGIN_REQUEST } from 'actions/plugin_manager'
 
+import { difference } from 'lodash'
+
 import {
   installPluginRequest
 } from 'reducers/library'
@@ -11,7 +13,13 @@ const importMiddleware = store => next => action => {
   next(action)
 
   if (action.type === importSketchpackRequest.toString()) {
-    const ids = Object.keys(action.payload.plugins)
+    const newIdentifiers = Object.keys(action.payload.plugins)
+    const currentIdentifiers = store.getState().sketchpack.plugins.allIdentifiers
+
+    const ids = difference(newIdentifiers,currentIdentifiers)
+
+    if (ids.length === 0) return
+
     store.dispatch(
       installPluginRequest(ids)
     )

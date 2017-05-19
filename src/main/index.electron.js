@@ -206,7 +206,7 @@ ipcRenderer.on('library/UPDATE_PLUGIN_SUCCESS', (evt,plugin) => {
       type: 'Update Plugin',
       props: {
         source: 'desktop',
-        pluginId: identifier
+        pluginId: plugin.identifier
       }
     }
   }))
@@ -236,7 +236,7 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
       type: 'Uninstall Plugin',
       props: {
         source: 'desktop',
-        pluginId: identifier
+        pluginId: plugin.identifier
       }
     }
   }))

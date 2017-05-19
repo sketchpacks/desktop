@@ -24,13 +24,6 @@ const initialState = {
 //- Reducers
 
 export default handleActions({
-  ['sketchpack/IMPORT_REQUEST']: (state, action) => {
-    return {
-      ...state,
-      installing: uniq(state.installing.concat(Object.keys(action.payload.plugins)))
-    }
-  },
-
   // Add reference to identifier before install
   [installPluginRequest]: (state, action) => {
     return {

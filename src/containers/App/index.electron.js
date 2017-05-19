@@ -8,7 +8,7 @@ import 'css/milligram.scss'
 
 import './app.scss'
 
-import {getOutdatedPlugins} from 'reducers/index'
+import { getOutdatedPlugins } from 'reducers/index'
 import SVGIcon from 'components/SVGIcon'
 import SideBarMenu from 'components/electron/SideBarMenu'
 import SearchBar from 'components/SearchBar'
@@ -78,11 +78,11 @@ class App extends Component {
   }
 
   render () {
-    const {availableUpdates,isImporting} = this.props
+    const {availableUpdates} = this.props
 
     return (
       <div className="app">
-        { isImporting && this.renderOverlay() }
+        { this.props.isImporting && this.renderOverlay() }
 
         <SideBarMenu updatesCount={availableUpdates} />
 

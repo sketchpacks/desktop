@@ -45,15 +45,9 @@ class App extends Component {
                     classNames={'searchBar'} />
 
                   <div className="nav-group">
-                    <a href="/browse" className="nav__item">Browse</a>
-
-                    <a
-                      href="https://github.com/integration/sketchpacks-relay"
-                      className="nav__item"
-                      target="_blank"
-                    >
-                      Submit Plugins
-                    </a>
+                    <Link to={`/browse`} className="nav__item">
+                      Browse
+                    </Link>
                   </div>
                 </nav>
 
@@ -88,7 +82,7 @@ class App extends Component {
           </div>
 
           <div className="footer-section">
-            <a href="https://github.com/integration/sketchpacks-relay" target="_blank">Submit your plugins</a>
+            <a href="https://github.com/integration/sketchpacks-relay" target="_blank">Publish my plugins</a>
             &nbsp;&bull;&nbsp;
             <a href="https://medium.com/building-sketchpacks" target="_blank">Blog</a>
             &nbsp;&bull;&nbsp;

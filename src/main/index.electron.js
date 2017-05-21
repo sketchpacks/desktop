@@ -29,6 +29,8 @@ import {filter} from 'lodash'
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 
+import { fetchPlugin } from 'reducers/plugins'
+
 import App from 'containers/App'
 import AppError from 'errors/AppError'
 
@@ -172,15 +174,10 @@ ipcRenderer.on('library/INSTALL_PLUGIN_SUCCESS', (evt,identifier) => {
 // })
 
 
-ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
-  store.dispatch(webInstallPluginRequest(pluginId))
+ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, identifiers) => {
+  store.dispatch(fetchPlugin({ identifiers }))
   store.dispatch(push(`/library/installed`))
-
-  const notif = new window.Notification('Sketchpacks', {
-    body: `Starting install...`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
+  ipcRenderer.send(INSTALL_PLUGIN_REQUEST,identifiers)
 })
 
 ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt, err, plugin) => {

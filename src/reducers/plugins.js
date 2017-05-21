@@ -15,12 +15,14 @@ const DEFAULT_TIMEOUT = 1500
 
 export const changeLocation = createAction('@@router/LOCATION_CHANGE')
 export const addPlugin = createAction('ADD_ENTITIES')
-export const browseRequest = createAction('browse/FETCH_REQUEST')
-export const browseSuccess = createAction('browse/FETCH_SUCCESS')
-export const browseError = createAction('browse/FETCH_ERROR')
 export const catalogRequest = createAction('catalog/FETCH_REQUEST')
 export const catalogReceived = createAction('catalog/FETCH_RECEIVED')
 export const catalogPaginate = createAction('catalog/PAGINATE')
+
+
+export const browseRequest = createAction('browse/FETCH_REQUEST')
+export const browseSuccess = createAction('browse/FETCH_SUCCESS')
+export const browseError = createAction('browse/FETCH_ERROR')
 
 export const browsePlugins = ({ url, list, append}) => (dispatch,getState) => {
   const client = axios.create({
@@ -51,6 +53,52 @@ export const browsePlugins = ({ url, list, append}) => (dispatch,getState) => {
         }
       },
       err => dispatch(browseError(err))
+    )
+}
+
+
+// fetchPlugin
+// GET for array of identifiers (batch)
+// GET plugin by namespace
+
+export const fetchPluginRequest = createAction('plugin/FETCH_REQUEST')
+export const fetchPluginSuccess = createAction('plugin/FETCH_SUCCESS', (payload) => payload, (_,meta) => meta)
+export const fetchPluginError = createAction('plugin/FETCH_ERROR')
+
+export const fetchPlugin = ({ namespace, identifiers }) => (dispatch,getState) => {
+  let endpoint
+
+  if (namespace) {
+    let owner, name
+    [owner,name] = namespace.split('/')
+    endpoint = `/plugins/users/${owner}/plugins/${name}`
+  }
+
+  if (identifiers) {
+    endpoint = `/plugins?in=${identifiers.join(',')}`
+  }
+
+  const client = axios.create({
+    baseURL: `${API_URL}/v1`,
+    timeout: DEFAULT_TIMEOUT,
+    transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
+  })
+
+  dispatch(fetchPluginRequest())
+
+  client.get(endpoint)
+    .then(
+      data => {
+        // data.data => { entities, result }
+        // data.headers => link, per_page, total
+        // data.status => 200 OK
+
+        if (data.status === 200) {
+          dispatch(addPlugin(data.data))
+          dispatch(fetchPluginSuccess(data.data))
+        }
+      },
+      err => dispatch(fetchPluginError(err))
     )
 }
 

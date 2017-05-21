@@ -144,14 +144,13 @@ app.on('open-url', (event, resource) => {
   event.preventDefault() // Handle event ourselves
 
   const uri = url.parse(resource)
-  const pluginId = uri.path.slice(1)
+  const identifier = uri.path.slice(1)
 
   if (!app.isReady()) {
-    externalPluginInstallQueue.push(pluginId)
+    externalPluginInstallQueue.push(identifier)
   }
   else {
-    // TODO: User pretty namespaces in place of pluginID
-    mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
+    mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', [identifier])
   }
 })
 
@@ -179,9 +178,7 @@ ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
 
 ipcMain.on('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', (event, arg) => {
   if (externalPluginInstallQueue.length > 0) {
-    forEach(externalPluginInstallQueue, (pluginId) => {
-      mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', pluginId)
-    })
+    mainWindow.webContents.send('EXTERNAL_PLUGIN_INSTALL_REQUEST', externalPluginInstallQueue)
     externalPluginInstallQueue = null
   }
 })

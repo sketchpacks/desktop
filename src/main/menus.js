@@ -52,6 +52,10 @@ const settingsMenu = [
   },
 
   {
+    label: 'Help &amp; Documentation',
+    click: () => shell.openExternal('https://docs.sketchpacks.com')
+  },
+  {
     label: 'Visit Sketchpacks.com',
     click: () => shell.openExternal('https://www.sketchpacks.com')
   },

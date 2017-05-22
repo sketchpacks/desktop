@@ -18,7 +18,12 @@ const importMiddleware = store => next => action => {
 
     const ids = difference(newIdentifiers,currentIdentifiers)
 
-    if (ids.length === 0) return
+    if (ids.length === 0) {
+      store.dispatch(
+        importSketchpackSuccess({}, {})
+      )
+      return
+    }
 
     store.dispatch(
       installPluginRequest(ids)

@@ -38,6 +38,7 @@ const {appMenu} = require('./src/menus/appMenu')
 const {inputMenu} = require('./src/menus/inputMenu')
 const {selectionMenu} = require('./src/menus/selectionMenu')
 const chokidar = require('chokidar')
+const semver = require('semver')
 
 const firstRun = require('first-run')
 
@@ -218,11 +219,13 @@ const installPluginTask = (identifier, callback) => {
 const updatePluginTask = (plugin, callback) => {
   if (typeof plugin === undefined) return
 
+  const updateRange = semver.toComparators(plugin.version_range)[0].join(' ')
+
   downloadAsset(Object.assign({},
     plugin,
     {
       destinationPath: app.getPath('temp'),
-      download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}`
+      download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}?range=${updateRange}`
     }
   ))
     .then(removeAsset)

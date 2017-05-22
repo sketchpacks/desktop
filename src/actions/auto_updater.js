@@ -6,7 +6,7 @@ import {
 
 import { ipcRenderer } from 'electron'
 
-import { getUnlockedPlugins,selectPlugin } from 'reducers'
+import { getUnlockedPlugins,selectPluginBasics } from 'reducers'
 
 const AUTOUPDATE_PLUGINS_REQUEST = 'manager/AUTOUPDATE_PLUGINS'
 
@@ -15,7 +15,7 @@ export const autoUpdatePluginsRequest = ({repeat}) => {
     dispatch({ type: AUTOUPDATE_PLUGINS_REQUEST })
 
     const unlockedPlugins = getUnlockedPlugins(getState())
-      .map(id => selectPlugin(getState(),id))
+      .map(id => selectPluginBasics(getState(),id))
 
     ipcRenderer.send('manager/UPDATE_REQUEST', unlockedPlugins)
 

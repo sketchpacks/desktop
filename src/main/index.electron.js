@@ -118,7 +118,7 @@ export const render = () => {
   store.dispatch(push(`/browse/newest?page=1&sort=score%3Adesc`))
 }
 
-const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true}))
+const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true }))
 
 const loadSketchpack = () => {
   const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')

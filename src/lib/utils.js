@@ -126,7 +126,7 @@ const removeAsset = (data) => new Promise((resolve, reject) => {
     install_dir_path.split('/')
   )[0]
 
-  const cleanAssetPath = [install_dir_path,assetDirectoryPath].join('/')
+  const cleanAssetPath = [install_dir_path,assetDirectoryPath].join('')
 
   log.debug('Removing asset: ', cleanAssetPath)
 

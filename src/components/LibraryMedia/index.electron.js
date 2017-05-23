@@ -180,10 +180,10 @@ class PluginMedia extends Component {
           </div>
 
           <div className="o-plugin__footer o-plugin__footer--recto">
-            { (location.pathname === '/library/managed') &&
+            { (this.props.location.pathname === '/library/managed') &&
               this.renderVersionLock() }
 
-            { (location.pathname !== '/library/managed') &&
+            { (this.props.location.pathname !== '/library/managed') &&
               this.renderVersion() }
 
             { this.renderButton() }

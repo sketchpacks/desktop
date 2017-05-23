@@ -100,11 +100,15 @@ export const getOutdatedPlugins = createSelector(
   [ getStateTree, getManagedPlugins ],
   (state,identifiers) => filter(
     identifiers,
-    (id) => isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
-    && semver.lt(
-      state.library.plugins.byIdentifier[id].version,
-      state.plugins.byIdentifier[id].version
-    )
+    (id) => {      
+      if (!state.plugins.byIdentifier[id]) return false
+
+      return isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
+        && semver.lt(
+          state.library.plugins.byIdentifier[id].version,
+          state.plugins.byIdentifier[id].version
+        )
+    }
   )
 )
 

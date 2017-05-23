@@ -7,7 +7,7 @@ import { pick,pickBy,filter } from 'lodash'
 
 export const installPlugin = createAction('manager/INSTALL_SUCCESS')
 export const detectPlugin = createAction('library/FETCH_RECEIVED', (payload) => payload, (_,meta) => meta)
-export const identifyPlugin = createAction('library/IDENTIFY_PLUGIN_SUCCESS')
+export const identifyPlugin = createAction('library/IDENTIFY_PLUGIN_SUCCESS', (payload) => payload, (_,meta) => meta)
 
 export const removePlugin = createAction('library/UNINSTALL_PLUGIN', identifier => {
   ipcRenderer.send('manager/UNINSTALL_REQUEST', identifier)
@@ -59,6 +59,23 @@ export default handleActions({
   }),
 
   [detectPlugin]: (state, action) => {
+    return {
+      ...state,
+      plugins: {
+        ...state.plugins,
+        byIdentifier: {
+          ...state.plugins.byIdentifier,
+          [action.payload.result]: pick(
+            action.payload.entities.plugins[action.payload.result],
+            ['install_path', 'manifest_path', 'version', 'compatible_version']
+          )
+        },
+        allIdentifiers: state.plugins.allIdentifiers.concat(action.payload.result)
+      }
+    }
+  },
+
+  [identifyPlugin]: (state, action) => {
     return {
       ...state,
       plugins: {

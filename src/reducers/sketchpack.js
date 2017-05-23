@@ -90,12 +90,14 @@ export default handleActions({
     }
   },
 
-  [detectPlugin]: (state, action) => {
+  [identifyPlugin]: (state, action) => {
     let { entities, result } = action.payload
 
     let plugin = entities.plugins[result]
 
     let identifier = plugin.identifier
+
+    if (!has(plugin, 'owner')) return state
 
     if (has(state.plugins.byIdentifier,identifier)) {
       return {

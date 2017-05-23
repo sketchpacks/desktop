@@ -24,7 +24,7 @@ import ms from 'ms'
 import os from 'os'
 import fs from 'fs'
 import json5file from '@sketchpacks/json5file'
-import {filter} from 'lodash'
+import { filter,has } from 'lodash'
 
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
@@ -219,9 +219,19 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
 
 ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
   if (!contents) return
-  const normalizedPlugin = normalize(contents, schemas.pluginSchema)
+
+  const hasOwner = Object.keys(contents).length > 5
+
+  const schema = (hasOwner) ? schemas.pluginSchema : schemas.manifestSchema
+
+  const normalizedPlugin = normalize(contents, schema)
+
+  if (hasOwner) {
+    store.dispatch(identifyPlugin(normalizedPlugin, { notification: false }))
+  } else {
+    store.dispatch(detectPlugin(normalizedPlugin, { notification: false }))
+  }
   store.dispatch(addPlugin(normalizedPlugin))
-  store.dispatch(detectPlugin(normalizedPlugin, { notification: false }))
 })
 
 

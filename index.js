@@ -59,6 +59,7 @@ const {
   extractAsset,
   removeAsset
 } = require('./src/lib/utils')
+
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
 const readManifest = require('./src/lib/readManifest')
@@ -219,13 +220,20 @@ const installPluginTask = (identifier, callback) => {
 const updatePluginTask = (plugin, callback) => {
   if (typeof plugin === undefined) return
 
-  const updateRange = semver.toComparators(plugin.version_range)[0].join(' ')
+  let updateURL
+
+  if (/^(\=)/.test(plugin.version_range)) {
+    updateURL = `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}`
+  } else {
+    const updateRange = semver.toComparators(plugin.version_range)[0].join(' ')
+    updateURL = `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}?range=${updateRange}`
+  }
 
   downloadAsset(Object.assign({},
     plugin,
     {
       destinationPath: app.getPath('temp'),
-      download_url: `${API_URL}/v1/plugins/${plugin.identifier}/download/update/${plugin.installed_version}?range=${updateRange}`
+      download_url: updateURL
     }
   ))
     .then(removeAsset)
@@ -249,6 +257,7 @@ const identifyPluginTask = (manifestPath, callback) => {
   let install_path
   let identifier
   let version
+  let name
 
   let unidentifiedPlugin
 
@@ -256,15 +265,18 @@ const identifyPluginTask = (manifestPath, callback) => {
     try {
       install_path = manifestContents.install_path
       version = sanitizeSemVer(manifestContents.version || "0.0.0")
+      name = manifestContents.name,
+      identifier = manifestContents.identifier
+
       unidentifiedPlugin = {
-        identifier: manifestContents.identifier,
-        name: manifestContents.name,
+        identifier,
+        name,
+        version,
+        install_path,
+        manifest_path,
         owner: {
           handle: manifestContents.name || manifestContents.author || manifestContents.authorName
-        },
-        version: version,
-        install_path,
-        manifest_path
+        }
       }
       resolve(unidentifiedPlugin)
     } catch (err) {
@@ -277,12 +289,20 @@ const identifyPluginTask = (manifestPath, callback) => {
     .then(buildPlugin)
     .then(getPluginByIdentifier)
     .then(response => {
-      const data = Object.assign({}, response.data, { install_path, manifest_path, version })
+      const data = Object.assign(
+        {},
+        response.data,
+        { install_path, manifest_path, version, name, identifier }
+      )
+
       callback(null, data)
     },
     err => {
       const error = new Error(`Failed to identify plugin - ${manifest_path}`)
-      const data = Object.assign({}, { install_path, manifest_path, version })
+      const data = Object.assign(
+        {},
+        { install_path, manifest_path, version, name, identifier }
+      )
       callback(error, data)
     })
     .catch(err => {
@@ -333,11 +353,13 @@ const queueInstall = (identifiers) => {
 }
 
 const queueUpdate = (plugins) => {
-  if (typeof plugins === undefined) return
-  if (plugins.length === 0) return
+  const items = [].concat(plugins)
 
-  log.debug(`Enqueueing ${plugins.length} plugins`)
-  plugins.map(plugin => workQueue.push({ action: 'update', payload: plugin }, (err, result) => {
+  if (typeof items === undefined) return
+  if (items.length === 0) return
+
+  log.debug(`Enqueueing ${items.length} plugins`)
+  items.map(plugin => workQueue.push({ action: 'update', payload: plugin }, (err, result) => {
     if (err) {
       log.error(err)
       return
@@ -375,6 +397,7 @@ const queueIdentify = (plugins) => {
 
   log.debug(`Enqueueing ${plugins.length} plugins`)
   plugins.map(plugin => workQueue.push({ action: 'identify', payload: plugin }, (err, result) => {
+    log.debug('queueIdentify', result)
     if (typeof result !== undefined) {
       mainWindow.webContents.send('PLUGIN_DETECTED', result)
     }

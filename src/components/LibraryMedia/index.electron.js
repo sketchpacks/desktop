@@ -25,6 +25,7 @@ class PluginMedia extends Component {
 
     // Sub-renders
     this.renderVersion = this.renderVersion.bind(this)
+    this.renderVersionLock = this.renderVersionLock.bind(this)
     this.renderButton = this.renderButton.bind(this)
 
     // Click events
@@ -59,12 +60,18 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
+    let version
+
     const {location} = this.props
+
+    if (location.pathname === '/library/updates') version = this.props.plugin.version
+
+    if (location.pathname === '/library/unmanaged') version = this.props.plugin.installed_version
 
     return <PluginMetric
       icon={'versions'}
       shape={'path'}
-      value={sanitizeSemVer(this.props.plugin.installed_version)}
+      value={sanitizeSemVer(version)}
       tooltip={'Installed version'} />
   }
 
@@ -83,6 +90,13 @@ class PluginMedia extends Component {
       className={location.pathname === '/library/updates'
         ? 'button'
         : 'button button-installed'} />
+  }
+
+  renderVersionLock () {
+    return <Dropdown
+      {...this.props.plugin}
+      handlePluginEvent={this.props.handlePluginEvent}
+    />
   }
 
   componentWillReceiveProps (nextProps) {
@@ -166,10 +180,11 @@ class PluginMedia extends Component {
           </div>
 
           <div className="o-plugin__footer o-plugin__footer--recto">
-            <Dropdown
-              {...this.props.plugin}
-              handlePluginEvent={this.props.handlePluginEvent}
-            />
+            { (location.pathname === '/library/managed') &&
+              this.renderVersionLock() }
+
+            { (location.pathname !== '/library/managed') &&
+              this.renderVersion() }
 
             { this.renderButton() }
           </div>

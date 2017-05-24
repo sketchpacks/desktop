@@ -12,7 +12,8 @@ import * as schemas from 'schemas'
 import {
   detectPlugin,
   identifyPlugin,
-  removePlugin
+  removePlugin,
+  installPluginRequest
 } from 'reducers/library'
 
 import {
@@ -138,10 +139,16 @@ export default handleActions({
     }
   }),
 
-  [importSketchpackRequest]: (state,action) => ({
-    ...state,
-    isImporting: true
-  }),
+  [installPluginRequest]: (state,action) => {
+    if (has(action,'meta.import')) {
+      return {
+        ...state,
+        isImporting: action.meta.import
+      }
+    } else {
+      return state
+    }
+  },
 
   [importSketchpackSuccess]: (state,action) => ({
     ...state,

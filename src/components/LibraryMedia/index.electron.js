@@ -172,9 +172,7 @@ class PluginMedia extends Component {
           <div className="o-media">
             <div className="o-media__content">
               <h3 className="o-plugin__name">
-                <span onClick={this.handleClickPluginName}>
-                  {title_or_name}
-                </span>
+                {title_or_name}
               </h3>
             </div>
           </div>

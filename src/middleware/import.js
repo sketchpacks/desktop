@@ -18,12 +18,25 @@ import {
 } from 'reducers/library'
 
 const DEFAULT_TIMEOUT = 1500
+const DEFAULT_BATCH_SIZE = 10
 
 const client = axios.create({
   baseURL: `${API_URL}/v1`,
   timeout: DEFAULT_TIMEOUT,
   transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
 })
+
+const createIdentifierBatches = (identifiers, batch_size) => {
+  let results = []
+
+  while (identifiers.length) {
+    results.push(
+      identifiers.splice(0, batch_size)
+    )
+  }
+
+  return results
+}
 
 const importMiddleware = store => next => action => {
   next(action)
@@ -41,18 +54,21 @@ const importMiddleware = store => next => action => {
       return
     }
 
-    client.get(`${API_URL}/v1/plugins?in=${ids.join(',')}`)
-      .then(data => {
-        store.dispatch(
-          addPlugin(data.data)
-        )
-        
-        store.dispatch(
-          installPluginRequest(data.data.result)
-        )
-        ipcRenderer.send(INSTALL_PLUGIN_REQUEST,data.data.result)
-      })
+    createIdentifierBatches(ids,DEFAULT_BATCH_SIZE).forEach(batch => {
+      client.get(`${API_URL}/v1/plugins?in=${batch.join(',')}`)
+        .then(data => {
+          store.dispatch(
+            addPlugin(data.data)
+          )
 
+          store.dispatch(
+            installPluginRequest(data.data.result, {
+              import: true
+            })
+          )
+          ipcRenderer.send(INSTALL_PLUGIN_REQUEST,data.data.result)
+        })
+    })
   }
 
   if (store.getState().sketchpack.isImporting

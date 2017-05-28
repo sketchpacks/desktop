@@ -12,6 +12,7 @@ import createLogger from 'redux-logger'
 import mixpanelMiddleware from 'remimi'
 import rootReducer from 'reducers'
 import sketchpackMiddleware from 'middleware/sketchpack'
+import pluginBundleWatcher from 'middleware/pluginBundleWatcher'
 import exportMiddleware from 'middleware/export'
 import importMiddleware from 'middleware/import'
 import notificationMiddleware from 'middleware/notification'
@@ -26,6 +27,7 @@ const enhancer = composeEnhancers(
   applyMiddleware(
     routerMiddleware((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory),
     thunk.withExtraArgument({api: SketchpacksApi}),
+    pluginBundleWatcher,
     logger,
     importMiddleware,
     exportMiddleware,

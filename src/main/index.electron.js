@@ -217,21 +217,15 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
 
-ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
-  if (!contents) return
-
-  const hasOwner = Object.keys(contents).length > 5
-
-  const schema = (hasOwner) ? schemas.pluginSchema : schemas.manifestSchema
-
-  const normalizedPlugin = normalize(contents, schema)
-
-  if (hasOwner) {
-    store.dispatch(identifyPlugin(normalizedPlugin, { notification: false }))
-  } else {
-    store.dispatch(detectPlugin(normalizedPlugin, { notification: false }))
-  }
-  store.dispatch(addPlugin(normalizedPlugin))
+ipcRenderer.on('PLUGIN_DETECTED', (evt,plugin) => {
+  store.dispatch({
+    type: 'registry/IDENTIFY_PLUGIN_REQUEST',
+    payload: {
+      plugin,
+      resource: 'plugins'
+    },
+    meta: { notification: false }
+  })
 })
 
 

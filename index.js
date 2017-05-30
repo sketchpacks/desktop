@@ -562,12 +562,12 @@ setTimeout(() => {
   watchSketchpack(librarySketchpackPath)
 }, 1000)
 
-// setTimeout(() => {
-//   watchLibrary('**/(*.sketchplugin|manifest.json)')
-// }, 1000)
+setTimeout(() => {
+  watchLibrary('**/(*.sketchplugin|manifest.json)')
+}, 1000)
 
 app.on('before-quit', () => {
   log.info('Watcher stopped')
-  // libraryWatcher.close()
+  libraryWatcher.close()
   sketchpackWatcher.close()
 })

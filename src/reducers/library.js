@@ -75,26 +75,6 @@ export default handleActions({
     }
   },
 
-  [identifyPlugin]: (state, action) => {
-    return {
-      ...state,
-      plugins: {
-        ...state.plugins,
-        byIdentifier: {
-          ...state.plugins.byIdentifier,
-          [action.payload.result]: {
-            ...state.plugins.byIdentifier[action.payload.result],
-            ...pick(
-              action.payload.entities.plugins[action.payload.result],
-              ['install_path', 'manifest_path', 'version', 'compatible_version']
-            )
-          }
-        },
-        allIdentifiers: uniq(state.plugins.allIdentifiers.concat(action.payload.result))
-      }
-    }
-  },
-
   [removePlugin]: (state,action) => ({
     ...state,
     plugins: {

@@ -134,7 +134,18 @@ ipcRenderer.on('sketchpack/IMPORT', (evt,contents) => {
 })
 
 ipcRenderer.on('sketchpack/IMPORT_REQUEST', (evt,args) => {
+  log.debug(args)
   ipcRenderer.send('sketchpack/IMPORT_REQUEST')
+  
+  store.dispatch({
+    type: 'behavior_tracking',
+    meta: {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Import'
+      }
+    }
+  })
 })
 
 ipcRenderer.on('sketchpack/EXPORT_REQUEST', (evt,args) => {
@@ -143,6 +154,16 @@ ipcRenderer.on('sketchpack/EXPORT_REQUEST', (evt,args) => {
 
 ipcRenderer.on('sketchpack/EXPORT', (evt,filepath) => {
   store.dispatch(exportSketchpackRequest(filepath))
+
+  store.dispatch({
+    type: 'behavior_tracking',
+    meta: {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Import'
+      }
+    }
+  })
 })
 
 ipcRenderer.on('sketchpack/SYNC_REQUEST', (evt,contents) => {
@@ -203,7 +224,8 @@ ipcRenderer.on('library/UPDATE_PLUGIN_SUCCESS', (evt,plugin) => {
       type: 'Update Plugin',
       props: {
         source: 'desktop',
-        pluginId: plugin.identifier
+        pluginId: plugin.identifier,
+        pluginVersion: normalizedPlugin.entities.plugins[normalizedPlugin.result].version
       }
     }
   }))

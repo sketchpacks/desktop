@@ -9,7 +9,7 @@ const buildMessage = ({ type, name, version }) => {
     case "library/UNINSTALL_PLUGIN_SUCCESS":
       return `Removed ${name}`
     case "library/UPDATE_PLUGIN_SUCCESS":
-      return `Updated ${name}`
+      return `Updated ${name} to ${version}`
     case "library/INSTALL_PLUGIN_SUCCESS":
       return `Installed ${name} ${version}`
     case "manager/INSTALL_ERROR":

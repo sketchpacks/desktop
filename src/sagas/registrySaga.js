@@ -48,10 +48,13 @@ function* identifyPluginsByBatch(resource) {
 function* fetchPlugins(identifiers) {
   try {
     const data = yield call(fetchPluginsByIdentifier, identifiers)
-    yield put({
-      type: 'registry/IDENTIFY_PLUGINS_SUCCESS',
-      payload: data
-    })
+
+    if (data.result) {
+      yield put({
+        type: 'registry/IDENTIFY_PLUGINS_SUCCESS',
+        payload: data
+      })
+    }
   } catch (err) {
     yield put({
       type: 'registry/IDENTIFY_PLUGINS_ERROR',

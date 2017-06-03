@@ -61,6 +61,7 @@ class PluginMedia extends Component {
 
   renderVersion () {
     let version
+    let tooltip = 'Installed version'
 
     const {location} = this.props
 
@@ -68,11 +69,16 @@ class PluginMedia extends Component {
 
     if (location.pathname === '/library/unmanaged') version = this.props.plugin.installed_version
 
+    if (location.pathname === '/library/updates') tooltip = 'Latest version'
+
+    if (location.pathname === '/library/managed') tooltip = 'Installed version'
+    if (location.pathname === '/library/unmanaged') tooltip = 'Installed version'
+
     return <PluginMetric
       icon={'versions'}
       shape={'path'}
       value={sanitizeSemVer(version)}
-      tooltip={'Installed version'} />
+      tooltip={tooltip} />
   }
 
   renderButton () {

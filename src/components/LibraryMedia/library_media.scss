@@ -33,6 +33,10 @@
   &--recto {
     align-content: flex-end;
     justify-content: flex-end;
+
+    button {
+      margin-left: 1.6rem;
+    }
   }
 
   .button {

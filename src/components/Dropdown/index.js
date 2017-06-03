@@ -106,11 +106,15 @@ class Dropdown extends Component {
   }
 
   render () {
+    const lockViewerClassName = (this.state.visible)
+      ? "lock-viewer lock-viewer--open button--dropdown"
+      : "lock-viewer button--dropdown"
+
     return (
 
       <div className="lock-select tooltipped tooltipped-n" aria-label={this.renderTooltipText()}>
         <div
-          className="lock-viewer button--dropdown"
+          className={lockViewerClassName}
           onClick={this.toggleVisibility}
         >
           <LockGauge

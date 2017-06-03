@@ -194,19 +194,6 @@ class PluginMedia extends Component {
     )
   }
 
-  renderAutoupdates () {
-    const { version, auto_updates } = this.props.plugin
-
-    if (!auto_updates) return
-
-    return <PluginMetric
-      icon={'autoupdates'}
-      value={'Auto-updates'}
-      shape={'polygon'}
-      tooltip={'Automatic plugin updates'}
-    />
-  }
-
   render () {
     const {
       name,
@@ -245,8 +232,6 @@ class PluginMedia extends Component {
             />
 
             { this.renderVersion() }
-
-            { this.renderAutoupdates() }
 
             { this.renderVersionLock() }
 

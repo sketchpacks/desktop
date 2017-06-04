@@ -93,7 +93,7 @@ class Dropdown extends Component {
   renderTooltipText () {
     switch (this.state.lock_strength) {
       case 'locked':
-        return `Locked at v${this.props.version}`
+        return `Locked at v${this.props.installed_version}`
       case 'unlocked':
         return "Apply all updates automatically"
       case 'minor':
@@ -138,14 +138,14 @@ class Dropdown extends Component {
           <li onClick={this.handlePatchLock}>
             <div className="lock-select__option">
               <strong>Patch Updates</strong>
-              <p>Apply all updates less than v{sanitizeSemVer(semver.toComparators(patchLockedSemver(this.props.version))[0][1])}</p>
+              <p>Apply all updates less than v{sanitizeSemVer(semver.toComparators(patchLockedSemver(this.props.installed_version))[0][1])}</p>
             </div>
           </li>
 
           <li onClick={this.handleMinorLock}>
             <div className="lock-select__option">
               <strong>Minor Updates</strong>
-              <p>Apply all updates less than v{sanitizeSemVer(semver.toComparators(minorLockedSemver(this.props.version))[0][1])}</p>
+              <p>Apply all updates less than v{sanitizeSemVer(semver.toComparators(minorLockedSemver(this.props.installed_version))[0][1])}</p>
             </div>
           </li>
 

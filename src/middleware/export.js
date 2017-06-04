@@ -29,18 +29,7 @@ const exportMiddleware = store => next => action => {
         store.dispatch(
           exportSketchpackSuccess({}, {
             total: identifiers.length,
-            plugins: identifiers,
-            mixpanel: {
-              eventName: 'Manage',
-              type: 'Export',
-              props: {
-                source: 'desktop',
-                name: sketchpack.name,
-                isLocked: sketchpack.isLocked,
-                plugins: identifiers,
-                total: identifiers.length
-              }
-            }
+            plugins: identifiers
           })
         )
       }

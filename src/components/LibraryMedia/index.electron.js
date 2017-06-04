@@ -25,6 +25,7 @@ class PluginMedia extends Component {
 
     // Sub-renders
     this.renderVersion = this.renderVersion.bind(this)
+    this.renderVersionLock = this.renderVersionLock.bind(this)
     this.renderButton = this.renderButton.bind(this)
 
     // Click events
@@ -59,13 +60,25 @@ class PluginMedia extends Component {
   }
 
   renderVersion () {
+    let version
+    let tooltip = 'Installed version'
+
     const {location} = this.props
+
+    if (location.pathname === '/library/updates') version = this.props.plugin.version
+
+    if (location.pathname === '/library/unmanaged') version = this.props.plugin.installed_version
+
+    if (location.pathname === '/library/updates') tooltip = 'Latest version'
+
+    if (location.pathname === '/library/managed') tooltip = 'Installed version'
+    if (location.pathname === '/library/unmanaged') tooltip = 'Installed version'
 
     return <PluginMetric
       icon={'versions'}
       shape={'path'}
-      value={sanitizeSemVer(this.props.plugin.installed_version)}
-      tooltip={'Installed version'} />
+      value={sanitizeSemVer(version)}
+      tooltip={tooltip} />
   }
 
   renderButton () {
@@ -83,6 +96,13 @@ class PluginMedia extends Component {
       className={location.pathname === '/library/updates'
         ? 'button'
         : 'button button-installed'} />
+  }
+
+  renderVersionLock () {
+    return <Dropdown
+      {...this.props.plugin}
+      handlePluginEvent={this.props.handlePluginEvent}
+    />
   }
 
   componentWillReceiveProps (nextProps) {
@@ -158,18 +178,17 @@ class PluginMedia extends Component {
           <div className="o-media">
             <div className="o-media__content">
               <h3 className="o-plugin__name">
-                <span onClick={this.handleClickPluginName}>
-                  {title_or_name}
-                </span>
+                {title_or_name}
               </h3>
             </div>
           </div>
 
           <div className="o-plugin__footer o-plugin__footer--recto">
-            <Dropdown
-              {...this.props.plugin}
-              handlePluginEvent={this.props.handlePluginEvent}
-            />
+            { (this.props.location.pathname === '/library/managed') &&
+              this.renderVersionLock() }
+
+            { (this.props.location.pathname !== '/library/managed') &&
+              this.renderVersion() }
 
             { this.renderButton() }
           </div>

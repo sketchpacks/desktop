@@ -1,13 +1,13 @@
 import { ipcRenderer } from 'electron'
 
 import { createAction, handleActions } from 'redux-actions'
-import { pick,pickBy,filter } from 'lodash'
+import { pick,pickBy,filter,uniq } from 'lodash'
 
 //- Actions
 
 export const installPlugin = createAction('manager/INSTALL_SUCCESS')
-export const detectPlugin = createAction('library/FETCH_RECEIVED', (payload) => payload, (_,meta) => meta)
-export const identifyPlugin = createAction('library/IDENTIFY_PLUGIN_SUCCESS')
+export const detectPlugin = createAction('library/PLUGIN_DETECTED', (payload) => payload, (_,meta) => meta)
+export const identifyPlugin = createAction('registry/IDENTIFY_PLUGINS_SUCCESS', (payload) => payload, (_,meta) => meta)
 
 export const removePlugin = createAction('library/UNINSTALL_PLUGIN', identifier => {
   ipcRenderer.send('manager/UNINSTALL_REQUEST', identifier)
@@ -19,7 +19,7 @@ export const updatePlugin = createAction('library/UPDATE_PLUGIN', identifier => 
   return identifier
 })
 
-export const installPluginRequest = createAction('library/INSTALL_PLUGIN_REQUEST')
+export const installPluginRequest = createAction('library/INSTALL_PLUGIN_REQUEST', (payload) => payload, (_,meta) => meta)
 export const installPluginSuccess = createAction('library/INSTALL_PLUGIN_SUCCESS', (payload) => payload, (_,meta) => meta)
 export const installPluginError = createAction('manager/INSTALL_ERROR')
 
@@ -65,12 +65,12 @@ export default handleActions({
         ...state.plugins,
         byIdentifier: {
           ...state.plugins.byIdentifier,
-          [action.payload.result]: pick(
-            action.payload.entities.plugins[action.payload.result],
+          [action.payload.plugin.identifier]: pick(
+            action.payload.plugin,
             ['install_path', 'manifest_path', 'version', 'compatible_version']
           )
         },
-        allIdentifiers: state.plugins.allIdentifiers.concat(action.payload.result)
+        allIdentifiers: uniq(state.plugins.allIdentifiers.concat(action.payload.plugin.identifier))
       }
     }
   },

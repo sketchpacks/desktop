@@ -24,7 +24,7 @@ import ms from 'ms'
 import os from 'os'
 import fs from 'fs'
 import json5file from '@sketchpacks/json5file'
-import {filter} from 'lodash'
+import { filter,has } from 'lodash'
 
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
@@ -118,7 +118,7 @@ export const render = () => {
   store.dispatch(push(`/browse/newest?page=1&sort=score%3Adesc`))
 }
 
-const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true}))
+const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true }))
 
 const loadSketchpack = () => {
   const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')
@@ -134,7 +134,18 @@ ipcRenderer.on('sketchpack/IMPORT', (evt,contents) => {
 })
 
 ipcRenderer.on('sketchpack/IMPORT_REQUEST', (evt,args) => {
+  log.debug(args)
   ipcRenderer.send('sketchpack/IMPORT_REQUEST')
+  
+  store.dispatch({
+    type: 'behavior_tracking',
+    meta: {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Import'
+      }
+    }
+  })
 })
 
 ipcRenderer.on('sketchpack/EXPORT_REQUEST', (evt,args) => {
@@ -143,6 +154,16 @@ ipcRenderer.on('sketchpack/EXPORT_REQUEST', (evt,args) => {
 
 ipcRenderer.on('sketchpack/EXPORT', (evt,filepath) => {
   store.dispatch(exportSketchpackRequest(filepath))
+
+  store.dispatch({
+    type: 'behavior_tracking',
+    meta: {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Import'
+      }
+    }
+  })
 })
 
 ipcRenderer.on('sketchpack/SYNC_REQUEST', (evt,contents) => {
@@ -203,7 +224,8 @@ ipcRenderer.on('library/UPDATE_PLUGIN_SUCCESS', (evt,plugin) => {
       type: 'Update Plugin',
       props: {
         source: 'desktop',
-        pluginId: plugin.identifier
+        pluginId: plugin.identifier,
+        pluginVersion: normalizedPlugin.entities.plugins[normalizedPlugin.result].version
       }
     }
   }))
@@ -217,11 +239,15 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
 
-ipcRenderer.on('PLUGIN_DETECTED', (evt,contents) => {
-  if (!contents) return
-  const normalizedPlugin = normalize(contents, schemas.pluginSchema)
-  store.dispatch(addPlugin(normalizedPlugin))
-  store.dispatch(detectPlugin(normalizedPlugin, { notification: false }))
+ipcRenderer.on('PLUGIN_DETECTED', (evt,plugin) => {
+  store.dispatch({
+    type: 'registry/IDENTIFY_PLUGIN_REQUEST',
+    payload: {
+      plugin,
+      resource: 'plugins'
+    },
+    meta: { notification: false }
+  })
 })
 
 

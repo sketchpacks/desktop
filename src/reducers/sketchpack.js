@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions'
 
-import {uniq,includes,isObject,has,pickBy,filter} from 'lodash'
+import {uniq,includes,isObject,has,pickBy,filter,reduce} from 'lodash'
 
 import { sanitizeSemVer } from 'lib/utils'
 
@@ -12,7 +12,8 @@ import * as schemas from 'schemas'
 import {
   detectPlugin,
   identifyPlugin,
-  removePlugin
+  removePlugin,
+  installPluginRequest
 } from 'reducers/library'
 
 import {
@@ -90,17 +91,17 @@ export default handleActions({
     }
   },
 
-  [detectPlugin]: (state, action) => {
+  [identifyPlugin]: (state, action) => {
     let { entities, result } = action.payload
 
-    let plugin = entities.plugins[result]
-
-    let identifier = plugin.identifier
-
-    if (has(state.plugins.byIdentifier,identifier)) {
-      return {
-        ...state
+    const plugins = action.payload.result.filter(
+      identifier => {
+        return !has(entities[identifier], 'owner')
       }
+    )
+
+    if (plugins.length === 0) {
+      return state
     }
 
     return {
@@ -109,12 +110,17 @@ export default handleActions({
         ...state.plugins,
         byIdentifier: {
           ...state.plugins.byIdentifier,
-          [identifier]: {
-            version: setVersionLock({ semver: plugin.version, lock: 'locked'})
-          }
+          ...reduce(entities.plugins, (result, data, identifier) => {
+            result[identifier] = {
+              version: has(state.plugins.byIdentifier, identifier)
+                ? state.plugins.byIdentifier[identifier].version
+                : setVersionLock({ semver: data.version, lock: 'locked'})
+            }
+            return result
+          }, {})
         },
         allIdentifiers: uniq(
-          state.plugins.allIdentifiers.concat(identifier)
+          state.plugins.allIdentifiers.concat(action.payload.result)
         )
       }
     }
@@ -136,10 +142,16 @@ export default handleActions({
     }
   }),
 
-  [importSketchpackRequest]: (state,action) => ({
-    ...state,
-    isImporting: true
-  }),
+  [installPluginRequest]: (state,action) => {
+    if (has(action,'meta.import')) {
+      return {
+        ...state,
+        isImporting: action.meta.import
+      }
+    } else {
+      return state
+    }
+  },
 
   [importSketchpackSuccess]: (state,action) => ({
     ...state,

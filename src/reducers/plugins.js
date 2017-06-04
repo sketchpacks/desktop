@@ -6,12 +6,14 @@ import linkHeader from 'parse-link-header'
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 import { createSelector } from 'reselect'
-import { reduce } from 'lodash'
+import { reduce, uniq } from 'lodash'
 
 const DEFAULT_TIMEOUT = 1500
 
 
 //- Actions
+export const identifyPlugin = createAction('registry/IDENTIFY_PLUGINS_SUCCESS')
+export const detectPlugin = createAction('library/PLUGIN_DETECTED')
 
 export const changeLocation = createAction('@@router/LOCATION_CHANGE')
 export const addPlugin = createAction('ADD_ENTITIES')
@@ -123,6 +125,26 @@ const initialState = {
 //- Reducers
 
 export default handleActions({
+  [detectPlugin]: (state, action) => {
+    return {
+      ...state,
+      byIdentifier: {
+        ...state.byIdentifier,
+        [action.payload.plugin.identifier]: { ...action.payload.plugin }
+      }
+    }
+  },
+
+  [identifyPlugin]: (state, action) => {
+    return {
+      ...state,
+      byIdentifier: {
+        ...state.byIdentifier,
+        ...action.payload.entities.plugins
+      }
+    }
+  },
+
   [addPlugin]: (state, action) => {
     return {
       ...state,

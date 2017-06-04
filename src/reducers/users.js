@@ -4,6 +4,8 @@ import {reduce,filter,uniq} from 'lodash'
 
 import { searchSuccess } from 'reducers/search'
 
+import { identifyPlugin } from 'reducers/library'
+
 //- Actions
 
 export const addUser = createAction('ADD_ENTITIES')
@@ -22,7 +24,7 @@ const initialState = {
 //- Reducers
 
 export default handleActions({
-  [addUser]: (state, action) => ({
+  [identifyPlugin]: (state, action) => ({
     ...state,
     byId: {
       ...state.byId,
@@ -61,7 +63,7 @@ export default handleActions({
       )
     )
   }),
-  
+
   [browseSuccess]: (state, action) => ({
     ...state,
     byId: {

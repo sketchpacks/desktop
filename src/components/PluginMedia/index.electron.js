@@ -8,6 +8,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
+import { has } from 'lodash'
+
 import {sanitizeSemVer} from 'lib/utils'
 
 import { isFullLocked } from 'lib/VersionLock'
@@ -194,19 +196,6 @@ class PluginMedia extends Component {
     )
   }
 
-  renderAutoupdates () {
-    const { version, auto_updates } = this.props.plugin
-
-    if (!auto_updates) return
-
-    return <PluginMetric
-      icon={'autoupdates'}
-      value={'Auto-updates'}
-      shape={'polygon'}
-      tooltip={'Automatic plugin updates'}
-    />
-  }
-
   render () {
     const {
       name,
@@ -235,18 +224,16 @@ class PluginMedia extends Component {
           </div>
 
           <div className="o-plugin__footer">
-            <Nameplate
+            { has(owner, 'handle') && <Nameplate
               handle={owner.handle}
               thumbnailUrl={owner.avatar_url}
               name={owner.name}
               height={24}
               width={24}
               onClick={this.handleClickAuthorName}
-            />
+            /> }
 
             { this.renderVersion() }
-
-            { this.renderAutoupdates() }
 
             { this.renderVersionLock() }
 

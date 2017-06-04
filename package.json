@@ -128,6 +128,7 @@
     "redux": "^3.6.0",
     "redux-actions": "^2.0.1",
     "redux-logger": "^2.7.4",
+    "redux-saga": "^0.15.3",
     "redux-thunk": "^2.2.0",
     "remimi": "^1.1.0",
     "request": "^2.79.0",

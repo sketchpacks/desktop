@@ -102,17 +102,19 @@ const extractAsset = (data) => new Promise((resolve, reject) => {
 
   data['install_path'] = path.join(extractionPath, entryName)
 
-  exec(`unzip -o -a ${archivePath} -d ${extractionPath}`, (error, stdout, stderr) => {
-    if (error) {
-      log.info(`exec error: ${error}`)
-      reject(error)
-      return
-    }
-    log.info(`stdout: ${stdout}`)
-    log.error(`stderr: ${stderr}`)
+  exec(`unzip -o -a ${archivePath} -d ${extractionPath}`,
+    { maxBuffer: 1024 * 500 },
+    (error, stdout, stderr) => {
+      if (error) {
+        log.info(`exec error: ${error}`)
+        reject(error)
+        return
+      }
+      log.info(`stdout: ${stdout}`)
+      log.error(`stderr: ${stderr}`)
 
-    resolve(data)
-  })
+      resolve(data)
+    })
 })
 
 const removeAsset = (data) => new Promise((resolve, reject) => {
@@ -126,7 +128,7 @@ const removeAsset = (data) => new Promise((resolve, reject) => {
     install_dir_path.split('/')
   )[0]
 
-  const cleanAssetPath = [install_dir_path,assetDirectoryPath].join('/')
+  const cleanAssetPath = [install_dir_path,assetDirectoryPath].join('')
 
   log.debug('Removing asset: ', cleanAssetPath)
 

@@ -25,7 +25,7 @@ const initialState = {
 
 export default handleActions({
   // Add reference to identifier before install
-  [installPluginRequest]: (state, action) => {
+  [installPluginRequest]: (state, action) => {    
     return {
       ...state,
       installing: uniq(state.installing.concat(action.payload))

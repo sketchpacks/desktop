@@ -1,3 +1,5 @@
+@import "../../css/Tokens.scss";
+
 .o-plugin {
   display: flex;
   flex-direction: column;
@@ -88,6 +90,17 @@
   border-radius: 3px;
   padding: 0 27px 0 7px;
   height: 32px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #e1e4ea;
+  }
+
+  &--open,
+  &--open:hover {
+    border-color: $color-blue-dark;
+  }
+
 }
 
 .lock-meter {

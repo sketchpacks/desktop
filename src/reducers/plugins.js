@@ -136,6 +136,8 @@ export default handleActions({
   },
 
   [identifyPlugin]: (state, action) => {
+    if (action.payload.result.length === 0) return state
+
     return {
       ...state,
       byIdentifier: {

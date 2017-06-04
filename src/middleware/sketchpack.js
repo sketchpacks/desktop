@@ -1,6 +1,6 @@
 const {remote} = require('electron')
 const path = require('path')
-const {includes,values,reduce,isEqual} = require('lodash')
+const {includes,values,reduce,isEqual,difference} = require('lodash')
 const json5file = require('@sketchpacks/json5file')
 const semver = require('semver')
 
@@ -34,17 +34,20 @@ const WATCHED_ACTIONS = {
 }
 
 const sketchpackMiddleware = store => next => action => {
-  const prevState = store.getState().sketchpack.plugins.byIdentifier
+  const prevSketchpack = store.getState().sketchpack.plugins
   next(action)
-  const nextState = store.getState().sketchpack.plugins.byIdentifier
+  const nextSketchpack = store.getState().sketchpack.plugins
 
   if (store.getState().sketchpack.isLocked) return
 
-  if (isEqual(prevState,nextState)) return
+  if (!isEqual(prevSketchpack.byIdentifier,nextSketchpack.byIdentifier)) {
+    store.dispatch(exportSketchpackRequest(sketchpackPath))
+  }
 
-  const identifiers = getSketchpackIdentifiers(store.getState())
+  const addedPlugins = difference(prevSketchpack.allIdentifiers,nextSketchpack.allIdentifiers)
+  const removedPlugins = difference(nextSketchpack.allIdentifiers,prevSketchpack.allIdentifiers)
 
-  if (identifiers.length > 0) {
+  if ((addedPlugins.length > 0) || (removedPlugins.length > 0)) {
     store.dispatch(exportSketchpackRequest(sketchpackPath))
   }
 }

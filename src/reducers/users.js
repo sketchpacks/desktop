@@ -24,25 +24,28 @@ const initialState = {
 //- Reducers
 
 export default handleActions({
-  [identifyPlugin]: (state, action) => ({
-    ...state,
-    byId: {
-      ...state.byId,
-      ...action.payload.entities.users
-    },
-    byHandle: {
-      ...state.byHandle,
-      ...reduce(action.payload.entities.users, (result, value, key) => {
-        result[action.payload.entities.users[key].handle] = key
-        return result
-      }, {})
-    },
-    allIds: uniq(
-      state.allIds.concat(
-        Object.keys(action.payload.entities.users)
+  [identifyPlugin]: (state, action) =>{
+    if (action.payload.result.length === 0) return state
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        ...action.payload.entities.users
+      },
+      byHandle: {
+        ...state.byHandle,
+        ...reduce(action.payload.entities.users, (result, value, key) => {
+          result[action.payload.entities.users[key].handle] = key
+          return result
+        }, {})
+      },
+      allIds: uniq(
+        state.allIds.concat(
+          Object.keys(action.payload.entities.users)
+        )
       )
-    )
-  }),
+    }
+},
 
   [searchSuccess]: (state, action) => ({
     ...state,

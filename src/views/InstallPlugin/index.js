@@ -32,8 +32,8 @@ class InstallPluginContainer extends Component {
   }
 
   initiateDownload () {
-    const {id} = this.props.pluginDetails
-    window.location = `sketchpacks://install/${id}`
+    const { identifier } = this.props.pluginDetails
+    window.location = `sketchpacks://install/${identifier}`
   }
 
   render () {

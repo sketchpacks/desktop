@@ -10,7 +10,7 @@ import pkg from '../../package'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, Route, IndexRoute, IndexRedirect, browserHistory, hashHistory } from 'react-router'
-import { syncHistoryWithStore } from 'react-router-redux'
+import { syncHistoryWithStore,push } from 'react-router-redux'
 import { Provider } from 'react-redux'
 import configureStore from 'store/configureStore'
 import { ipcRenderer, ipcMain, remote } from 'electron'
@@ -18,64 +18,71 @@ import log from 'electron-log'
 import firstRun from 'first-run'
 import path from 'path'
 
+import readSketchpack from 'lib/readSketchpack'
+
 import ms from 'ms'
 import os from 'os'
 import fs from 'fs'
-import jsonfile from 'jsonfile'
-import {filter} from 'lodash'
+import json5file from '@sketchpacks/json5file'
+import { filter,has } from 'lodash'
+
+import { normalize } from 'normalizr'
+import * as schemas from 'schemas'
+
+import { fetchPlugin } from 'reducers/plugins'
 
 import App from 'containers/App'
+import AppError from 'errors/AppError'
 
 import BrowsePlugins from 'views/BrowsePlugins'
-import InstalledPlugins from 'views/InstalledPlugins'
+import SearchResults from 'views/SearchResults'
+import ManagedPlugins from 'views/ManagedPlugins'
+import UnmanagedPlugins from 'views/UnmanagedPlugins'
 import UpdatedPlugins from 'views/UpdatedPlugins'
 
 import PluginDetails from 'views/PluginDetails'
-import SearchResults from 'views/SearchResults'
 
 import UserProfile from 'views/UserProfile'
 import UserPlugins from 'views/UserPlugins'
 
-import {
-  appInstall,
-
-  pluginsRequest,
-  pluginsReceived,
-
-  fetchLibraryRequest,
-  fetchLibraryReceived,
-
-  FETCH_LIBRARY_REQUEST,
-  FETCH_LIBRARY_RECEIVED,
-} from 'actions'
+import { appInstall } from 'actions'
 
 import {
-  installPluginRequest,
-  installPluginSuccess,
+  installPluginError,
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
+  INSTALL_PLUGIN_ERROR,
 
-  updatePluginRequest,
-  updatePluginSuccess,
   UPDATE_PLUGIN_REQUEST,
   UPDATE_PLUGIN_SUCCESS,
 
-  uninstallPluginRequest,
-  uninstallPluginSuccess,
   UNINSTALL_PLUGIN_REQUEST,
   UNINSTALL_PLUGIN_SUCCESS,
 
-  toggleVersionLockRequest,
-  toggleVersionLockSuccess,
-  TOGGLE_VERSION_LOCK_REQUEST,
-  TOGGLE_VERSION_LOCK_SUCCESS,
-
-  autoUpdatePluginsRequest,
-  webInstallPluginRequest,
-  importSketchToolboxRequest,
-  importSketchpackRequest,
-  exportLibraryRequest
+  webInstallPluginRequest
 } from 'actions/plugin_manager'
+
+import {
+  autoUpdatePluginsRequest,
+} from 'actions/auto_updater'
+
+import {
+  addPlugin
+} from 'reducers/plugins'
+
+import {
+  identifyPlugin,
+  detectPlugin,
+  installPluginSuccess,
+  uninstallPluginSuccess,
+  updatePluginSuccess
+} from 'reducers/library'
+
+import {
+  syncSketchpackRequest,
+  importSketchpackRequest,
+  exportSketchpackRequest
+} from 'reducers/sketchpack'
 
 let store = configureStore()
 const history = syncHistoryWithStore((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory, store)
@@ -91,9 +98,10 @@ export const render = () => {
           <Route path="browse/newest" component={BrowsePlugins} />
           <Route path="browse/name" component={BrowsePlugins} />
 
-          <Route path="search" component={BrowsePlugins} />
+          <Route path="search" component={SearchResults} />
 
-          <Route path="library/installed" component={InstalledPlugins} />
+          <Route path="library/managed" component={ManagedPlugins} />
+          <Route path="library/unmanaged" component={UnmanagedPlugins} />
           <Route path="library/updates" component={UpdatedPlugins} />
         </Route>
       </Router>
@@ -104,123 +112,123 @@ export const render = () => {
   ipcRenderer.send('CHECK_FOR_EXTERNAL_PLUGIN_INSTALL_REQUEST', null)
 
   ipcRenderer.send('APP_WINDOW_OPEN', null)
+
+  loadSketchpack()
+
+  store.dispatch(push(`/browse/newest?page=1&sort=score%3Adesc`))
+}
+
+const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true }))
+
+const loadSketchpack = () => {
+  const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')
+  readSketchpack(sketchpackPath)
+    .then(contents => store.dispatch(syncSketchpackRequest(contents)))
+
 }
 
 
-const migrateCatalog = (catalogPath, libraryContents) => {
-  const Datastore = require('nedb')
-  const db = new Datastore({ filename: catalogPath })
-  db.loadDatabase((err) => {
-    if (err) console.log(err)
-    db.find({ installed: true }, (err, docs) => {
-      store.dispatch(fetchLibraryReceived(Object.assign(libraryContents.concat(docs))))
-      store.dispatch({
-        type: 'MIGRATE_CATALOG',
-        payload: docs
-      })
-      fs.unlink(catalogPath)
-    })
-  })
-}
+ipcRenderer.on('sketchpack/IMPORT', (evt,contents) => {
+  browserHistory.push('/library/managed')
+  store.dispatch(importSketchpackRequest(contents))
+})
 
-
-
-const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true}))
-
-const loadLibrary = () => {
-  const libraryPath = path.join(remote.app.getPath('userData'), 'library.json')
-
-  const opts = {
-    flag: 'r',
-    encoding: 'utf8'
-  }
-
-  try {
-    jsonfile.readFile(libraryPath, opts, (err, data) => {
-      const contents = !(err)
-        ? data
-        : { plugins: [] }
-
-      if (contents.plugins.length > 0) store.dispatch(fetchLibraryReceived(contents.plugins))
-
-
-      let catalogPath = path.join(remote.app.getPath('userData'), 'catalog.db')
-      if (fs.existsSync(catalogPath)) {
-        migrateCatalog(catalogPath, contents.plugins)
+ipcRenderer.on('sketchpack/IMPORT_REQUEST', (evt,args) => {
+  log.debug(args)
+  ipcRenderer.send('sketchpack/IMPORT_REQUEST')
+  
+  store.dispatch({
+    type: 'behavior_tracking',
+    meta: {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Import'
       }
-    })
-  } catch (err) {
-    console.log(err)
-  }
-
-  setTimeout(autoUpdatePlugins, ms(PLUGIN_AUTOUPDATE_DELAY))
-}
-loadLibrary()
-
-
-ipcRenderer.on('IMPORT_FROM_SKETCHPACK', (evt, args) => {
-  browserHistory.push('library/installed')
-  ipcRenderer.send('IMPORT_FROM_SKETCHPACK')
-  store.dispatch(importSketchpackRequest())
-})
-
-
-ipcRenderer.on('IMPORT_FROM_SKETCH_TOOLBOX', (evt, args) => {
-  browserHistory.push('library/installed')
-  ipcRenderer.send('IMPORT_FROM_SKETCH_TOOLBOX')
-  store.dispatch(importSketchToolboxRequest())
-})
-
-ipcRenderer.on('EXPORT_LIBRARY', (evt, args) => {
-  ipcRenderer.send('EXPORT_LIBRARY', store.getState().library.items)
-  store.dispatch(exportLibraryRequest())
-})
-
-
-ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, pluginId) => {
-  store.dispatch(webInstallPluginRequest(pluginId))
-  browserHistory.push('library/installed')
-
-  const notif = new window.Notification('Sketchpacks', {
-    body: `Starting install...`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
+    }
   })
 })
 
-
-ipcRenderer.on(TOGGLE_VERSION_LOCK_REQUEST, (evt,args) => {
-  store.dispatch(toggleVersionLockSuccess(args))
+ipcRenderer.on('sketchpack/EXPORT_REQUEST', (evt,args) => {
+  ipcRenderer.send('sketchpack/EXPORT_REQUEST')
 })
 
-ipcRenderer.on(INSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} v${plugin.version} installed`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
+ipcRenderer.on('sketchpack/EXPORT', (evt,filepath) => {
+  store.dispatch(exportSketchpackRequest(filepath))
 
-  store.dispatch(installPluginSuccess(plugin))
+  store.dispatch({
+    type: 'behavior_tracking',
+    meta: {
+      mixpanel: {
+        eventName: 'Manage',
+        type: 'Import'
+      }
+    }
+  })
 })
 
-ipcRenderer.on(UPDATE_PLUGIN_SUCCESS, (evt,plugin) => {
-  const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} updated to v${plugin.version}`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
-
-  store.dispatch(updatePluginSuccess(plugin))
+ipcRenderer.on('sketchpack/SYNC_REQUEST', (evt,contents) => {
+  log.debug('sketchpack/SYNC_REQUEST',contents)
+  store.dispatch(syncSketchpackRequest(contents))
 })
 
-ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
-  const notif = new window.Notification('Sketchpacks', {
-    body: `${plugin.title} uninstalled`,
-    silent: true,
-    icon: path.join(__dirname, 'src/static/images/icon.png'),
-  })
+ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,plugin) => {
+  ipcRenderer.send(INSTALL_PLUGIN_REQUEST,plugin)
+})
 
-  store.dispatch(uninstallPluginSuccess(plugin))
+ipcRenderer.on('library/INSTALL_PLUGIN_SUCCESS', (evt,identifier) => {
+  store.dispatch(installPluginSuccess(identifier, {
+    notification: true,
+    mixpanel: {
+      eventName: 'Manage',
+      type: 'Install Plugin',
+      props: {
+        source: 'desktop',
+        pluginId: identifier
+      }
+    }
+  }))
+})
+
+// ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt,filepath) => {
+//   browserHistory.push('/library/managed')
+//   store.dispatch(importSketchpackRequest(filepath))
+// })
+
+
+ipcRenderer.on('EXTERNAL_PLUGIN_INSTALL_REQUEST', (evt, identifiers) => {
+  store.dispatch(fetchPlugin({ identifiers }))
+  store.dispatch(push(`/library/installed`))
+  ipcRenderer.send(INSTALL_PLUGIN_REQUEST,identifiers)
+})
+
+ipcRenderer.on(INSTALL_PLUGIN_ERROR, (evt, err, plugin) => {
+  store.dispatch({
+    type: INSTALL_PLUGIN_ERROR,
+    error: true,
+    payload: new AppError(err),
+    meta: {
+      plugin,
+      notification: true
+    }
+  })
+})
+
+ipcRenderer.on('library/UPDATE_PLUGIN_SUCCESS', (evt,plugin) => {
+  const normalizedPlugin = normalize(plugin, schemas.pluginSchema)
+  store.dispatch(addPlugin(normalizedPlugin))
+
+  store.dispatch(updatePluginSuccess(plugin.identifier, {
+    notification: true,
+    mixpanel: {
+      eventName: 'Manage',
+      type: 'Update Plugin',
+      props: {
+        source: 'desktop',
+        pluginId: plugin.identifier,
+        pluginVersion: normalizedPlugin.entities.plugins[normalizedPlugin.result].version
+      }
+    }
+  }))
 })
 
 ipcRenderer.on('CHECK_FOR_PLUGIN_UPDATES', (evt) => {
@@ -231,6 +239,31 @@ ipcRenderer.on('CHECK_FOR_CLIENT_UPDATES', (evt, args) => {
   ipcRenderer.send('CHECK_FOR_CLIENT_UPDATES', args)
 })
 
+ipcRenderer.on('PLUGIN_DETECTED', (evt,plugin) => {
+  store.dispatch({
+    type: 'registry/IDENTIFY_PLUGIN_REQUEST',
+    payload: {
+      plugin,
+      resource: 'plugins'
+    },
+    meta: { notification: false }
+  })
+})
+
+
+ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
+  store.dispatch(uninstallPluginSuccess(plugin.identifier, {
+    notification: true,
+    mixpanel: {
+      eventName: 'Manage',
+      type: 'Uninstall Plugin',
+      props: {
+        source: 'desktop',
+        pluginId: plugin.identifier
+      }
+    }
+  }))
+})
 
 
 if (firstRun({name: `${pkg.name}-${pkg.version}`})) {

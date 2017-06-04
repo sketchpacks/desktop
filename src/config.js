@@ -8,7 +8,7 @@ module.exports = {
   SERVER_PORT: process.env.PORT || 8080,
 
   WEB_URL: 'https://www.sketchpacks.com',
-  API_URL: 'https://sketchpacks-api.herokuapp.com',
+  API_URL: 'https://api.sketchpacks.com',
 
   PLUGIN_AUTOUPDATE_DELAY: '2m',
   PLUGIN_AUTOUPDATE_INTERVAL: process.env.NODE_ENV === 'development' ? '30s' : '30m',

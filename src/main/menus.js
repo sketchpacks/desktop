@@ -1,7 +1,6 @@
 const {remote, shell} = require('electron')
 const {Menu, MenuItem} = remote
 
-
 const appPath = process.platform === 'darwin'
   ? remote.app.getPath('exe').replace(/\.app\/Content.*/, '.app')
   : undefined
@@ -53,6 +52,10 @@ const settingsMenu = [
   },
 
   {
+    label: 'Help and Documentation',
+    click: () => shell.openExternal('https://docs.sketchpacks.com')
+  },
+  {
     label: 'Visit Sketchpacks.com',
     click: () => shell.openExternal('https://www.sketchpacks.com')
   },
@@ -84,25 +87,14 @@ const settingsMenu = [
   {
     label: 'Export My Library',
     click(item, window, event) {
-      window.webContents.send('EXPORT_LIBRARY', null)
+      window.webContents.send('sketchpack/EXPORT_REQUEST', null)
     },
-  },
-
-  {
-    type: 'separator'
   },
 
   {
     label: 'Import a Sketchpack',
     click(item, window, event) {
-      window.webContents.send('IMPORT_FROM_SKETCHPACK', null)
-    },
-  },
-
-  {
-    label: 'Import from Sketch Toolbox',
-    click(item, window, event) {
-      window.webContents.send('IMPORT_FROM_SKETCH_TOOLBOX', null)
+      window.webContents.send('sketchpack/IMPORT_REQUEST', null)
     },
   },
 

@@ -8,12 +8,17 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
 
+import { has } from 'lodash'
+
 import {sanitizeSemVer} from 'lib/utils'
+
+import { isFullLocked } from 'lib/VersionLock'
 
 import Button from 'components/Button'
 import Nameplate from 'components/Nameplate'
 import PluginMetric from 'components/PluginMetric'
 import BeatLoader from 'respinner/lib/BeatLoader'
+import Dropdown from 'components/Dropdown'
 
 import './plugin_media.scss'
 
@@ -35,9 +40,10 @@ class PluginMedia extends Component {
     this.handleClickAuthorName = this.handleClickAuthorName.bind(this)
 
     this.state = {
-      hidePreview: props.thumbnail_url === "",
-      isInstalled: props.isInstalled,
       clicked: false,
+      isInstalled: false,
+      isLocked: false,
+      isInstalling: false
     }
   }
 
@@ -81,7 +87,7 @@ class PluginMedia extends Component {
     const {version} = this.props.plugin
     const {location} = this.props
 
-    const tooltip = (location.pathname === '/library/installed')
+    const tooltip = (location.pathname === '/library/managed')
       ? 'Installed version'
       : 'Latest version'
 
@@ -94,22 +100,21 @@ class PluginMedia extends Component {
 
   renderButton () {
     const {location,handlePluginEvent} = this.props
-    const {isInstalled} = this.props
 
-    if (this.state.clicked) return <button className='button'><BeatLoader fill="#ffffff" count={3} /></button>
+    if (this.state.isInstalling) return <button className='button'><BeatLoader fill="#ffffff" count={3} /></button>
 
     return <Button
-      onClick={!isInstalled
+      onClick={!this.state.isInstalled
         ? this.handleClickInstall
         : (location.pathname === '/library/updates')
           ? this.handleClickUpdate
           : this.handleClickRemove}
-      actionVerb={!isInstalled
+      actionVerb={!this.state.isInstalled
         ? 'Install'
         : (location.pathname === '/library/updates')
           ? 'Update'
           : 'Remove'}
-      className={!isInstalled
+      className={!this.state.isInstalled
         ? 'button'
         : (location.pathname === '/library/updates')
           ? 'button'
@@ -117,44 +122,78 @@ class PluginMedia extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (this.props.isInstalled !== nextProps.isInstalled) {
-      this.setState({
-        clicked: false
-      })
+
+    const nextPlugin = nextProps.plugin
+
+    const newState = { ...this.state }
+
+    try {
+      newState['isInstalled'] = nextPlugin.installed_version
+    } catch (err) {
+      newState['isInstalled'] = false
     }
+
+    try {
+      newState['isInstalling'] = nextPlugin.isInstalling
+    } catch (err) {
+      newState['isInstalling'] = false
+    }
+
+    try {
+      newState['isLocked'] = isFullLocked(nextPlugin.version_range)
+    } catch (err) {
+      newState['isLocked'] = false
+    }
+
+    this.setState({ ...newState })
+  }
+
+  componentDidMount () {
+    const newState = { ...this.state }
+    const {
+      installed_version,
+      version_range,
+      isInstalling
+    } = this.props.plugin
+
+    try {
+      newState['isInstalled'] = installed_version
+    } catch (err) {
+      newState['isInstalled'] = false
+    }
+
+    try {
+      newState['isInstalling'] = isInstalling
+    } catch (err) {
+      newState['isInstalling'] = false
+    }
+
+    try {
+      newState['isLocked'] = isFullLocked(version_range)
+    } catch (err) {
+      newState['isLocked'] = false
+    }
+
+    this.setState({ ...newState })
   }
 
   renderVersionLock () {
     const {plugin,location} = this.props
 
-    const isLocked = plugin.version.indexOf('^') === -1
-
-    if (location.pathname !== '/library/installed') return
+    if (location.pathname !== '/library/managed') return
+    if (!plugin.version_range) return
 
     return (
       <div
         onClick={this.handleClickLock}
         className="tooltipped tooltipped-n"
-        aria-label={isLocked
+        aria-label={this.state.isLocked
           ? 'Enable auto-updates'
           : `Lock this version at v${sanitizeSemVer(plugin.version)}` }
       >
-        {isLocked ? '🔒' : '🔓'}
+        {this.state.isLocked ? '🔒' : '🔓'}
       </div>
     )
-  }
-
-  renderAutoupdates () {
-    const { version, auto_updates } = this.props.plugin
-
-    if (!auto_updates) return
-
-    return <PluginMetric
-      icon={'autoupdates'}
-      value={'Auto-updates'}
-      shape={'polygon'}
-      tooltip={'Automatic plugin updates'}
-    />
   }
 
   render () {
@@ -168,10 +207,9 @@ class PluginMedia extends Component {
       title
     } = this.props.plugin
     const title_or_name = title || name
-    const isInstalled = this.state.isInstalled || false
 
     return (
-        <article className="o-plugin">
+        <article className="o-plugin o-plugin--browse">
           <div className="o-media">
             <div className="o-media__content">
               <h3 className="o-plugin__name">
@@ -186,18 +224,16 @@ class PluginMedia extends Component {
           </div>
 
           <div className="o-plugin__footer">
-            <Nameplate
+            { has(owner, 'handle') && <Nameplate
               handle={owner.handle}
               thumbnailUrl={owner.avatar_url}
               name={owner.name}
               height={24}
               width={24}
               onClick={this.handleClickAuthorName}
-            />
+            /> }
 
             { this.renderVersion() }
-
-            { this.renderAutoupdates() }
 
             { this.renderVersionLock() }
 
@@ -209,7 +245,6 @@ class PluginMedia extends Component {
 }
 
 PluginMedia.propTypes = {
-  isInstalled: React.PropTypes.bool,
   plugin: React.PropTypes.object,
   handlePluginEvent: React.PropTypes.func,
 }

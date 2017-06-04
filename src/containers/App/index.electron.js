@@ -8,15 +8,16 @@ import 'css/milligram.scss'
 
 import './app.scss'
 
+import { getOutdatedPlugins } from 'reducers/index'
 import SVGIcon from 'components/SVGIcon'
 import SideBarMenu from 'components/electron/SideBarMenu'
 import SearchBar from 'components/SearchBar'
 
-import {getUpdatesCount} from 'selectors'
-
 class App extends Component {
   constructor (props) {
     super(props)
+
+    this.renderOverlay = this.renderOverlay.bind(this)
 
     this.handleImportClick = this.handleImportClick.bind(this)
     this.handleExportClick = this.handleExportClick.bind(this)
@@ -25,11 +26,11 @@ class App extends Component {
   }
 
   handleImportClick () {
-    ipcRenderer.send('IMPORT_FROM_SKETCHPACK', null)
+    ipcRenderer.send('sketchpack/IMPORT_REQUEST')
   }
 
   handleExportClick () {
-    ipcRenderer.send('EXPORT_LIBRARY', this.props.state.library.items)
+    ipcRenderer.send('sketchpack/EXPORT_REQUEST')
   }
 
   renderLibraryActions () {
@@ -67,20 +68,33 @@ class App extends Component {
     )
   }
 
+  renderOverlay () {
+    return (
+      <div className="overlay">
+        <h2>Importing 🚚</h2>
+        <p>This might take a few minutes</p>
+      </div>
+    )
+  }
+
   render () {
     const {availableUpdates} = this.props
 
     return (
-
       <div className="app">
+        { this.props.isImporting && this.renderOverlay() }
+
         <SideBarMenu updatesCount={availableUpdates} />
 
         <div className="app__body">
           <header className='app__header'>
-            { this.props.location.pathname === '/library/installed'
+            { this.props.location.pathname === '/library/managed'
               && this.renderLibraryActions()  }
 
-            <SearchBar {...this.props} classNames={'searchBar'} />
+             { this.props.location.pathname !== '/library/managed'
+               && this.props.location.pathname !== '/library/unmanaged'
+              && this.props.location.pathname !== '/library/updates'
+                && <SearchBar {...this.props} classNames={'searchBar'} /> }
           </header>
 
           <div className="app__viewport">
@@ -102,7 +116,8 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   return {
     state,
-    availableUpdates: getUpdatesCount(state)
+    availableUpdates: getOutdatedPlugins(state).length,
+    isImporting: state.sketchpack.isImporting
   }
 }
 

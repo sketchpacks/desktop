@@ -6,61 +6,21 @@ const {
 
 const { ipcRenderer } = require('electron')
 
+const log = require('electron-log')
 const ms = require('ms')
-const axios = require('axios')
-const semver = require('semver')
-const {filter} = require('lodash')
+const {find} = require('lodash')
 
 const {sanitizeSemVer} = require('../lib/utils')
-
-
-
-const TOGGLE_VERSION_LOCK_REQUEST = 'manager/TOGGLE_VERSION_LOCK_REQUEST'
-
-function toggleVersionLockRequest (plugin) {
-  return (dispatch, getState) => {
-    dispatch(toggleVersionLockSuccess(plugin))
-  }
-}
-
-
-const TOGGLE_VERSION_LOCK_SUCCESS = 'manager/TOGGLE_VERSION_LOCK_SUCCESS'
-
-function toggleVersionLockSuccess (plugin) {
-  const isLocked = plugin.version.indexOf('^') === -1
-
-  return {
-    type: TOGGLE_VERSION_LOCK_SUCCESS,
-    plugin,
-    meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: isLocked ? 'Lock Plugin Version' : 'Unlock Plugin Version',
-        props: {
-          source: 'desktop',
-          pluginId: `${plugin.owner.handle}/${plugin.name}`,
-          pluginVersion: plugin.version
-        },
-      },
-    },
-  }
-}
-
-
-const TOGGLE_VERSION_LOCK_ERROR = 'manager/TOGGLE_VERSION_LOCK_ERROR'
-
-function toggleVersionLockError (plugin) {
-  return {
-    type: TOGGLE_VERSION_LOCK_ERROR,
-    plugin
-  }
-}
 
 
 const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
 
 function installPluginRequest (plugin) {
   return (dispatch, getState) => {
+    dispatch({
+      type: 'library/INSTALL_PLUGIN_REQUEST',
+      payload: plugin
+    })
     ipcRenderer.send(INSTALL_PLUGIN_REQUEST, plugin)
   }
 }
@@ -75,21 +35,13 @@ function webInstallPluginRequest (pluginId) {
 
 const INSTALL_PLUGIN_SUCCESS = 'manager/INSTALL_SUCCESS'
 
-function installPluginSuccess (plugin) {
+function installPluginSuccess (identifier) {
   return {
     type: INSTALL_PLUGIN_SUCCESS,
-    plugin,
+    payload: identifier,
     meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: 'Install Plugin',
-        props: {
-          source: 'desktop',
-          pluginId: `${plugin.owner.handle}/${plugin.name}`,
-          pluginVersion: plugin.version
-        },
-      },
-    },
+      notification: true
+    }
   }
 }
 
@@ -100,7 +52,7 @@ function installPluginError (error, plugin) {
   return {
     type: INSTALL_PLUGIN_ERROR,
     error: error,
-    plugin
+    payload: plugin
   }
 }
 
@@ -108,7 +60,6 @@ function installPluginError (error, plugin) {
 const UPDATE_PLUGIN_REQUEST = 'manager/UPDATE_REQUEST'
 
 function updatePluginRequest (plugin) {
-  const outdatedPlugin = plugin
 
   return (dispatch, getState, {api}) => {
     api.getPluginUpdate({ pluginId: plugin.id, version: sanitizeSemVer(plugin.version) })
@@ -122,7 +73,7 @@ function updatePluginRequest (plugin) {
           download_url: update.download_url
         })
 
-        ipcRenderer.send(UPDATE_PLUGIN_REQUEST, {updatedPlugin, outdatedPlugin})
+        ipcRenderer.send(UPDATE_PLUGIN_REQUEST, updatedPlugin)
       })
   }
 }
@@ -144,6 +95,10 @@ function updatePluginSuccess (plugin) {
           pluginVersion: plugin.version
         },
       },
+      notification: {
+        title: 'Sketchpacks',
+        message: `${plugin.name} updated to ${plugin.version}`
+      }
     },
   }
 }
@@ -164,7 +119,12 @@ const UNINSTALL_PLUGIN_REQUEST = 'manager/UNINSTALL_REQUEST'
 
 function uninstallPluginRequest (plugin) {
   return (dispatch, getState) => {
-    ipcRenderer.send(UNINSTALL_PLUGIN_REQUEST, plugin)
+    const removable = find(getState().library.items, (item) => {
+      return plugin.owner.handle === item.owner.handle
+        && plugin.name === item.name
+    })
+
+    ipcRenderer.send(UNINSTALL_PLUGIN_REQUEST, removable)
   }
 }
 
@@ -198,91 +158,6 @@ function uninstallPluginError (error, plugin) {
   }
 }
 
-const pluginData = (owner,slug) => new Promise((resolve,reject) => {
-  axios.get(`${API_URL}/v1/users/${owner}/plugins/${slug.toLowerCase()}`)
-    .then(response => {
-      resolve(response.data)
-    })
-    .catch(response => {
-      resolve({})
-    })
-})
-
-function updateAvailable (remote,local) {
-  let remoteVersion = sanitizeSemVer(plugin.version)
-  let localVersion = sanitizeSemVer(plugin.installed_version)
-
-  return semver.lt(localVersion,remoteVersion)
-}
-
-const AUTOUPDATE_PLUGINS_REQUEST = 'manager/AUTOUPDATE_PLUGINS'
-
-function autoUpdatePluginsRequest ({repeat}) {
-  return (dispatch, getState, {api}) => {
-    dispatch({ type: AUTOUPDATE_PLUGINS_REQUEST })
-
-    const plugins = getState().library.items
-    const unlockedPlugins = filter(plugins, (p) => p.version.indexOf('^') > -1)
-
-    unlockedPlugins.forEach(plugin => dispatch(updatePluginRequest(plugin)))
-
-    if (repeat) {
-      setTimeout(() => dispatch(autoUpdatePluginsRequest({repeat: true})), ms(PLUGIN_AUTOUPDATE_INTERVAL))
-    }
-  }
-}
-
-const IMPORT_FROM_SKETCHPACK_REQUEST = 'manager/IMPORT_FROM_SKETCHPACK_REQUEST'
-
-function importSketchpackRequest () {
-  return {
-    type: IMPORT_FROM_SKETCHPACK_REQUEST,
-    meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: 'Import',
-        props: {
-          source: 'Sketchpack'
-        },
-      },
-    },
-  }
-}
-
-const IMPORT_FROM_SKETCH_TOOLBOX_REQUEST = 'manager/IMPORT_FROM_SKETCH_TOOLBOX_REQUEST'
-
-function importSketchToolboxRequest () {
-  return {
-    type: IMPORT_FROM_SKETCH_TOOLBOX_REQUEST,
-    meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: 'Import',
-        props: {
-          source: 'Sketch Toolbox'
-        },
-      },
-    },
-  }
-}
-
-const EXPORT_LIBRARY_REQUEST = 'manager/EXPORT_LIBRARY'
-
-function exportLibraryRequest () {
-  return {
-    type: EXPORT_LIBRARY_REQUEST,
-    meta: {
-      mixpanel: {
-        eventName: 'Manage',
-        type: 'Export',
-        props: {
-          source: 'My Library'
-        },
-      },
-    },
-  }
-}
-
 
 module.exports = {
   installPluginRequest,
@@ -297,14 +172,6 @@ module.exports = {
   uninstallPluginSuccess,
   uninstallPluginError,
 
-  toggleVersionLockRequest,
-  toggleVersionLockSuccess,
-  toggleVersionLockError,
-
-  TOGGLE_VERSION_LOCK_REQUEST,
-  TOGGLE_VERSION_LOCK_SUCCESS,
-  TOGGLE_VERSION_LOCK_ERROR,
-
   INSTALL_PLUGIN_REQUEST,
   INSTALL_PLUGIN_SUCCESS,
   INSTALL_PLUGIN_ERROR,
@@ -317,9 +184,5 @@ module.exports = {
   UNINSTALL_PLUGIN_SUCCESS,
   UNINSTALL_PLUGIN_ERROR,
 
-  autoUpdatePluginsRequest,
-  webInstallPluginRequest,
-  importSketchToolboxRequest,
-  importSketchpackRequest,
-  exportLibraryRequest
+  webInstallPluginRequest
 }

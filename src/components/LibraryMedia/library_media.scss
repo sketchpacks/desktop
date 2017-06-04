@@ -1,0 +1,45 @@
+.o-plugin {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid rgba(50,58,73,0.10);
+  padding: 2rem 2rem 1.2rem 2rem;
+  border-radius: 0.3rem;
+
+  &__name {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.02rem;
+
+    cursor: pointer;
+  }
+
+  &__thumbnail {
+    max-width: 16.0rem;
+    max-height: 12.0rem;
+    overflow: hidden;
+  }
+}
+
+.o-plugin__footer {
+  display: flex;
+  flex-direction: row;
+  align-content: flex-start;
+  justify-content: space-between;
+
+  &--recto {
+    align-content: flex-end;
+    justify-content: flex-end;
+
+    button {
+      margin-left: 1.6rem;
+    }
+  }
+
+  .button {
+    width: 12rem;
+  }
+}

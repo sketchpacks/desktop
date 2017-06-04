@@ -1,53 +1,26 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { browserHistory } from 'react-router'
 
-import {map,includes} from 'lodash'
+import { getPluginIdentifiers } from 'reducers'
 
+import withSelector from 'hoc/withSelector'
+import withPluginDispatcher from 'hoc/withPluginDispatcher'
 import PluginList from 'components/PluginList'
 import ConnectedPluginList from 'hoc/ConnectedPluginList'
-const EnhancedPluginList = ConnectedPluginList(PluginList)
+
+const EnhancedPluginList = ConnectedPluginList(withPluginDispatcher(withSelector(PluginList,getPluginIdentifiers)))
 
 class BrowsePluginsContainer extends Component {
   constructor (props) {
     super(props)
-
-    this.renderEmptyState = this.renderEmptyState.bind(this)
-    this.renderLoadingState = this.renderLoadingState.bind(this)
-  }
-
-  renderEmptyState () {
-    return (
-      <div className="empty-state--expanded">
-        <h4>No plugins found</h4>
-      </div>
-    )
-  }
-
-  renderLoadingState () {
-    return (
-      <div className="empty-state--expanded">
-        <h4>Loading plugins</h4>
-      </div>
-    )
   }
 
   render () {
-    const {plugins} = this.props
-
     return (
       <div style={{position: 'relative'}}>
-
-        { (plugins.isLoading)
-          && this.renderLoadingState() }
-
-        { (parseInt(plugins.total) === 0)
-          && this.renderEmptyState() }
-
         <EnhancedPluginList
-          plugins={plugins}
+          state={this.props.state}
           location={this.props.location}
-          installedPluginIds={map(this.props.library.items, 'id')}
           dispatch={this.props.dispatch}
         />
       </div>
@@ -62,13 +35,12 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 function mapStateToProps(state, ownProps) {
-  const { catalog,search,library,location } = state
+  const { search,location } = state
 
   return {
-    library,
-    plugins: catalog,
+    state,
     search,
-    location: state.routing.locationBeforeTransitions
+    location: state.routing.locationBeforeTransitions,
   }
 }
 

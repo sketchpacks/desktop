@@ -8,20 +8,12 @@ import {remote} from 'electron'
 import React from 'react'
 
 import qs from 'qs'
-import {SketchpacksApi} from 'api'
 
 import Waypoint from 'react-waypoint'
+import { browsePlugins } from 'reducers/plugins'
 
-import {
-  fetchCatalog
-} from 'actions'
-
-import {
-  installPluginRequest,
-  updatePluginRequest,
-  uninstallPluginRequest,
-  toggleVersionLockRequest,
-} from 'actions/plugin_manager'
+import BrowseError from 'components/BrowseError'
+import EmptyStateSwitcher from 'components/EmptyStateSwitcher'
 
 const ConnectedPluginList = ComposedComponent =>
   class extends React.Component {
@@ -29,88 +21,96 @@ const ConnectedPluginList = ComposedComponent =>
       super(props)
 
       this.fetchData = this.fetchData.bind(this)
-
-      this.handlePluginEvent = this.handlePluginEvent.bind(this)
-    }
-
-    handlePluginEvent ({ type, plugin, author }) {
-      const {dispatch} = this.props
-
-      switch (type) {
-        case "install":
-          return dispatch(installPluginRequest(plugin))
-        case "remove":
-          return dispatch(uninstallPluginRequest(plugin))
-        case "update":
-          return dispatch(updatePluginRequest(plugin))
-        case "lock":
-          return dispatch(toggleVersionLockRequest(plugin))
-        case "favorite":
-          return console.log(type, plugin)
-        case "collect":
-          return console.log(type, plugin)
-        case "info":
-          return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}`)
-        case "author":
-          return remote.shell.openExternal(`${WEB_URL}/@${plugin.owner.handle}`)
-      }
+      this.retryFetchData = this.retryFetchData.bind(this)
     }
 
     componentDidMount () {
       this.fetchData({
-        page: 1,
-        append: false,
-        q: this.props.location.query.q,
-        sort: this.props.location.query.sort,
+        page: this.props.state.plugins.meta.page,
+        sort: this.props.state.plugins.meta.sort,
+        append: false
       })
     }
 
     componentWillReceiveProps (nextProps) {
-      if (this.props.plugins.isLoading === true) return
+      // if (this.props.plugins.isLoading === true) return
 
-      if (this.props.location.query.sort !== nextProps.location.query.sort) {
+      if (this.props.state.plugins.meta.sort !== nextProps.state.plugins.meta.sort) {
         this.fetchData({
-          page: 1,
-          sort: nextProps.location.query.sort,
+          page: nextProps.state.plugins.meta.page,
+          sort: nextProps.state.plugins.meta.sort,
+          q: nextProps.state.plugins.meta.q,
           append: false,
-          q: nextProps.location.query.q,
         })
       }
     }
 
+    retryFetchData ({ sort, page, append, q }) {
+      this.fetchData({
+        sort: this.props.state.plugins.meta.sort,
+        page: this.props.state.plugins.meta.nextPage,
+        q: this.props.state.plugins.meta.q,
+        append: true
+      })
+    }
+
     fetchData ({ sort, page, append, q }) {
+      if (this.props.state.plugins.isLoading) return
+
       const {dispatch,plugins} = this.props
 
-      if (plugins.isLoading === true) return
+      // if (this.props.state.plugins.isLoading === true) return
 
-      const queryParams = qs.stringify({
-        page: page || parseInt(plugins.nextPage),
-        per_page: 10,
-        sort: sort || plugins.sort,
-        text: q || null
+      const request_params = qs.stringify({
+        sort: sort || this.props.state.plugins.meta.sort,
+        page: page || this.props.state.plugins.meta.page,
+        text: q ||  this.props.state.plugins.meta.q
       })
+      const request_url = `/plugins?${request_params}`
 
-      dispatch(fetchCatalog(queryParams, append))
+      dispatch(
+        browsePlugins({
+          url: request_url,
+          append,
+          list: this.props.state.plugins.meta.sort
+        })
+      )
     }
 
     render () {
+      if (this.props.state.plugins.isLoading
+        && (this.props.state.plugins.allIdentifiers.length === 0)) {
+        return <EmptyStateSwitcher pathname={'browse'} />
+      }
+
+      if (this.props.state.plugins.isError
+        && (this.props.state.plugins.allIdentifiers.length === 0)) {
+        return <BrowseError
+          message={this.props.state.plugins.errorMessage}
+          onRetry={this.retryFetchData}
+        />
+      }
+
       return (
         <div>
           <ComposedComponent
             fetchData={this.fetchData}
-            handlePluginEvent={this.handlePluginEvent}
-
-            plugins={this.props.plugins}
             state={this.props.state}
             location={this.props.location}
             dispatch={this.props.dispatch}
-            installedPluginIds={this.props.installedPluginIds}
+            errorMessage={this.props.state.plugins.errorMessage}
+            onRetry={this.retryFetchData}
           />
 
-          { !this.props.plugins.isLoading
-            && this.props.plugins.total >= 11
+          { (this.props.location.pathname !== '/library/installed'
+              || this.props.location.pathname !== '/library/updates')
+            // && !this.props.state.plugins.isLoading
+            && this.props.state.plugins.allIdentifiers.length >= 9
             && <Waypoint
-              onEnter={() => this.fetchData({ sort: this.props.plugins.sort })} /> }
+              onEnter={() => this.fetchData({
+                page: this.props.state.plugins.meta.nextPage,
+                append: true
+              })} /> }
         </div>
       )
     }

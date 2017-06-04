@@ -1,14 +1,15 @@
 import React, {Component} from 'react'
 
 import PluginMedia from 'components/PluginMedia'
+import BrowseError from 'components/BrowseError'
+import EmptyStateSwitcher from 'components/EmptyStateSwitcher'
 
-import {map,includes} from 'lodash'
+import {
+  getPluginByIdentifier,
+  selectPlugin
+} from 'reducers'
 
 import './styles.scss'
-
-const isInstalled = (library, pluginId) => {
-  return includes(library, pluginId)
-}
 
 class PluginList extends Component {
   constructor (props) {
@@ -18,30 +19,34 @@ class PluginList extends Component {
   render () {
     const {
       plugins,
-      authorDetails,
-      installedPluginIds,
       location,
       dispatch,
       handlePluginEvent,
-      fetchData
+      state,
+      errorMessage,
+      onRetry
     } = this.props
+
+    if (errorMessage && plugins.length === 0) {
+      return <BrowseError
+        message={errorMessage}
+        onRetry={onRetry} />
+    }
+
+    if (plugins.length === 0) {
+      return <EmptyStateSwitcher pathname={location.pathname} />
+    }
 
     return (
       <div className="o-plugin-list">
 
-        {plugins.items.map((plugin, idx) => {
-
-          // Set the owner property if not present
-          if (!('owner' in plugin)) plugin['owner'] = authorDetails
-
+        {plugins.map((identifier, idx) => {
           return <PluginMedia
-            plugin={plugin}
-            isInstalled={isInstalled(installedPluginIds, plugin.id)}
+            key={`${idx}-${identifier}`}
+            plugin={selectPlugin(state,identifier)}
             location={location}
             dispatch={dispatch}
-            handlePluginEvent={handlePluginEvent}
-            fetchData={fetchData}
-            key={`${idx}-${plugin.id}`} />
+            handlePluginEvent={handlePluginEvent} />
         })}
       </div>
     )

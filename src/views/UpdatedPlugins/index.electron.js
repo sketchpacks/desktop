@@ -1,59 +1,26 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { browserHistory } from 'react-router'
 
-import {map,includes} from 'lodash'
-import { getUpdatedPlugins } from 'selectors'
-
-import PluginList from 'components/PluginList'
-import ConnectedPluginList from 'hoc/ConnectedPluginList'
-const EnhancedPluginList = ConnectedPluginList(PluginList)
+import {getOutdatedPlugins} from 'reducers/index'
+import withPluginDispatcher from 'hoc/withPluginDispatcher'
+import withSelector from 'hoc/withSelector'
+import LibraryList from 'components/LibraryList'
+const ConnectedLibraryList = withPluginDispatcher(withSelector(LibraryList,getOutdatedPlugins))
 
 class UpdatedPluginsContainer extends Component {
   constructor (props) {
     super(props)
-
-    this.renderEmptyState = this.renderEmptyState.bind(this)
-    this.renderLoadingState = this.renderLoadingState.bind(this)
-  }
-
-  renderEmptyState () {
-    return (
-      <div className="empty-state--expanded">
-        <span className="o-emoji o-emoji--xl">🖖🏽</span>
-
-        <h4>No updates available</h4>
-
-        <p>Your outdated plugins will appear here. 🔒 a plugin to prevent future
-        updates from being applied.</p>
-      </div>
-    )
-  }
-
-  renderLoadingState () {
-    return (
-      <div className="empty-state--expanded">
-        <h4>Loading</h4>
-      </div>
-    )
   }
 
   render () {
-    const {plugins} = this.props
+    const {location,dispatch} = this.props
 
     return (
       <div style={{position: 'relative'}}>
-        { (plugins.isLoading)
-          && this.renderLoadingState() }
-
-        { (parseInt(plugins.items.length) === 0)
-          && this.renderEmptyState() }
-
-        <EnhancedPluginList
-          plugins={plugins}
-          location={this.props.location}
-          installedPluginIds={map(this.props.plugins.items, 'id')}
-          dispatch={this.props.dispatch}
+        <ConnectedLibraryList
+          handlePluginEvent={this.handlePluginEvent}
+          location={location}
+          dispatch={dispatch}
         />
       </div>
     )
@@ -69,7 +36,6 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   return {
     state,
-    plugins: {items: getUpdatedPlugins(state)},
     location: state.routing.locationBeforeTransitions,
   }
 }

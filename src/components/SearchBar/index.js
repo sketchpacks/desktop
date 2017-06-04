@@ -10,12 +10,8 @@ import { push } from 'react-router-redux'
 import SVGIcon from 'components/SVGIcon'
 
 import qs from 'qs'
-import linkHeader from 'parse-link-header'
-import {SketchpacksApi} from 'api'
 
-import {
-  fetchSearch
-} from 'actions'
+import { searchPlugins } from 'reducers/search'
 
 import './styles.scss'
 
@@ -30,8 +26,23 @@ class SearchBar extends Component {
   fetchData ({ sort, page, append, q }) {
     const {dispatch} = this.props
 
-    dispatch(fetchSearch(q, false))
-    browserHistory.push(`/search?q=${q}`)
+    const request_params = qs.stringify({
+      sort: 'score:desc',
+      page,
+      text: q
+    })
+    const request_url = `/plugins?${request_params}`
+
+    dispatch(push(`/search?q=${q}`))
+
+    dispatch(
+      searchPlugins({
+        url: request_url,
+        append: false,
+        list: 'search',
+        keyword: q
+      })
+    )
   }
 
   handleEnterKey (e) {
@@ -39,10 +50,7 @@ class SearchBar extends Component {
 
     if (e.target.value.length <= 2) return
 
-    const {dispatch} = this.props
-    const keyword = e.target.value
-
-    this.fetchData({ q: keyword })
+    this.fetchData({ q: e.target.value })
   }
 
   render () {

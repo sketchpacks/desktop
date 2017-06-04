@@ -2,23 +2,12 @@
 
 exports[`Avatar should render an avatar 1`] = `
 <div>
-  <LazyLoad
-    debounce={500}
+  <img
+    className="image is-maker"
     height={24}
-    offset={200}
-    once={false}
-    overflow={false}
-    resize={false}
-    scroll={true}
-    unmountIfInvisible={true}
-  >
-    <img
-      className="image is-maker"
-      height={24}
-      role="presentation"
-      src="https://github.com/sketchpacks.png"
-      width={24}
-    />
-  </LazyLoad>
+    role="presentation"
+    src="https://github.com/sketchpacks.png"
+    width={24}
+  />
 </div>
 `;

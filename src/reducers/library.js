@@ -14,9 +14,9 @@ export const removePlugin = createAction('library/UNINSTALL_PLUGIN', identifier 
   return identifier
 })
 
-export const updatePlugin = createAction('library/UPDATE_PLUGIN', identifier => {
-  ipcRenderer.send('manager/UPDATE_REQUEST', identifier)
-  return identifier
+export const updatePlugin = createAction('library/UPDATE_PLUGIN', plugins => {
+  ipcRenderer.send('manager/UPDATE_REQUEST', plugins)
+  return plugins
 })
 
 export const installPluginRequest = createAction('library/INSTALL_PLUGIN_REQUEST', (payload) => payload, (_,meta) => meta)
@@ -65,10 +65,13 @@ export default handleActions({
         ...state.plugins,
         byIdentifier: {
           ...state.plugins.byIdentifier,
-          [action.payload.plugin.identifier]: pick(
-            action.payload.plugin,
-            ['install_path', 'manifest_path', 'version', 'compatible_version']
-          )
+          [action.payload.plugin.identifier]: {
+            ...pick(
+              action.payload.plugin,
+              ['install_path', 'manifest_path', 'version', 'compatible_version']
+            ),
+            installed_version: action.payload.plugin.version
+          }
         },
         allIdentifiers: uniq(state.plugins.allIdentifiers.concat(action.payload.plugin.identifier))
       }

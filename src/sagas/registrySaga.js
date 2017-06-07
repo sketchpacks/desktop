@@ -37,9 +37,12 @@ const createBatches = (items, size) => {
 function* identifyPluginsByBatch(resource) {
   yield call(delay, 1000)
 
-  const batches = createBatches(Object.keys(identifiers[resource]),10)
+  const batches = createBatches(Object.keys(identifiers[resource]),DEFAULT_BATCH_SIZE)
 
-  yield all(batches.map(identifiers => fork(fetchPlugins,identifiers)))
+  for (const batch in batches) {
+    yield call(delay, 1000)
+    yield call(fetchPlugins,batches[batch])
+  }
 
   delete identifiers[resource]
   delete tasks[identifiers]

@@ -102,8 +102,8 @@ const extractAsset = (data) => new Promise((resolve, reject) => {
 
   data['install_path'] = path.join(extractionPath, entryName)
 
-  exec(`unzip -o -a ${archivePath} -d ${extractionPath}`,
-    { maxBuffer: 1024 * 500 },
+  exec(`unzip -o -qq -a ${archivePath} -d ${extractionPath}`,
+    { maxBuffer: 1024 * 1000 },
     (error, stdout, stderr) => {
       if (error) {
         log.info(`exec error: ${error}`)

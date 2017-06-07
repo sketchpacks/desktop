@@ -1,11 +1,14 @@
 import { createAction, handleActions } from 'redux-actions'
 
-import { without,uniq } from 'lodash'
+import { without, uniq, isArray } from 'lodash'
 
 import {
   installPluginRequest,
   installPluginSuccess,
   installPluginError,
+  updatePlugin,
+  updatePluginSuccess,
+  updatePluginError,
   installPlugin,
   detectPlugin
 } from 'reducers/library'
@@ -17,7 +20,8 @@ import {
 //- State
 
 const initialState = {
-  installing: []
+  installing: [],
+  updating: []
 }
 
 
@@ -25,7 +29,7 @@ const initialState = {
 
 export default handleActions({
   // Add reference to identifier before install
-  [installPluginRequest]: (state, action) => {    
+  [installPluginRequest]: (state, action) => {
     return {
       ...state,
       installing: uniq(state.installing.concat(action.payload))
@@ -53,6 +57,32 @@ export default handleActions({
     return {
       ...state,
       installing: without(state.installing, action.meta.plugin)
+    }
+  },
+
+  // Add reference to identifier before update
+  [updatePlugin]: (state, action) => {
+    const identifiers = [].concat(action.payload).map(plugin => plugin.identifier)
+
+    return {
+      ...state,
+      updating: uniq(state.updating.concat(identifiers))
+    }
+  },
+
+  // Remove reference to identifier after update
+  [updatePluginSuccess]: (state, action) => {
+    return {
+      ...state,
+      updating: without(state.updating, action.payload)
+    }
+  },
+
+  // Remove reference to identifier after failed update
+  [updatePluginError]: (state, action) => {
+    return {
+      ...state,
+      updating: without(state.updating, action.meta.plugin)
     }
   }
 }, initialState)

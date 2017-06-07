@@ -100,7 +100,7 @@ export const getOutdatedPlugins = createSelector(
   [ getStateTree, getManagedPlugins ],
   (state,identifiers) => filter(
     identifiers,
-    (id) => {      
+    (id) => {
       if (!state.plugins.byIdentifier[id]) return false
 
       return isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
@@ -124,14 +124,19 @@ const getPluginInstallActivity = (state,identifier) => {
   return includes(state.queue.installing, identifier)
 }
 
+const getPluginUpdateActivity = (state,identifier) => {
+  return includes(state.queue.updating, identifier)
+}
+
 export const selectPlugin = createSelector(
   [
     getPluginByIdentifier,
     getLibraryPluginByIdentifier,
     getSketchpackPluginByIdentifier,
-    getPluginInstallActivity
+    getPluginInstallActivity,
+    getPluginUpdateActivity
   ],
-  (entity, lib, pack, isInstalling) => {
+  (entity, lib, pack, isInstalling, isUpdating) => {
     const data = entity
 
     if (lib) {
@@ -144,6 +149,7 @@ export const selectPlugin = createSelector(
     }
 
     data['isInstalling'] = isInstalling
+    data['isUpdating'] = isUpdating
 
     return data
   }
@@ -154,9 +160,10 @@ export const selectPluginBasics = createSelector(
     getPluginBasicsByIdentifier,
     getLibraryPluginByIdentifier,
     getSketchpackPluginByIdentifier,
-    getPluginInstallActivity
+    getPluginInstallActivity,
+    getPluginUpdateActivity
   ],
-  (entity, lib, pack, isInstalling) => {
+  (entity, lib, pack, isInstalling, isUpdating) => {
     const data = entity
 
     if (lib) {
@@ -169,6 +176,7 @@ export const selectPluginBasics = createSelector(
     }
 
     data['isInstalling'] = isInstalling
+    data['isUpdating'] = isUpdating
 
     return data
   }

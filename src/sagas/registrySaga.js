@@ -9,7 +9,7 @@ import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 
 const DEFAULT_TIMEOUT = 1500
-const DEFAULT_BATCH_SIZE = 10
+const DEFAULT_BATCH_SIZE = 25
 
 const identifiers = {}
 const tasks = {}
@@ -17,7 +17,8 @@ const tasks = {}
 const client = axios.create({
   baseURL: `${API_URL}/v1`,
   timeout: DEFAULT_TIMEOUT,
-  transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
+  transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema),
+  headers: {'Content-Encoding': 'gzip'}
 })
 
 const fetchPluginsByIdentifier = (identifiers) => client
@@ -37,9 +38,12 @@ const createBatches = (items, size) => {
 function* identifyPluginsByBatch(resource) {
   yield call(delay, 1000)
 
-  const batches = createBatches(Object.keys(identifiers[resource]),10)
+  const batches = createBatches(Object.keys(identifiers[resource]),DEFAULT_BATCH_SIZE)
 
-  yield all(batches.map(identifiers => fork(fetchPlugins,identifiers)))
+  for (const batch in batches) {
+    yield call(delay, 1000)
+    yield call(fetchPlugins,batches[batch])
+  }
 
   delete identifiers[resource]
   delete tasks[identifiers]

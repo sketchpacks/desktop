@@ -136,7 +136,7 @@ ipcRenderer.on('sketchpack/IMPORT', (evt,contents) => {
 ipcRenderer.on('sketchpack/IMPORT_REQUEST', (evt,args) => {
   log.debug(args)
   ipcRenderer.send('sketchpack/IMPORT_REQUEST')
-  
+
   store.dispatch({
     type: 'behavior_tracking',
     meta: {
@@ -256,7 +256,7 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
     notification: true,
     mixpanel: {
       eventName: 'Manage',
-      type: 'Uninstall Plugin',
+      type: 'Remove Plugin',
       props: {
         source: 'desktop',
         pluginId: plugin.identifier

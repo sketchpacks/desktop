@@ -37,7 +37,8 @@ class PluginMedia extends Component {
       clicked: false,
       isInstalled: false,
       isLocked: false,
-      isInstalling: false
+      isInstalling: false,
+      isUpdating: false
     }
   }
 
@@ -84,7 +85,7 @@ class PluginMedia extends Component {
   renderButton () {
     const {location,handlePluginEvent} = this.props
 
-    if (this.state.isInstalling) return <button className='button'><BeatLoader fill="#ffffff" count={3} /></button>
+    if (this.state.isUpdating) return <button className='button'><BeatLoader fill="#ffffff" count={3} /></button>
 
     return <Button
       onClick={location.pathname === '/library/updates'
@@ -124,6 +125,12 @@ class PluginMedia extends Component {
     }
 
     try {
+      newState['isUpdating'] = nextPlugin.isUpdating
+    } catch (err) {
+      newState['isUpdating'] = false
+    }
+
+    try {
       newState['isLocked'] = isFullLocked(nextPlugin.version_range)
     } catch (err) {
       newState['isLocked'] = false
@@ -137,7 +144,8 @@ class PluginMedia extends Component {
     const {
       installed_version,
       version_range,
-      isInstalling
+      isInstalling,
+      isUpdating
     } = this.props.plugin
 
     try {
@@ -150,6 +158,12 @@ class PluginMedia extends Component {
       newState['isInstalling'] = isInstalling
     } catch (err) {
       newState['isInstalling'] = false
+    }
+
+    try {
+      newState['isUpdating'] = isUpdating
+    } catch (err) {
+      newState['isUpdating'] = false
     }
 
     try {

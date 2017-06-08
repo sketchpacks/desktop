@@ -130,7 +130,10 @@ export default handleActions({
       ...state,
       byIdentifier: {
         ...state.byIdentifier,
-        [action.payload.plugin.identifier]: { ...action.payload.plugin }
+        [action.payload.plugin.identifier]: {
+          ...action.payload.plugin,
+          installed_version: action.payload.plugin.version
+        }
       }
     }
   },

@@ -8,10 +8,13 @@ import 'css/milligram.scss'
 
 import './app.scss'
 
-import { getOutdatedPlugins } from 'reducers/index'
+import { getOutdatedPlugins, selectPluginBasics } from 'reducers/index'
+import { updatePlugin } from 'reducers/library'
+
 import SVGIcon from 'components/SVGIcon'
 import SideBarMenu from 'components/electron/SideBarMenu'
 import SearchBar from 'components/SearchBar'
+import Button from 'components/Button'
 
 class App extends Component {
   constructor (props) {
@@ -21,8 +24,11 @@ class App extends Component {
 
     this.handleImportClick = this.handleImportClick.bind(this)
     this.handleExportClick = this.handleExportClick.bind(this)
+    this.handleBatchUpdateClick = this.handleBatchUpdateClick.bind(this)
 
     this.renderLibraryActions = this.renderLibraryActions.bind(this)
+
+    this.renderUpdatesActions = this.renderUpdatesActions.bind(this)
   }
 
   handleImportClick () {
@@ -31,6 +37,13 @@ class App extends Component {
 
   handleExportClick () {
     ipcRenderer.send('sketchpack/EXPORT_REQUEST')
+  }
+
+  handleBatchUpdateClick () {
+    const plugins = this.props.availableUpdates
+      .map(id => selectPluginBasics(this.props.state, id))
+
+    this.props.dispatch(updatePlugin(plugins))
   }
 
   renderLibraryActions () {
@@ -68,6 +81,22 @@ class App extends Component {
     )
   }
 
+  renderUpdatesActions () {
+    const {availableUpdates} = this.props
+
+    if (!availableUpdates.length) return
+
+    return (
+      <div className="header__actions">
+        <Button
+          onClick={this.handleBatchUpdateClick}
+          actionVerb={`Update All (${availableUpdates.length})`}
+          className={'button'}
+        />
+      </div>
+    )
+  }
+
   renderOverlay () {
     return (
       <div className="overlay">
@@ -84,17 +113,20 @@ class App extends Component {
       <div className="app">
         { this.props.isImporting && this.renderOverlay() }
 
-        <SideBarMenu updatesCount={availableUpdates} />
+        <SideBarMenu updatesCount={availableUpdates.length} />
 
         <div className="app__body">
           <header className='app__header'>
             { this.props.location.pathname === '/library/managed'
               && this.renderLibraryActions()  }
 
-             { this.props.location.pathname !== '/library/managed'
-               && this.props.location.pathname !== '/library/unmanaged'
+            { this.props.location.pathname === '/library/updates'
+              && this.renderUpdatesActions()  }
+
+            { this.props.location.pathname !== '/library/managed'
+              && this.props.location.pathname !== '/library/unmanaged'
               && this.props.location.pathname !== '/library/updates'
-                && <SearchBar {...this.props} classNames={'searchBar'} /> }
+              && <SearchBar {...this.props} classNames={'searchBar'} /> }
           </header>
 
           <div className="app__viewport">
@@ -116,7 +148,7 @@ const mapDispatchToProps = (dispatch) => {
 function mapStateToProps(state, ownProps) {
   return {
     state,
-    availableUpdates: getOutdatedPlugins(state).length,
+    availableUpdates: getOutdatedPlugins(state),
     isImporting: state.sketchpack.isImporting
   }
 }

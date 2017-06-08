@@ -29,6 +29,7 @@ class PluginMedia extends Component {
     // Sub-renders
     this.renderVersion = this.renderVersion.bind(this)
     this.renderButton = this.renderButton.bind(this)
+    this.renderTotalDownloads = this.renderTotalDownloads.bind(this)
     this.renderVersionLock = this.renderVersionLock.bind(this)
 
     // Click events
@@ -96,6 +97,19 @@ class PluginMedia extends Component {
       shape={'path'}
       value={sanitizeSemVer(version)}
       tooltip={tooltip} />
+  }
+
+  renderTotalDownloads () {
+    const {rollup} = this.props.plugin
+    const {location} = this.props
+
+    if (!has(this.props.plugin, 'rollup.downloads')) return
+
+    return <PluginMetric
+      icon={'downloads'}
+      shape={'path'}
+      value={rollup.downloads.this_week}
+      tooltip={'Downloads this week'} />
   }
 
   renderButton () {
@@ -232,6 +246,8 @@ class PluginMedia extends Component {
               width={24}
               onClick={this.handleClickAuthorName}
             /> }
+
+            { this.renderTotalDownloads() }
 
             { this.renderVersion() }
 

@@ -50,7 +50,7 @@ const withPluginDispatcher = (WrappedComponent) => {
           }, {
             mixpanel: {
               eventName: 'Manage',
-              type: 'Version Range',
+              type: 'Set Version Range',
               props: {
                 source: 'desktop',
                 pluginId: identifier,

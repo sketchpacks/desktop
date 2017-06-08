@@ -91,7 +91,7 @@ function updatePluginSuccess (plugin) {
         type: 'Update Plugin',
         props: {
           source: 'desktop',
-          pluginId: `${plugin.owner.handle}/${plugin.name}`,
+          pluginId: plugin.identifier,
           pluginVersion: plugin.version
         },
       },
@@ -140,7 +140,7 @@ function uninstallPluginSuccess (plugin) {
         type: 'Uninstall Plugin',
         props: {
           source: 'desktop',
-          pluginId: `${plugin.owner.handle}/${plugin.name}`,
+          pluginId: plugin.identifier,
         },
       },
     },

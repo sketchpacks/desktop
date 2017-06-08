@@ -273,7 +273,7 @@ export function appInstall (payload) {
     meta: {
       mixpanel: {
         eventName: 'App',
-        type: 'Install',
+        type: 'Install App',
         props: {
           version: payload,
         },

@@ -142,7 +142,7 @@ ipcRenderer.on('sketchpack/IMPORT_REQUEST', (evt,args) => {
     meta: {
       mixpanel: {
         eventName: 'Manage',
-        type: 'Import'
+        type: 'Import Plugin'
       }
     }
   })
@@ -160,7 +160,7 @@ ipcRenderer.on('sketchpack/EXPORT', (evt,filepath) => {
     meta: {
       mixpanel: {
         eventName: 'Manage',
-        type: 'Import'
+        type: 'Export Plugin'
       }
     }
   })

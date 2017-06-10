@@ -273,11 +273,10 @@ const identifyPluginTask = (manifestPath, callback) => {
         name,
         version,
         install_path,
-        manifest_path,
-        owner: {
-          handle: manifestContents.name || manifestContents.author || manifestContents.authorName
-        }
+        manifest_path
       }
+
+      callback(null, unidentifiedPlugin)
       resolve(unidentifiedPlugin)
     } catch (err) {
       log.error('buildPlugin', err)
@@ -287,28 +286,6 @@ const identifyPluginTask = (manifestPath, callback) => {
 
   readManifest(manifest_path)
     .then(buildPlugin)
-    .then(getPluginByIdentifier)
-    .then(response => {
-      const data = Object.assign(
-        {},
-        response.data,
-        { install_path, manifest_path, version, name, identifier }
-      )
-
-      callback(null, data)
-    },
-    err => {
-      const error = new Error(`Failed to identify plugin - ${manifest_path}`)
-      const data = Object.assign(
-        {},
-        { install_path, manifest_path, version, name, identifier }
-      )
-      callback(error, data)
-    })
-    .catch(err => {
-      log.error('Failed to identify plugin: ', err)
-      callback(null, unidentifiedPlugin)
-    })
 }
 
 

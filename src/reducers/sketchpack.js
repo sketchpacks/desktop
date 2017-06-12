@@ -41,6 +41,7 @@ export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 //- State
 
 const initialState = {
+  overwatch: true,
   isLocked: false,
   isImporting: false,
   isLoaded: false,

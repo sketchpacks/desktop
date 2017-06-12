@@ -172,9 +172,9 @@ ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, plugins) => {
   queueUpdate(plugins)
 })
 
-ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
-  log.debug(UNINSTALL_PLUGIN_REQUEST, arg)
-  queueRemove([arg])
+ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, plugins) => {
+  log.debug(UNINSTALL_PLUGIN_REQUEST, plugins)
+  queueRemove(plugins)
 })
 
 
@@ -347,12 +347,17 @@ const queueUpdate = (plugins) => {
 }
 
 const queueRemove = (plugins) => {
-  if (typeof plugins === undefined) return
-  if (plugins.length === 0) return
+  const items = [].concat(plugins)
 
-  log.debug(`Enqueueing ${plugins.length} plugins`)
-  plugins.map(plugin => workQueue.push({ action: 'remove', payload: plugin }, (err, result) => {
-    if (err) return
+  if (typeof items === undefined) return
+  if (items.length === 0) return
+
+  log.debug(`Enqueueing ${items.length} plugins`)
+  items.map(plugin => workQueue.push({ action: 'remove', payload: plugin }, (err, result) => {
+    if (err) {
+      log.error(err)
+      return
+    }
     log.debug('Uninstall complete', result)
     mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, result)
   }))

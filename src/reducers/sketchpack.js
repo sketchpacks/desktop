@@ -25,7 +25,7 @@ import {
 //- Actions
 
 export const syncSketchpackRequest = createAction('sketchpack/SYNC_REQUEST')
-export const syncSketchpackSuccess = createAction('sketchpack/SYNC_SUCCESS')
+export const syncSketchpackSuccess = createAction('sketchpack/SYNC_SUCCESS', (payload) => payload, (_,meta) => meta)
 export const syncSketchpackError = createAction('sketchpack/SYNC_ERROR')
 
 export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE', (payload) => payload, (_,meta) => meta)
@@ -43,6 +43,7 @@ export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 const initialState = {
   isLocked: false,
   isImporting: false,
+  isLoaded: false,
   plugins: {
     allIdentifiers: [],
     byIdentifier: {}
@@ -64,12 +65,15 @@ export default handleActions({
           ...state.byIdentifier,
           ...action.payload.plugins
         },
-        allIdentifiers: uniq(
-          state.plugins.allIdentifiers.concat(
-            Object.keys(action.payload.plugins)
-          )
-        )
+        allIdentifiers: uniq(Object.keys(action.payload.plugins))
       }
+    }
+  },
+
+  [syncSketchpackSuccess]: (state, action) => {
+    return {
+      ...state,
+      isLoaded: true,
     }
   },
 
@@ -100,12 +104,13 @@ export default handleActions({
       }
     )
 
-    if (plugins.length === 0) {
-      return state
-    }
+    if (plugins.length === 0) return state
+
+    if (state.isLocked) return state
 
     return {
       ...state,
+      isLoaded: true,
       plugins: {
         ...state.plugins,
         byIdentifier: {
@@ -155,7 +160,8 @@ export default handleActions({
 
   [importSketchpackSuccess]: (state,action) => ({
     ...state,
-    isImporting: false
+    isImporting: false,
+    isLoaded: true
   }),
 
   [importSketchpackError]: (state,action) => ({

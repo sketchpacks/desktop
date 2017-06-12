@@ -40,10 +40,6 @@ const sketchpackMiddleware = store => next => action => {
 
   if (store.getState().sketchpack.isLocked) return
 
-  if (!isEqual(prevSketchpack.byIdentifier,nextSketchpack.byIdentifier)) {
-    store.dispatch(exportSketchpackRequest(sketchpackPath))
-  }
-
   const addedPlugins = difference(prevSketchpack.allIdentifiers,nextSketchpack.allIdentifiers)
   const removedPlugins = difference(nextSketchpack.allIdentifiers,prevSketchpack.allIdentifiers)
 

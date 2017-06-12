@@ -171,7 +171,8 @@ ipcRenderer.on('sketchpack/SYNC_REQUEST', (evt,contents) => {
   store.dispatch(syncSketchpackRequest(contents))
 })
 
-ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,plugin) => {
+ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,identifiers) => {
+  store.dispatch('registry/IDENTIFY_PLUGIN_REQUEST', identifiers)
   ipcRenderer.send(INSTALL_PLUGIN_REQUEST,plugin)
 })
 

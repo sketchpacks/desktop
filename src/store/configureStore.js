@@ -17,6 +17,7 @@ import sketchpackMiddleware from 'middleware/sketchpack'
 import exportMiddleware from 'middleware/export'
 import importMiddleware from 'middleware/import'
 import notificationMiddleware from 'middleware/notification'
+import syncMiddleware from 'middleware/sync'
 
 import sagas from 'sagas'
 
@@ -33,6 +34,7 @@ const enhancer = composeEnhancers(
     sagaMiddleware,
     routerMiddleware((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory),
     thunk.withExtraArgument({ api: SketchpacksApi }),
+    syncMiddleware,
     logger,
     importMiddleware,
     exportMiddleware,

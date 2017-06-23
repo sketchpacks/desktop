@@ -45,6 +45,8 @@ import PluginDetails from 'views/PluginDetails'
 import UserProfile from 'views/UserProfile'
 import UserPlugins from 'views/UserPlugins'
 
+import Preferences from 'views/Preferences'
+
 import { appInstall } from 'actions'
 
 import {
@@ -103,6 +105,8 @@ export const render = () => {
           <Route path="library/managed" component={ManagedPlugins} />
           <Route path="library/unmanaged" component={UnmanagedPlugins} />
           <Route path="library/updates" component={UpdatedPlugins} />
+
+          <Route path="preferences" component={Preferences} />
         </Route>
       </Router>
     </Provider>,

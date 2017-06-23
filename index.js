@@ -457,7 +457,10 @@ ipcMain.on('SELECT_FILE', (event, caller) => {
     }, (filePaths) => {
       if (filePaths) {
         try {
-          mainWindow.webContents.send(caller, filePaths)
+          mainWindow.webContents.send('SET_PREFERENCE', {
+            path: 'syncing.sketchpack_path',
+            value: filePaths[0]
+          })
         } catch (err) {
           log.error(err)
         }

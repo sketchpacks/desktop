@@ -196,3 +196,7 @@ export const checkPluginLockState = createSelector(
     }
   }
 )
+
+export const getPreferences = createSelector(
+  [ getStateTree ], (state) => state.preferences
+)

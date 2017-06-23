@@ -9,7 +9,7 @@ const writePreferences = (filepath, contents, callback) => {
   }
 
   const data = Object.assign({},
-    initialState,
+    ...initialState,
     contents
   )
 

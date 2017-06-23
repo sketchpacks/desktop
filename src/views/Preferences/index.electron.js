@@ -1,3 +1,5 @@
+const { ipcRenderer } = require('electron')
+
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
@@ -7,9 +9,17 @@ class Preferences extends Component {
   }
 
   render () {
+    console.log(this.props.preferences)
+
     return (
       <div style={{position: 'relative'}}>
         <h1>Preferences</h1>
+
+        <button
+          onClick={() => ipcRenderer.send('SELECT_FILE', 'PREFERENCE_SET_SKETCHPACK')
+        }>
+          Change location
+        </button>
       </div>
     )
   }

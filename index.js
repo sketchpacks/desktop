@@ -444,6 +444,30 @@ ipcMain.on('sketchpack/EXPORT_REQUEST', (event, args) => {
   }
 })
 
+ipcMain.on('SELECT_FILE', (event, caller) => {
+  try {
+    dialog.showOpenDialog(null, {
+      properties: ['openFile'],
+      filters: [
+        {
+          name: 'Sketchpack',
+          extensions: ['sketchpack']
+        }
+      ]
+    }, (filePaths) => {
+      if (filePaths) {
+        try {
+          mainWindow.webContents.send(caller, filePaths)
+        } catch (err) {
+          log.error(err)
+        }
+      }
+    })
+  } catch (err) {
+    log.error(err)
+  }
+})
+
 process.on('uncaughtException', (err) => {
   log.error(err)
 })

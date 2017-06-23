@@ -31,6 +31,13 @@ const settingsMenu = [
   },
 
   {
+    label: 'Preferences',
+    click(item, window, event) {
+      window.webContents.send('NAVIGATE_TO', {path: '/preferences'})
+    },
+  },
+
+  {
     label: 'Launch at startup',
     type: 'checkbox',
     click(item, window, event) {

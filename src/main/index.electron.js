@@ -86,6 +86,10 @@ import {
   exportSketchpackRequest
 } from 'reducers/sketchpack'
 
+import {
+  setPreference
+} from 'reducers/preferences'
+
 let store = configureStore()
 const history = syncHistoryWithStore((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory, store)
 
@@ -268,6 +272,15 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
       }
     }
   }))
+})
+
+ipcRenderer.on('NAVIGATE_TO', (evt, args) => {
+  store.dispatch(push(args.path))
+})
+
+
+ipcRenderer.on('SET_PREFERENCE', (evt, preference) => {
+  store.dispatch(setPreference(preference))
 })
 
 

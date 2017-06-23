@@ -1,6 +1,8 @@
-import { set }
+import { set } from 'lodash'
 
 import { createAction, handleActions } from 'redux-actions'
+
+import { getInstallPath } from 'lib/utils'
 
 //- Actions
 //-
@@ -9,7 +11,10 @@ export const setPreference = createAction('preference/SET', (payload) => payload
 //- State
 
 const initialState = {
-  syncing: {}
+  syncing: {},
+  plugins: {
+    install_directory: getInstallPath()
+  }
 }
 
 

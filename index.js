@@ -26,7 +26,8 @@ const {
   protocol,
   Menu,
   ipcMain,
-  ipcRenderer
+  ipcRenderer,
+  globalShortcut
 } = electron
 const url = require('url')
 const log = require('electron-log')
@@ -100,6 +101,10 @@ let sketchpackWatcher
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
+
+  globalShortcut.register('CommandOrControl+,', () => {
+    mainWindow.webContents.send('NAVIGATE_TO', {path: '/preferences'})
+  })
 })
 
 menuBar.on('after-show', () => {

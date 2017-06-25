@@ -62,6 +62,7 @@ const {
 
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
+const readPreferences = require('./src/lib/readPreferences')
 const readManifest = require('./src/lib/readManifest')
 
 const {
@@ -567,8 +568,10 @@ const watchSketchpack = (watchPath) => {
 }
 
 setTimeout(() => {
-  const librarySketchpackPath = path.join(app.getPath('userData'),'my-library.sketchpack')
-  watchSketchpack(librarySketchpackPath)
+  readPreferences(path.join(app.getPath('userData'),'preferences.json'))
+    .then(contents => {
+      watchSketchpack(contents.syncing.sketchpack_path)
+    })
 }, 1000)
 
 setTimeout(() => {

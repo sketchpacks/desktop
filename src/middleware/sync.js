@@ -8,7 +8,6 @@ const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
 
 import {
   getSketchpackIdentifiers,
-  syncSketchpackContents,
   selectPluginBasics
 } from 'reducers'
 

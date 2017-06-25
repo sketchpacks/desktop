@@ -1,10 +1,17 @@
 import path from 'path'
-import electron from 'electron'
 import { set } from 'lodash'
+
+import electron from 'electron'
 
 import { createAction, handleActions } from 'redux-actions'
 
+import readSketchpack from 'lib/readSketchpack'
 import { getInstallPath } from 'lib/utils'
+
+import {
+  syncSketchpackRequest,
+  importSketchpackRequest
+} from 'reducers/sketchpack'
 
 //- Actions
 
@@ -15,7 +22,12 @@ export const setPreferenceError = createAction('preferences/UPDATE_ERROR')
 export const setPreference = ({ path, value }) => (dispatch,getState) => {
   dispatch(setPreferenceRequest({ path, value }))
 
-  dispatch(setPreferenceSuccess())
+  readSketchpack(value)
+    .then(contents => {
+      dispatch(importSketchpackRequest(contents))
+      // dispatch(setPreferenceSuccess())
+    })
+
 }
 
 //- State
@@ -36,8 +48,6 @@ export const initialState = {
 
 
 //- Reducers
-
-
 
 export default handleActions({
   [setPreferenceRequest]: (state, action) => ({

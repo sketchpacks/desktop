@@ -18,6 +18,7 @@ import log from 'electron-log'
 import firstRun from 'first-run'
 import path from 'path'
 
+import readPreferences from 'lib/readPreferences'
 import readSketchpack from 'lib/readSketchpack'
 
 import ms from 'ms'
@@ -91,7 +92,12 @@ import {
 } from 'reducers/preferences'
 
 let store = configureStore()
-const history = syncHistoryWithStore((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory, store)
+const history = syncHistoryWithStore(
+  (__PRODUCTION__ && __ELECTRON__)
+    ? hashHistory
+    : browserHistory,
+  store
+)
 
 export const render = () => {
   ReactDOM.render(
@@ -121,18 +127,31 @@ export const render = () => {
 
   ipcRenderer.send('APP_WINDOW_OPEN', null)
 
-  loadSketchpack()
+  loadPreferences()
 
   store.dispatch(push(`/browse/newest?page=1&sort=score%3Adesc`))
 }
 
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true }))
 
-const loadSketchpack = () => {
-  const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')
+const loadPreferences = () => {
+  const preferencesPath = path.join(remote.app.getPath('userData'), 'preferences.json')
+
+  readPreferences(preferencesPath)
+    .then(contents => {
+      store.dispatch(
+        setPreference({
+          path: 'syncing.sketchpack_path',
+          value: contents.syncing.sketchpack_path
+        })
+      )
+      loadSketchpack(contents.syncing.sketchpack_path)
+    })
+}
+
+const loadSketchpack = (sketchpackPath) => {
   readSketchpack(sketchpackPath)
     .then(contents => store.dispatch(syncSketchpackRequest(contents)))
-
 }
 
 

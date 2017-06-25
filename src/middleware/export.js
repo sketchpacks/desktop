@@ -1,11 +1,14 @@
 import { reduce, pick } from 'lodash'
-import writeSketchpack from 'lib/writeSketchpack'
-import { exportSketchpackRequest, exportSketchpackSuccess } from 'reducers/sketchpack'
 
-const {
-  getSketchpackIdentifiers,
-  syncSketchpackContents
-} = require('reducers')
+import writeSketchpack from 'lib/writeSketchpack'
+
+import { getSketchpackIdentifiers } from 'reducers'
+
+import {
+  exportSketchpackRequest,
+  exportSketchpackSuccess
+} from 'reducers/sketchpack'
+
 
 const exportMiddleware = store => next => action => {
   next(action)

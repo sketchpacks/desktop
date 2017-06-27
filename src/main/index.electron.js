@@ -145,13 +145,7 @@ const loadPreferences = () => {
           value: contents.syncing.sketchpack_path
         })
       )
-      loadSketchpack(contents.syncing.sketchpack_path)
     })
-}
-
-const loadSketchpack = (sketchpackPath) => {
-  readSketchpack(sketchpackPath)
-    .then(contents => store.dispatch(syncSketchpackRequest(contents)))
 }
 
 

@@ -16,9 +16,9 @@ import {
   installPluginRequest
 } from 'reducers/library'
 
-import {
-  setVersionLock
-} from 'lib/VersionLock'
+import { setPreferenceSuccess } from 'reducers/preferences'
+
+import { setVersionLock } from 'lib/VersionLock'
 
 
 
@@ -41,10 +41,10 @@ export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 //- State
 
 const initialState = {
-  overwatch: true,
   isLocked: false,
   isImporting: false,
   isLoaded: false,
+  name: "My Library",
   plugins: {
     allIdentifiers: [],
     byIdentifier: {}
@@ -74,7 +74,16 @@ export default handleActions({
   [syncSketchpackSuccess]: (state, action) => {
     return {
       ...state,
-      isLoaded: true,
+      isLoaded: true
+    }
+  },
+
+  [setPreferenceSuccess]: (state, action) => {
+    if (!has(action, 'payload.path')) return state
+
+    return {
+      ...state,
+      isLoaded: action.payload.path === 'syncing.sketchpack_path'
     }
   },
 

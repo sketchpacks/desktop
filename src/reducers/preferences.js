@@ -22,12 +22,15 @@ export const setPreferenceError = createAction('preferences/UPDATE_ERROR')
 export const setPreference = ({ path, value }) => (dispatch,getState) => {
   dispatch(setPreferenceRequest({ path, value }))
 
-  readSketchpack(value)
-    .then(contents => {
-      dispatch(importSketchpackRequest(contents))
-      // dispatch(setPreferenceSuccess())
-    })
+  if (path === 'syncing.sketchpack_path') {
+    readSketchpack(value)
+      .then(contents => {
+        dispatch(syncSketchpackRequest(contents))
+        // dispatch(importSketchpackRequest(contents))
+      })
+  }
 
+  dispatch(setPreferenceSuccess({ path, value }))
 }
 
 //- State

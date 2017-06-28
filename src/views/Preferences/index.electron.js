@@ -2,8 +2,13 @@ const { ipcRenderer } = require('electron')
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { syncHistoryWithStore,goBack } from 'react-router-redux'
 
 import { getPreferences } from 'reducers'
+
+import SVGIcon from 'components/SVGIcon'
+
+import './preferences.scss'
 
 class Preferences extends Component {
   constructor (props) {
@@ -12,11 +17,22 @@ class Preferences extends Component {
 
   render () {
     return (
-      <div style={{position: 'relative'}}>
+      <div className="preferences">
         <h1>Preferences</h1>
 
-        <strong>Sketchpack Sync</strong>
-        <p>{this.props.preferences.syncing.sketchpack_path}</p>
+        <a
+          href="#"
+          className={'preferences-close'}
+          onClick={() => this.props.dispatch(goBack())}>
+          <SVGIcon icon={'x'} shape={'polygon'} size={'24'} />
+        </a>
+
+        <h2>Syncing</h2>
+        <p className="preference-description">Sync your managed library with your sketchpack located at:</p>
+
+        <div className="preference-preview">
+          { this.props.preferences.syncing.sketchpack_path }
+        </div>
 
         <button
           onClick={() => ipcRenderer.send('SELECT_FILE', 'PREFERENCE_SET_SKETCHPACK')

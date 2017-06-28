@@ -103,6 +103,8 @@ export const render = () => {
   ReactDOM.render(
     <Provider store={store}>
       <Router history={history}>
+        <Route path="/preferences" component={Preferences} />
+
         <Route path="/" component={App}>
           <IndexRoute component={BrowsePlugins} />
           <Route path="browse" component={BrowsePlugins} />
@@ -115,8 +117,6 @@ export const render = () => {
           <Route path="library/managed" component={ManagedPlugins} />
           <Route path="library/unmanaged" component={UnmanagedPlugins} />
           <Route path="library/updates" component={UpdatedPlugins} />
-
-          <Route path="preferences" component={Preferences} />
         </Route>
       </Router>
     </Provider>,
@@ -147,6 +147,10 @@ const loadPreferences = () => {
       )
     })
 }
+
+ipcRenderer.on('GO_BACK', (evt,args) => {
+  browserHistory.goBack()
+})
 
 
 ipcRenderer.on('sketchpack/IMPORT', (evt,contents) => {

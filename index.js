@@ -533,6 +533,16 @@ const watchLibrary = (watchPath) => {
     .on('ready', onWatcherReady)
 }
 
+ipcMain.on('sketchpack/CHANGE', (event, arg) => {
+  sketchpackWatcher.close()
+
+  sketchpackWatcher = ''
+
+  watchSketchpack(arg)
+
+  log.info('sketchpack/CHANGE', sketchpackWatcher.getWatched())
+})
+
 const watchSketchpack = (watchPath) => {
   log.debug('Watching Sketchpack at ', watchPath)
   sketchpackWatcher = chokidar.watch(watchPath, {

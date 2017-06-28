@@ -2,6 +2,7 @@ import path from 'path'
 import { set } from 'lodash'
 
 import electron from 'electron'
+import { ipcRenderer } from 'electron'
 
 import { createAction, handleActions } from 'redux-actions'
 
@@ -25,6 +26,7 @@ export const setPreference = ({ path, value }) => (dispatch,getState) => {
   if (path === 'syncing.sketchpack_path') {
     readSketchpack(value)
       .then(contents => {
+        ipcRenderer.send('sketchpack/CHANGE', value)
         dispatch(syncSketchpackRequest(contents))
         // dispatch(importSketchpackRequest(contents))
       })

@@ -1,45 +1,47 @@
 import { ipcRenderer } from 'electron'
 import { installPluginRequest } from 'actions/plugin_manager'
-import { difference,without,includes } from 'lodash'
+import { difference,without,includes,has,uniq,xor } from 'lodash'
 import writeSketchpack from 'lib/writeSketchpack'
-import { exportSketchpackRequest,exportSketchpackSuccess,syncSketchpackSuccess } from 'reducers/sketchpack'
-
-const INSTALL_PLUGIN_REQUEST = 'manager/INSTALL_REQUEST'
+import {
+  exportSketchpackRequest,
+  exportSketchpackSuccess,
+  syncSketchpackRequest,
+  syncSketchpackSuccess
+} from 'reducers/sketchpack'
 
 import {
   getSketchpackIdentifiers,
-  selectPluginBasics
+  selectPluginBasics,
+  getManagedPlugins
 } from 'reducers'
 
 import { installPlugin,removePlugin } from 'reducers/library'
 
 const syncMiddleware = store => next => action => {
-  const prevIdentifiers = Object.keys(store.getState().sketchpack.plugins.byIdentifier)
+  const prevIdentifiers = store.getState().sketchpack.plugins.allIdentifiers
+
+
   next(action)
 
-  const overwatchEnabled = store.getState().sketchpack.overwatch
+  const managedIdentifiers = getManagedPlugins(store.getState())
+  const nextIdentifiers = store.getState().sketchpack.plugins.allIdentifiers
 
-  const nextIdentifiers = Object.keys(store.getState().sketchpack.plugins.byIdentifier)
-
-  const currentLibrary = Object.keys(store.getState().library.plugins.allIdentifiers)
-
-  if (!overwatchEnabled) return
-
-  if (action.type !== 'sketchpack/SYNC_REQUEST') return
-
-  const addedIdentifiers = difference(nextIdentifiers,prevIdentifiers)
-  const removedIdentifiers = difference(prevIdentifiers,nextIdentifiers)
-
-  const installablePlugins = without(addedIdentifiers,currentLibrary)
+  if (action.type !== syncSketchpackRequest.toString()) return
 
   if (!store.getState().sketchpack.isLoaded) return
 
-  if ((installablePlugins.length > 0) && without(installablePlugins,store.getState().queue.installing)) {
+  const addedIdentifiers = difference(nextIdentifiers,prevIdentifiers)
+  const removedIdentifiers = difference(prevIdentifiers,nextIdentifiers)
+  const installablePlugins = difference(addedIdentifiers,managedIdentifiers)
+
+  if (installablePlugins.length > 0) {
     installPlugin(installablePlugins)
   }
 
-  if ((removedIdentifiers.length > 0) && without(removedIdentifiers,store.getState().queue.uninstalling)) {
-    removePlugin(removedIdentifiers.map(id => selectPluginBasics(store.getState(),id)))
+  if (removedIdentifiers.length > 0) {
+    removePlugin(
+      removedIdentifiers.map(id => selectPluginBasics(store.getState(),id))
+    )
   }
 
   store.dispatch(

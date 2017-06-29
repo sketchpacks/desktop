@@ -28,7 +28,7 @@ class Preferences extends Component {
         </a>
 
         <h2>Syncing</h2>
-        <p className="preference-description">Sync your managed library with your sketchpack located at:</p>
+        <p className="preference-description">Currently synced with <strong>{ this.props.sketchpack.name }</strong> located at:</p>
 
         <div className="preference-preview">
           { this.props.preferences.syncing.sketchpack_path }
@@ -52,6 +52,7 @@ const mapDispatchToProps = (dispatch) => {
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    sketchpack: state.sketchpack,
     preferences: getPreferences(state)
   }
 }

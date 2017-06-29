@@ -38,7 +38,7 @@ const sketchpackMiddleware = store => next => action => {
     prevSketchpack.allIdentifiers
   )
 
-  if ((addedPlugins.length > 0) || (removedPlugins.length > 0)) {
+  if (!isEqual(prevSketchpack,nextSketchpack)) {
     store.dispatch(
       exportSketchpackRequest(store.getState().preferences.syncing.sketchpack_path)
     )

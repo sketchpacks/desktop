@@ -40,7 +40,7 @@ const sketchpackMiddleware = store => next => action => {
 
   if (!isEqual(prevSketchpack,nextSketchpack)) {
     store.dispatch(
-      exportSketchpackRequest(store.getState().preferences.syncing.sketchpack_path)
+      exportSketchpackRequest(store.getState().preferences.sketchpack.location)
     )
   }
 }

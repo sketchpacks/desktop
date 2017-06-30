@@ -1,12 +1,12 @@
 module.exports = {
   __PRODUCTION__: (typeof process !== "undefined")
     && (typeof process.execPath !== "undefined")
-    && (process.execPath.search('electron-prebuilt') === -1)
+    && (process.execPath.search('electron') === -1)
     || false,
 
   __DEVELOPMENT__: (typeof process !== "undefined")
     && (typeof process.execPath !== "undefined")
-    && (process.execPath.search('electron-prebuilt') !== -1)
+    && (process.execPath.search('electron') !== -1)
     || false,
 
   __ELECTRON__: (typeof process !== "undefined")

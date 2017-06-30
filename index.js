@@ -464,7 +464,7 @@ ipcMain.on('SELECT_FILE', (event, caller) => {
       if (filePaths) {
         try {
           mainWindow.webContents.send('SET_PREFERENCE', {
-            path: 'syncing.sketchpack_path',
+            path: 'sketchpack.location',
             value: filePaths[0]
           })
         } catch (err) {
@@ -584,9 +584,7 @@ const watchSketchpack = (watchPath) => {
 
 setTimeout(() => {
   readPreferences(path.join(app.getPath('userData'),'preferences.json'))
-    .then(contents => {
-      watchSketchpack(contents.syncing.sketchpack_path)
-    })
+    .then(contents => watchSketchpack(contents.sketchpack.location))
 }, 1000)
 
 setTimeout(() => {

@@ -60,6 +60,8 @@
 
 .is-visible { display: block; }
 
+.is-hidden { display: none; }
+
 .container--padded-top {
   padding-top: getSize("large");
 }

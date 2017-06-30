@@ -2,6 +2,11 @@
   padding: 3.2rem;
   position: relative;
 
+  hr {
+    border-color: #dedede;
+    margin: 2.4rem 0;
+  }
+
   h1 {
     font-size: 1.4rem;
     line-height: 4;
@@ -16,6 +21,12 @@
     font-weight: 200;
     letter-spacing: 0.1rem;
     margin-bottom: 0.8rem;
+  }
+
+  h3 {
+    font-size: 2.0rem;
+    font-weight: 400;
+    margin-bottom: 0.4rem;
   }
 
   a {
@@ -43,5 +54,10 @@
     border: 1px solid #dedede;
     border-radius: 0.4rem;
     margin-bottom: 0.8rem;
+  }
+
+  &-children {
+    margin-top: 2.0rem;
+    margin-left: 4.0rem;
   }
 }

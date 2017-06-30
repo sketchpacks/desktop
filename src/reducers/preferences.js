@@ -16,6 +16,8 @@ import {
 
 //- Actions
 
+export const loadPreferences = createAction('preferences/LOAD', (payload) => payload, (_,meta) => meta)
+
 export const setPreferenceRequest = createAction('preferences/UPDATE_REQUEST')
 export const setPreferenceSuccess = createAction('preferences/UPDATE_SUCCESS', (payload) => payload, (_,meta) => meta)
 export const setPreferenceError = createAction('preferences/UPDATE_ERROR')
@@ -23,14 +25,12 @@ export const setPreferenceError = createAction('preferences/UPDATE_ERROR')
 export const setPreference = ({ path, value }) => (dispatch,getState) => {
   dispatch(setPreferenceRequest({ path, value }))
 
-  if (path === 'syncing.sketchpack_path') {
-    readSketchpack(value)
-      .then(contents => {
-        ipcRenderer.send('sketchpack/CHANGE', value)
-        dispatch(syncSketchpackRequest(contents))
-        // dispatch(importSketchpackRequest(contents))
-      })
-  }
+  readSketchpack(value)
+    .then(contents => {
+      ipcRenderer.send('sketchpack/CHANGE', value)
+      dispatch(syncSketchpackRequest(contents))
+      // dispatch(importSketchpackRequest(contents))
+    })
 
   dispatch(setPreferenceSuccess({ path, value }))
 }
@@ -43,8 +43,12 @@ const defaultSketchpack = path.join(
 )
 
 export const initialState = {
+  sketchpack: {
+    location: defaultSketchpack
+  },
   syncing: {
-    sketchpack_path: defaultSketchpack
+    enabled: false,
+    overwatch: false
   },
   plugins: {
     install_directory: getInstallPath()
@@ -58,5 +62,10 @@ export default handleActions({
   [setPreferenceRequest]: (state, action) => ({
     ...state,
     ...set(state, action.payload.path, action.payload.value)
+  }),
+
+  [loadPreferences]: (state, action) => ({
+    ...state,
+    ...action.payload
   })
 }, initialState)

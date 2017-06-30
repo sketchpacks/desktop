@@ -88,6 +88,7 @@ import {
 } from 'reducers/sketchpack'
 
 import {
+  loadPreferences,
   setPreference
 } from 'reducers/preferences'
 
@@ -127,25 +128,18 @@ export const render = () => {
 
   ipcRenderer.send('APP_WINDOW_OPEN', null)
 
-  loadPreferences()
+  loadCachedPreferences()
 
   store.dispatch(push(`/browse/newest?page=1&sort=score%3Adesc`))
 }
 
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true }))
 
-const loadPreferences = () => {
+const loadCachedPreferences = () => {
   const preferencesPath = path.join(remote.app.getPath('userData'), 'preferences.json')
 
   readPreferences(preferencesPath)
-    .then(contents => {
-      store.dispatch(
-        setPreference({
-          path: 'syncing.sketchpack_path',
-          value: contents.syncing.sketchpack_path
-        })
-      )
-    })
+    .then(contents => store.dispatch(loadPreferences(contents)))
 }
 
 ipcRenderer.on('GO_BACK', (evt,args) => {

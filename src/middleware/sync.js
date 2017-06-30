@@ -20,7 +20,6 @@ import { installPlugin,removePlugin } from 'reducers/library'
 const syncMiddleware = store => next => action => {
   const prevIdentifiers = store.getState().sketchpack.plugins.allIdentifiers
 
-
   next(action)
 
   const managedIdentifiers = getManagedPlugins(store.getState())
@@ -30,6 +29,8 @@ const syncMiddleware = store => next => action => {
 
   if (!store.getState().sketchpack.isLoaded) return
 
+  if (!store.getState().preferences.syncing.enabled) return
+
   const addedIdentifiers = difference(nextIdentifiers,prevIdentifiers)
   const removedIdentifiers = difference(prevIdentifiers,nextIdentifiers)
   const installablePlugins = difference(addedIdentifiers,managedIdentifiers)
@@ -38,7 +39,7 @@ const syncMiddleware = store => next => action => {
     installPlugin(installablePlugins)
   }
 
-  if (removedIdentifiers.length > 0) {
+  if ((removedIdentifiers.length > 0) && (store.getState().preferences.syncing.overwatch)) {
     removePlugin(
       removedIdentifiers.map(id => selectPluginBasics(store.getState(),id))
     )

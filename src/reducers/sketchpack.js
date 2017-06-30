@@ -83,7 +83,7 @@ export default handleActions({
 
     return {
       ...state,
-      isLoaded: action.payload.path === 'syncing.sketchpack_path'
+      isLoaded: action.payload.path === 'sketchpack.location'
     }
   },
 

@@ -1,5 +1,5 @@
 .preferences {
-  padding: 3.2rem;
+  padding: 3.2rem 6.4rem;
   position: relative;
 
   hr {
@@ -34,7 +34,7 @@
   }
 
   &-close {
-    position: absolute;
+    position: fixed;
     top: 1.6rem;
     right: 1.6rem;
   }

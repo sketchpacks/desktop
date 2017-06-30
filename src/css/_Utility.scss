@@ -47,6 +47,12 @@
   margin-left: getSize("large");
 }
 
+
+.u-mar-bottom-x-small {
+  margin-bottom: getSize("x-small");
+}
+
+
 .spaced-between {
   display: flex;
   flex-direction: column;

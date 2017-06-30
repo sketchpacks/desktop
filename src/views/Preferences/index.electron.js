@@ -33,8 +33,9 @@ class Preferences extends Component {
         </a>
 
         <h2>Sketchpack</h2>
-        <p className="preference-description">Manage plugins using <strong>{ this.props.sketchpack.name }</strong> located at:</p>
+        <p>Plugins defined in the sketchpack are added to Managed Library</p>
 
+        <p className="preference-description">Manage plugins using the sketchpack located at:</p>
         <div className="preference-preview">
           { preferences.sketchpack.location }
         </div>
@@ -47,10 +48,13 @@ class Preferences extends Component {
 
         <hr />
 
-        <div className="o-media">
+        <h2>Shared Libraries</h2>
+        <p>Sync your Managed Library across multiple teams</p>
+
+        <div className="o-media u-mar-bottom-x-small">
           <div className="o-media__content">
-            <h2>Syncing</h2>
-            <p className="preference-description">Automatically install plugins added to <strong>{ this.props.sketchpack.name }</strong></p>
+            <h3>Installing plugins</h3>
+            <p className="preference-description">Automatically install plugins added to your sketchpack</p>
           </div>
 
           <div className="o-media__right">
@@ -78,38 +82,35 @@ class Preferences extends Component {
           </div>
         </div>
 
-        <div className={preferences.syncing.enabled ? "preference-children" : "preference-children is-hidden"}>
-          <div className="o-media">
-            <div className="o-media__content">
-              <h3>Overwatch</h3>
-              <p className="preference-description">Automatically uninstall plugins removed from <strong>{ this.props.sketchpack.name }</strong></p>
-            </div>
+        <div className="o-media">
+          <div className="o-media__content">
+            <h3>Removing plugins</h3>
+            <p className="preference-description">Automatically uninstall plugins removed from your sketchpack</p>
+          </div>
 
-            <div className="o-media__right">
-              <Switch
-                checked={preferences.syncing.overwatch}
-                disabled={!preferences.syncing.enabled}
-                onChange={(value) => {
-                    dispatch(
-                      setPreference({
-                        path: 'syncing.overwatch',
-                        value
-                      })
-                    )
-
-                    dispatch({
-                      type: 'behavior_tracking',
-                      meta: {
-                        mixpanel: {
-                          eventName: 'Manage',
-                          type: value ? 'Overwatch Enabled' : 'Overwatch Disabled'
-                        }
-                      }
+          <div className="o-media__right">
+            <Switch
+              checked={preferences.syncing.overwatch}
+              onChange={(value) => {
+                  dispatch(
+                    setPreference({
+                      path: 'syncing.overwatch',
+                      value
                     })
-                  }
+                  )
+
+                  dispatch({
+                    type: 'behavior_tracking',
+                    meta: {
+                      mixpanel: {
+                        eventName: 'Manage',
+                        type: value ? 'Overwatch Enabled' : 'Overwatch Disabled'
+                      }
+                    }
+                  })
                 }
-              />
-            </div>
+              }
+            />
           </div>
         </div>
 

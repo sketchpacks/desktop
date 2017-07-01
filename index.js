@@ -82,7 +82,9 @@ const opts = {
   icon: __dirname + '/src/IconTemplate.png',
   width: 720,
   height: 540,
-  index: (__PRODUCTION__ && __ELECTRON__) ? `file://${__dirname}/src/dist/index.html` : `http://localhost:${SERVER_PORT}/`,
+  index: (__PRODUCTION__ && __ELECTRON__)
+    ? `file://${__dirname}/src/dist/index.html`
+    : `http://localhost:${SERVER_PORT}/`,
   resizable: false,
   alwaysOnTop: false,
   showOnAllWorkspaces: true,

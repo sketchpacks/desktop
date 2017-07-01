@@ -136,7 +136,10 @@ export const render = () => {
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true }))
 
 const loadCachedPreferences = () => {
-  const preferencesPath = path.join(remote.app.getPath('userData'), 'preferences.json')
+  const preferencesPath = path.join(
+    (remote.app).getPath('userData'),
+    'preferences.json'
+  )
 
   readPreferences(preferencesPath)
     .then(contents => store.dispatch(loadPreferences(contents)))

@@ -48,6 +48,108 @@ class Preferences extends Component {
 
         <hr />
 
+        <h3>Default Version Lock</h3>
+        <p>Set your default version range for new plugins</p>
+
+          <div className="o-media">
+            <div className="o-media__left u-mar-right-x-small">
+              <input
+                type="radio"
+                className="preference-radio"
+                value="locked"
+                checked={preferences.sketchpack.defaultLock === "locked"}
+                onChange={(evt) => {
+                  dispatch(
+                    setPreference({
+                      path: 'sketchpack.defaultLock',
+                      value: evt.target.value
+                    })
+                  )
+                }}
+              />
+            </div>
+
+            <div className="o-media__content">
+              <strong>Locked</strong>
+              <p className="preference-description">Plugins are locked by default</p>
+            </div>
+          </div>
+
+          <div className="o-media">
+            <div className="o-media__left u-mar-right-x-small">
+              <input
+                type="radio"
+                className="preference-radio"
+                value="patch"
+                checked={preferences.sketchpack.defaultLock === "patch"}
+                onChange={(evt) => {
+                  dispatch(
+                    setPreference({
+                      path: 'sketchpack.defaultLock',
+                      value: evt.target.value
+                    })
+                  )
+                }}
+              />
+            </div>
+
+            <div className="o-media__content">
+              <strong>Patch-level Lock</strong>
+              <p className="preference-description">Allow patch-level updates by default</p>
+            </div>
+          </div>
+
+          <div className="o-media">
+            <div className="o-media__left u-mar-right-x-small">
+              <input
+                type="radio"
+                className="preference-radio"
+                value="minor"
+                checked={preferences.sketchpack.defaultLock === "minor"}
+                onChange={(evt) => {
+                  dispatch(
+                    setPreference({
+                      path: 'sketchpack.defaultLock',
+                      value: evt.target.value
+                    })
+                  )
+                }}
+              />
+            </div>
+
+            <div className="o-media__content">
+              <strong>Minor-level Lock</strong>
+              <p className="preference-description">Allow minor-level updates by default</p>
+            </div>
+          </div>
+
+          <div className="o-media">
+            <div className="o-media__left u-mar-right-x-small">
+              <input
+                type="radio"
+                className="preference-radio"
+                value="unlocked"
+                checked={preferences.sketchpack.defaultLock === "unlocked"}
+                onChange={(evt) => {
+                  dispatch(
+                    setPreference({
+                      path: 'sketchpack.defaultLock',
+                      value: evt.target.value
+                    })
+                  )
+                }}
+              />
+            </div>
+
+            <div className="o-media__content">
+              <strong>Unlocked</strong>
+              <p className="preference-description">Automatically apply all updates</p>
+            </div>
+          </div>
+
+
+        <hr />
+
         <h2>Shared Libraries</h2>
         <p>Sync your Managed Library across multiple teams</p>
 

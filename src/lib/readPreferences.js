@@ -13,7 +13,8 @@ const defaultSketchpack = path.join(
 
 const initialState = {
   sketchpack: {
-    location: defaultSketchpack
+    location: defaultSketchpack,
+    defaultLock: 'locked'
   },
   syncing: {
     enabled: false,
@@ -27,15 +28,15 @@ const initialState = {
 const readPreferences = (filepath) => new Promise((resolve,reject) => {
   try {
     json5file.readFile(filepath, (err, contents) => {
+      const data = Object.assign({},
+        initialState,
+        contents
+      )
+
       if (err) {
         log.info(err, data)
         resolve(data)
       }
-
-      const data = Object.assign({},
-        initialState,
-        contents
-      )      
 
       log.info('readPreferences',data)
       resolve(data)

@@ -16,7 +16,11 @@ import {
   installPluginRequest
 } from 'reducers/library'
 
-import { setPreferenceSuccess } from 'reducers/preferences'
+import {
+  setPreferenceRequest,
+  setPreferenceSuccess,
+  loadPreferences
+} from 'reducers/preferences'
 
 import { setVersionLock } from 'lib/VersionLock'
 
@@ -44,7 +48,8 @@ const initialState = {
   isLocked: false,
   isImporting: false,
   isLoaded: false,
-  name: "My Library",
+  defaultLock: 'locked',
+  name: 'My Library',
   plugins: {
     allIdentifiers: [],
     byIdentifier: {}
@@ -129,7 +134,10 @@ export default handleActions({
             result[identifier] = {
               version: has(state.plugins.byIdentifier, identifier)
                 ? state.plugins.byIdentifier[identifier].version
-                : setVersionLock({ semver: data.version, lock: 'locked'})
+                : setVersionLock({
+                    semver: data.version,
+                    lock: state.defaultLock
+                  })
             }
             return result
           }, {})
@@ -177,5 +185,21 @@ export default handleActions({
   [importSketchpackError]: (state,action) => ({
     ...state,
     isImporting: false
-  })
+  }),
+
+  [loadPreferences]: (state,action) => ({
+    ...state,
+    defaultLock: action.payload.sketchpack.defaultLock
+  }),
+
+  [setPreferenceRequest]: (state,action) => {
+    if (action.payload.path === "sketchpack.defaultLock") {
+      return {
+        ...state,
+        defaultLock: action.payload.value
+      }
+    } else {
+      return state
+    }
+  }
 }, initialState)

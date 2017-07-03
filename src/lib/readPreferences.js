@@ -2,7 +2,7 @@ const path = require('path')
 const Promise = require('promise')
 const json5file = require('@sketchpacks/json5file')
 const log = require('electron-log')
-const { getInstallPath } = require('../lib/utils')
+const { getInstallPath } = require('./utils')
 
 const electron = require('electron')
 
@@ -26,26 +26,25 @@ const initialState = {
 }
 
 const readPreferences = (filepath) => new Promise((resolve,reject) => {
-  try {
-    json5file.readFile(filepath, (err, contents) => {
-      const data = Object.assign({},
-        initialState,
-        contents
-      )
-
-      if (err) {
-        log.info(err, data)
-        resolve(data)
+  json5file.readFile(filepath, (err, contents) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        log.debug('preferences.json does not exist', err)
       }
 
-      log.info('readPreferences',data)
-      resolve(data)
-    })
-  } catch (err) {
-    log.info(err, data)
-    resolve(data)
-  }
+      reject(err)
+    }
 
+    const data = Object.assign({},
+      initialState,
+      contents
+    )
+
+    log.debug('Parsing default preferences.json', data)
+
+    resolve(data)
+  })
 })
+
 
 module.exports = readPreferences

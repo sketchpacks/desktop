@@ -32,7 +32,6 @@ const {
 const url = require('url')
 const log = require('electron-log')
 const menubar = require('menubar')
-const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
 const {appMenu} = require('./src/menus/appMenu')
@@ -406,28 +405,25 @@ ipcMain.on('sketchpack/IMPORT_REQUEST', (event, args) => {
     ]
   }, (filePaths) => {
     if (filePaths) {
-      try {
-        readSketchpack(filePaths[0])
-          .then(contents => {
-            if (contents.schema_version === "1.0.0") {
-              mainWindow.webContents.send('sketchpack/IMPORT', contents)
-              return
-            } else {
-              const opts = {
-                type: 'info',
-                title: 'Import failed',
-                message: 'Import failed',
-                detail: "Can't import sketchpacks with outdated schema versions",
-                buttons: ['Ok'],
-                defaultId: 0
-              }
-
-              dialog.showMessageBox(opts)
+      readSketchpack(filePaths[0])
+        .then(contents => {
+          if (contents.schema_version === "1.0.0") {
+            mainWindow.webContents.send('sketchpack/IMPORT', contents)
+            return
+          } else {
+            const opts = {
+              type: 'info',
+              title: 'Import failed',
+              message: 'Import failed',
+              detail: "Can't import sketchpacks with outdated schema versions",
+              buttons: ['Ok'],
+              defaultId: 0
             }
-          })
-      } catch (err) {
-        log.error(err)
-      }
+
+            dialog.showMessageBox(opts)
+          }
+        })
+        .catch(err => log.debug(err))
     }
   })
 })
@@ -563,6 +559,7 @@ const watchSketchpack = (watchPath) => {
 
         readSketchpack(watchPath)
           .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
+          .catch(err => log.debug(err))
       }
     })
     .on('change', (watchPath) => {
@@ -571,6 +568,7 @@ const watchSketchpack = (watchPath) => {
 
         readSketchpack(watchPath)
           .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
+          .catch(err => log.debug(err))
       }
     })
     .on('unlink', (watchPath) => {
@@ -585,8 +583,19 @@ const watchSketchpack = (watchPath) => {
 }
 
 setTimeout(() => {
-  readPreferences(path.join(app.getPath('userData'),'preferences.json'))
-    .then(contents => watchSketchpack(contents.sketchpack.location))
+  const preferencesPath = path.join(
+    app.getPath('userData'),
+    'preferences.json'
+  )
+
+  if (fs.existsSync(preferencesPath)) {
+    readPreferences(preferencesPath)
+      .then(contents => {
+        log.debug(contents)
+        watchSketchpack(contents.sketchpack.location)
+      })
+      .catch(err => log.debug(err))
+  }
 }, 1000)
 
 setTimeout(() => {

@@ -14,25 +14,24 @@ const initialState = {
 }
 
 const readSketchpack = (filepath) => new Promise((resolve,reject) => {
-  const data = Object.assign({},
-    initialState,
-    contents
-  )
-
-  try {
-    json5file.readFile(filepath, (err, contents) => {
-      if (err) {
-        log.info(err, data)
-        resolve(data)
+  json5file.readFile(filepath, (err, contents) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        log.debug('my-library.sketchpack does not exist', err)
       }
 
-      log.info('readSketchpack',data)
-      resolve(data)
-    })
-  } catch (err) {
-    log.info(err, data)
+      reject(err)
+    }
+
+    const data = Object.assign({},
+      initialState,
+      contents
+    )
+
+    log.debug('Parsing default my-library.sketchpack', data)
+
     resolve(data)
-  }
+  })
 })
 
 module.exports = readSketchpack

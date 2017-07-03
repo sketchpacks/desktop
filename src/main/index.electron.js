@@ -137,12 +137,18 @@ const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat
 
 const loadCachedPreferences = () => {
   const preferencesPath = path.join(
-    (remote.app).getPath('userData'),
+    remote.app.getPath('userData'),
     'preferences.json'
   )
 
-  readPreferences(preferencesPath)
-    .then(contents => store.dispatch(loadPreferences(contents)))
+  if (fs.existsSync(preferencesPath)) {
+    readPreferences(preferencesPath)
+      .then(contents => {
+        log.debug(contents)
+        store.dispatch(loadPreferences(contents))
+      })
+      .catch(err => log.debug(err))
+  }
 }
 
 ipcRenderer.on('GO_BACK', (evt,args) => {

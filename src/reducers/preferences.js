@@ -31,6 +31,7 @@ export const setPreference = ({ path, value }) => (dispatch,getState) => {
       dispatch(syncSketchpackRequest(contents))
       // dispatch(importSketchpackRequest(contents))
     })
+    .catch(err => log.debug(err))
 
   dispatch(setPreferenceSuccess({ path, value }))
 }

@@ -21,7 +21,7 @@ const initialState = {
     overwatch: false
   },
   plugins: {
-    install_directory: getInstallPath()
+    install_directory: '/Library/Application Support/com.bohemiancoding.sketch3/Plugins'
   }
 }
 

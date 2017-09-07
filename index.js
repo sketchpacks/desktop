@@ -89,7 +89,7 @@ const opts = {
   showOnAllWorkspaces: true,
   preloadWindow: true,
   tooltip: `Sketchpacks ${pkg.version} beta`,
-  backgroundColor: '#f8f9fa',
+  backgroundColor: '#f8f9fa'
 }
 
 const menuBar = menubar(opts)
@@ -105,6 +105,11 @@ menuBar.on('ready', () => {
 
   globalShortcut.register('CommandOrControl+,', () => {
     mainWindow.webContents.send('NAVIGATE_TO', {path: '/preferences'})
+  })
+
+  mainWindow.webContents.on('crashed', (err) => {
+    console.log(`ERROR: ${err}`)
+    log.info(`ERROR: ${err}`)
   })
 })
 

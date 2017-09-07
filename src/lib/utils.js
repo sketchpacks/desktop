@@ -22,7 +22,9 @@ const getInstallPath = () => {
     return IsThere(path.join(HOME_PATH,installPath))
   })
 
-  return path.join(HOME_PATH,installPath).replace(/ /g, '\\ ')
+  log.debug('Install path found: ', installPath)
+
+  return path.join(HOME_PATH,installPath).replace(/ /g, '\ ')
 }
 
 const downloadAsset = (opts) => new Promise((resolve, reject) => {
@@ -124,7 +126,7 @@ const removeAsset = (data) => new Promise((resolve, reject) => {
   const install_dir_path = getInstallPath()
 
   const assetDirectoryPath = difference(
-    install_path.replace(/ /g, '\\ ').split('/'),
+    install_path.replace(/ /g, '\ ').split('/'),
     install_dir_path.split('/')
   )[0]
 

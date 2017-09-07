@@ -46,14 +46,14 @@ const defaultSketchpack = path.join(
 export const initialState = {
   sketchpack: {
     location: defaultSketchpack,
-    defaultLock: 'locked'
+    defaultLock: 'unlocked'
   },
   syncing: {
     enabled: false,
     overwatch: false
   },
   plugins: {
-    install_directory: getInstallPath()
+    install_directory: '/Library/Application Support/com.bohemiancoding.sketch3/Plugins'
   }
 }
 

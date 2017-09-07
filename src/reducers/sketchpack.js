@@ -48,7 +48,7 @@ const initialState = {
   isLocked: false,
   isImporting: false,
   isLoaded: false,
-  defaultLock: 'locked',
+  defaultLock: 'unlocked',
   name: 'My Library',
   plugins: {
     allIdentifiers: [],

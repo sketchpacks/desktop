@@ -18,6 +18,7 @@ import log from 'electron-log'
 import firstRun from 'first-run'
 import path from 'path'
 
+import readPreferences from 'lib/readPreferences'
 import readSketchpack from 'lib/readSketchpack'
 
 import ms from 'ms'
@@ -44,6 +45,8 @@ import PluginDetails from 'views/PluginDetails'
 
 import UserProfile from 'views/UserProfile'
 import UserPlugins from 'views/UserPlugins'
+
+import Preferences from 'views/Preferences'
 
 import { appInstall } from 'actions'
 
@@ -84,13 +87,25 @@ import {
   exportSketchpackRequest
 } from 'reducers/sketchpack'
 
+import {
+  loadPreferences,
+  setPreference
+} from 'reducers/preferences'
+
 let store = configureStore()
-const history = syncHistoryWithStore((__PRODUCTION__ && __ELECTRON__) ? hashHistory : browserHistory, store)
+const history = syncHistoryWithStore(
+  (__PRODUCTION__ && __ELECTRON__)
+    ? hashHistory
+    : browserHistory,
+  store
+)
 
 export const render = () => {
   ReactDOM.render(
     <Provider store={store}>
       <Router history={history}>
+        <Route path="/preferences" component={Preferences} />
+
         <Route path="/" component={App}>
           <IndexRoute component={BrowsePlugins} />
           <Route path="browse" component={BrowsePlugins} />
@@ -113,19 +128,32 @@ export const render = () => {
 
   ipcRenderer.send('APP_WINDOW_OPEN', null)
 
-  loadSketchpack()
+  loadCachedPreferences()
 
   store.dispatch(push(`/browse/newest?page=1&sort=score%3Adesc`))
 }
 
 const autoUpdatePlugins = () => store.dispatch(autoUpdatePluginsRequest({ repeat: true }))
 
-const loadSketchpack = () => {
-  const sketchpackPath = path.join(remote.app.getPath('userData'), 'my-library.sketchpack')
-  readSketchpack(sketchpackPath)
-    .then(contents => store.dispatch(syncSketchpackRequest(contents)))
+const loadCachedPreferences = () => {
+  const preferencesPath = path.join(
+    remote.app.getPath('userData'),
+    'preferences.json'
+  )
 
+  if (fs.existsSync(preferencesPath)) {
+    readPreferences(preferencesPath)
+      .then(contents => {
+        log.debug(contents)
+        store.dispatch(loadPreferences(contents))
+      })
+      .catch(err => log.debug(err))
+  }
 }
+
+ipcRenderer.on('GO_BACK', (evt,args) => {
+  browserHistory.goBack()
+})
 
 
 ipcRenderer.on('sketchpack/IMPORT', (evt,contents) => {
@@ -171,7 +199,8 @@ ipcRenderer.on('sketchpack/SYNC_REQUEST', (evt,contents) => {
   store.dispatch(syncSketchpackRequest(contents))
 })
 
-ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,plugin) => {
+ipcRenderer.on(INSTALL_PLUGIN_REQUEST, (evt,identifiers) => {
+  store.dispatch('registry/IDENTIFY_PLUGIN_REQUEST', identifiers)
   ipcRenderer.send(INSTALL_PLUGIN_REQUEST,plugin)
 })
 
@@ -263,6 +292,15 @@ ipcRenderer.on(UNINSTALL_PLUGIN_SUCCESS, (evt,plugin) => {
       }
     }
   }))
+})
+
+ipcRenderer.on('NAVIGATE_TO', (evt, args) => {
+  store.dispatch(push(args.path))
+})
+
+
+ipcRenderer.on('SET_PREFERENCE', (evt, preference) => {
+  store.dispatch(setPreference(preference))
 })
 
 

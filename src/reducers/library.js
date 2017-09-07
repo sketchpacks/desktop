@@ -5,13 +5,17 @@ import { pick,pickBy,filter,uniq } from 'lodash'
 
 //- Actions
 
-export const installPlugin = createAction('manager/INSTALL_SUCCESS')
 export const detectPlugin = createAction('library/PLUGIN_DETECTED', (payload) => payload, (_,meta) => meta)
 export const identifyPlugin = createAction('registry/IDENTIFY_PLUGINS_SUCCESS', (payload) => payload, (_,meta) => meta)
 
-export const removePlugin = createAction('library/UNINSTALL_PLUGIN', identifier => {
-  ipcRenderer.send('manager/UNINSTALL_REQUEST', identifier)
-  return identifier
+export const installPlugin = createAction('library/INSTALL_PLUGIN', identifiers => {
+  ipcRenderer.send('manager/INSTALL_REQUEST', identifiers)
+  return identifiers
+})
+
+export const removePlugin = createAction('library/UNINSTALL_PLUGIN', identifiers => {
+  ipcRenderer.send('manager/UNINSTALL_REQUEST', identifiers)
+  return identifiers
 })
 
 export const updatePlugin = createAction('library/UPDATE_PLUGIN', plugins => {
@@ -78,18 +82,18 @@ export default handleActions({
     }
   },
 
-  [removePlugin]: (state,action) => ({
+  [uninstallPluginSuccess]: (state,action) => ({
     ...state,
     plugins: {
       ...state.plugins,
       byIdentifier: {
         ...pickBy(
           state.plugins.byIdentifier,
-          (value,key) => key !== action.payload.identifier
+          (value,key) => key !== action.payload
         )
       },
       allIdentifiers: filter(
-        state.plugins.allIdentifiers, p => p !== action.payload.identifier
+        state.plugins.allIdentifiers, p => p !== action.payload
       )
     }
   }),

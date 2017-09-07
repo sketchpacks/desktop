@@ -1,10 +1,12 @@
-const {remote, shell} = require('electron')
-const {Menu, MenuItem} = remote
+const { remote, shell } = require('electron')
+const { Menu, MenuItem } = remote
 
 const appPath = process.platform === 'darwin'
   ? remote.app.getPath('exe').replace(/\.app\/Content.*/, '.app')
   : undefined
+
 const AutoLaunch = require('auto-launch')
+
 const autolauncher = new AutoLaunch({
 	name: 'Sketchpacks',
   path: appPath,
@@ -31,6 +33,14 @@ const settingsMenu = [
   },
 
   {
+    label: 'Preferences...',
+    accelerator: 'CmdOrCtrl+,',
+    click(item, window, event) {
+      window.webContents.send('NAVIGATE_TO', {path: '/preferences'})
+    },
+  },
+
+  {
     label: 'Launch at startup',
     type: 'checkbox',
     click(item, window, event) {
@@ -52,7 +62,7 @@ const settingsMenu = [
   },
 
   {
-    label: 'Help and Documentation',
+    label: 'Help and Documentation...',
     click: () => shell.openExternal('https://docs.sketchpacks.com')
   },
   {
@@ -60,11 +70,11 @@ const settingsMenu = [
     click: () => shell.openExternal('https://www.sketchpacks.com')
   },
   {
-    label: 'Report a Bug',
+    label: 'Report a Bug...',
     click: () => shell.openExternal('https://github.com/sketchpacks/bug-reports/issues')
   },
   {
-    label: 'Give Feedback',
+    label: 'Give Feedback...',
     click: () => shell.openExternal('https://github.com/sketchpacks/feedback/issues')
   },
 
@@ -77,24 +87,6 @@ const settingsMenu = [
     accelerator: 'Cmd+U',
     click(item, window, event) {
       window.webContents.send('CHECK_FOR_PLUGIN_UPDATES', null)
-    },
-  },
-
-  {
-    type: 'separator'
-  },
-
-  {
-    label: 'Export My Library',
-    click(item, window, event) {
-      window.webContents.send('sketchpack/EXPORT_REQUEST', null)
-    },
-  },
-
-  {
-    label: 'Import a Sketchpack',
-    click(item, window, event) {
-      window.webContents.send('sketchpack/IMPORT_REQUEST', null)
     },
   },
 

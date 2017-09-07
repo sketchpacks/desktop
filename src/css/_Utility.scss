@@ -47,6 +47,12 @@
   margin-left: getSize("large");
 }
 
+
+.u-mar-bottom-x-small {
+  margin-bottom: getSize("x-small");
+}
+
+
 .spaced-between {
   display: flex;
   flex-direction: column;
@@ -59,6 +65,8 @@
 }
 
 .is-visible { display: block; }
+
+.is-hidden { display: none; }
 
 .container--padded-top {
   padding-top: getSize("large");

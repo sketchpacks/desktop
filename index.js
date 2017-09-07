@@ -26,12 +26,12 @@ const {
   protocol,
   Menu,
   ipcMain,
-  ipcRenderer
+  ipcRenderer,
+  globalShortcut
 } = electron
 const url = require('url')
 const log = require('electron-log')
 const menubar = require('menubar')
-const dblite = require('dblite')
 const axios = require('axios')
 const async = require('async')
 const {appMenu} = require('./src/menus/appMenu')
@@ -62,6 +62,7 @@ const {
 
 const writeSketchpack = require('./src/lib/writeSketchpack')
 const readSketchpack = require('./src/lib/readSketchpack')
+const readPreferences = require('./src/lib/readPreferences')
 const readManifest = require('./src/lib/readManifest')
 
 const {
@@ -80,12 +81,14 @@ const opts = {
   icon: __dirname + '/src/IconTemplate.png',
   width: 720,
   height: 540,
-  index: (__PRODUCTION__ && __ELECTRON__) ? `file://${__dirname}/src/dist/index.html` : `http://localhost:${SERVER_PORT}/`,
+  index: (__PRODUCTION__ && __ELECTRON__)
+    ? `file://${__dirname}/src/dist/index.html`
+    : `http://localhost:${SERVER_PORT}/`,
   resizable: false,
   alwaysOnTop: false,
   showOnAllWorkspaces: true,
   preloadWindow: true,
-  tooltip: `Sketchpacks v${pkg.version} beta`,
+  tooltip: `Sketchpacks ${pkg.version} beta`,
   backgroundColor: '#f8f9fa',
 }
 
@@ -99,12 +102,16 @@ let sketchpackWatcher
 
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
+
+  globalShortcut.register('CommandOrControl+,', () => {
+    mainWindow.webContents.send('NAVIGATE_TO', {path: '/preferences'})
+  })
 })
 
 menuBar.on('after-show', () => {
   if (__DEVELOPMENT__) {
     // require('devtron').install()
-    menuBar.window.openDevTools({ mode: 'detach' })
+  menuBar.window.openDevTools({ mode: 'detach' })
   }
 })
 
@@ -172,9 +179,9 @@ ipcMain.on(UPDATE_PLUGIN_REQUEST, (event, plugins) => {
   queueUpdate(plugins)
 })
 
-ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, arg) => {
-  log.debug(UNINSTALL_PLUGIN_REQUEST, arg)
-  queueRemove([arg])
+ipcMain.on(UNINSTALL_PLUGIN_REQUEST, (event, plugins) => {
+  log.debug(UNINSTALL_PLUGIN_REQUEST, plugins)
+  queueRemove(plugins)
 })
 
 
@@ -347,12 +354,17 @@ const queueUpdate = (plugins) => {
 }
 
 const queueRemove = (plugins) => {
-  if (typeof plugins === undefined) return
-  if (plugins.length === 0) return
+  const items = [].concat(plugins)
 
-  log.debug(`Enqueueing ${plugins.length} plugins`)
-  plugins.map(plugin => workQueue.push({ action: 'remove', payload: plugin }, (err, result) => {
-    if (err) return
+  if (typeof items === undefined) return
+  if (items.length === 0) return
+
+  log.debug(`Enqueueing ${items.length} plugins`)
+  items.map(plugin => workQueue.push({ action: 'remove', payload: plugin }, (err, result) => {
+    if (err) {
+      log.error(err)
+      return
+    }
     log.debug('Uninstall complete', result)
     mainWindow.webContents.send(UNINSTALL_PLUGIN_SUCCESS, result)
   }))
@@ -393,28 +405,25 @@ ipcMain.on('sketchpack/IMPORT_REQUEST', (event, args) => {
     ]
   }, (filePaths) => {
     if (filePaths) {
-      try {
-        readSketchpack(filePaths[0])
-          .then(contents => {
-            if (contents.schema_version === "1.0.0") {
-              mainWindow.webContents.send('sketchpack/IMPORT', contents)
-              return
-            } else {
-              const opts = {
-                type: 'info',
-                title: 'Import failed',
-                message: 'Import failed',
-                detail: "Can't import sketchpacks with outdated schema versions",
-                buttons: ['Ok'],
-                defaultId: 0
-              }
-
-              dialog.showMessageBox(opts)
+      readSketchpack(filePaths[0])
+        .then(contents => {
+          if (contents.schema_version === "1.0.0") {
+            mainWindow.webContents.send('sketchpack/IMPORT', contents)
+            return
+          } else {
+            const opts = {
+              type: 'info',
+              title: 'Import failed',
+              message: 'Import failed',
+              detail: "Can't import sketchpacks with outdated schema versions",
+              buttons: ['Ok'],
+              defaultId: 0
             }
-          })
-      } catch (err) {
-        log.error(err)
-      }
+
+            dialog.showMessageBox(opts)
+          }
+        })
+        .catch(err => log.debug(err))
     }
   })
 })
@@ -436,6 +445,33 @@ ipcMain.on('sketchpack/EXPORT_REQUEST', (event, args) => {
   } catch (err) {
     log.error(err)
     if (err) mainWindow.webContents.send('sketchpack/EXPORT_ERROR')
+  }
+})
+
+ipcMain.on('SELECT_FILE', (event, caller) => {
+  try {
+    dialog.showOpenDialog(null, {
+      properties: ['openFile'],
+      filters: [
+        {
+          name: 'Sketchpack',
+          extensions: ['sketchpack']
+        }
+      ]
+    }, (filePaths) => {
+      if (filePaths) {
+        try {
+          mainWindow.webContents.send('SET_PREFERENCE', {
+            path: 'sketchpack.location',
+            value: filePaths[0]
+          })
+        } catch (err) {
+          log.error(err)
+        }
+      }
+    })
+  } catch (err) {
+    log.error(err)
   }
 })
 
@@ -495,6 +531,16 @@ const watchLibrary = (watchPath) => {
     .on('ready', onWatcherReady)
 }
 
+ipcMain.on('sketchpack/CHANGE', (event, arg) => {
+  sketchpackWatcher.close()
+
+  sketchpackWatcher = ''
+
+  watchSketchpack(arg)
+
+  log.info('sketchpack/CHANGE', sketchpackWatcher.getWatched())
+})
+
 const watchSketchpack = (watchPath) => {
   log.debug('Watching Sketchpack at ', watchPath)
   sketchpackWatcher = chokidar.watch(watchPath, {
@@ -513,6 +559,7 @@ const watchSketchpack = (watchPath) => {
 
         readSketchpack(watchPath)
           .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
+          .catch(err => log.debug(err))
       }
     })
     .on('change', (watchPath) => {
@@ -521,6 +568,7 @@ const watchSketchpack = (watchPath) => {
 
         readSketchpack(watchPath)
           .then(contents => mainWindow.webContents.send('sketchpack/SYNC_REQUEST', contents))
+          .catch(err => log.debug(err))
       }
     })
     .on('unlink', (watchPath) => {
@@ -535,8 +583,19 @@ const watchSketchpack = (watchPath) => {
 }
 
 setTimeout(() => {
-  const librarySketchpackPath = path.join(app.getPath('userData'),'my-library.sketchpack')
-  watchSketchpack(librarySketchpackPath)
+  const preferencesPath = path.join(
+    app.getPath('userData'),
+    'preferences.json'
+  )
+
+  if (fs.existsSync(preferencesPath)) {
+    readPreferences(preferencesPath)
+      .then(contents => {
+        log.debug(contents)
+        watchSketchpack(contents.sketchpack.location)
+      })
+      .catch(err => log.debug(err))
+  }
 }, 1000)
 
 setTimeout(() => {

@@ -11,6 +11,7 @@ import library from 'reducers/library'
 import sketchpack from 'reducers/sketchpack'
 import search from 'reducers/search'
 import queue from 'reducers/queue'
+import preferences from 'reducers/preferences'
 
 //- Reducer
 
@@ -21,7 +22,8 @@ const rootReducer = combineReducers({
   plugins,
   sketchpack,
   search,
-  queue
+  queue,
+  preferences
 })
 
 export default rootReducer
@@ -101,7 +103,7 @@ export const getOutdatedPlugins = createSelector(
   (state,identifiers) => filter(
     identifiers,
     (id) => {
-      if (!state.plugins.byIdentifier[id]) return false
+      if (!state.plugins.allIdentifiers.includes(id)) return false
 
       return isFullLocked(state.sketchpack.plugins.byIdentifier[id].version)
         && semver.lt(
@@ -193,4 +195,8 @@ export const checkPluginLockState = createSelector(
       return false
     }
   }
+)
+
+export const getPreferences = createSelector(
+  [ getStateTree ], (state) => state.preferences
 )

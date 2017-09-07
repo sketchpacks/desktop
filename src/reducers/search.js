@@ -24,7 +24,9 @@ export const searchPlugins = ({ url, list, append, keyword }) => (dispatch,getSt
   })
 
   dispatch(
-    searchRequest({}, {
+    searchRequest({
+      keyword
+    }, {
       mixpanel: {
         eventName: 'Registry',
         type: 'Search',

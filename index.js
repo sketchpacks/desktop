@@ -88,7 +88,7 @@ const opts = {
   alwaysOnTop: false,
   showOnAllWorkspaces: true,
   preloadWindow: true,
-  tooltip: `Sketchpacks v${pkg.version} beta`,
+  tooltip: `Sketchpacks ${pkg.version} beta`,
   backgroundColor: '#f8f9fa',
 }
 
@@ -111,7 +111,7 @@ menuBar.on('ready', () => {
 menuBar.on('after-show', () => {
   if (__DEVELOPMENT__) {
     // require('devtron').install()
-    menuBar.window.openDevTools({ mode: 'detach' })
+  menuBar.window.openDevTools({ mode: 'detach' })
   }
 })
 

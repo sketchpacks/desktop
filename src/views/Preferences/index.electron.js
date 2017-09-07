@@ -150,8 +150,8 @@ class Preferences extends Component {
 
         <hr />
 
-        <h2>Shared Libraries</h2>
-        <p>Sync your Managed Library across multiple teams</p>
+        <h2>Syncing</h2>
+        <p>Sync your Managed Library across multiple machines and teams</p>
 
         <div className="o-media u-mar-bottom-x-small">
           <div className="o-media__content">

@@ -2,8 +2,8 @@
   "name": "sketchpacks-app",
   "productName": "Sketchpacks",
   "companyName": "Sketchpacks",
-  "description": "Manage and auto-update your Sketch Plugins from the menu bar",
-  "version": "0.5.6",
+  "description": "Manage and sync Sketch plugins across machines and teams",
+  "version": "0.6.0",
   "main": "index.js",
   "scripts": {
     "postinstall": "install-app-deps",

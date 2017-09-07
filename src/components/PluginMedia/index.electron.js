@@ -30,7 +30,6 @@ class PluginMedia extends Component {
     this.renderVersion = this.renderVersion.bind(this)
     this.renderButton = this.renderButton.bind(this)
     this.renderTotalDownloads = this.renderTotalDownloads.bind(this)
-    this.renderVersionLock = this.renderVersionLock.bind(this)
 
     // Click events
     this.handleClickLock = this.handleClickLock.bind(this)
@@ -108,8 +107,8 @@ class PluginMedia extends Component {
     return <PluginMetric
       icon={'downloads'}
       shape={'path'}
-      value={rollup.downloads.this_week}
-      tooltip={'Downloads this week'} />
+      value={rollup.downloads.all_time}
+      tooltip={'All-time Downloads'} />
   }
 
   renderButton () {
@@ -191,25 +190,6 @@ class PluginMedia extends Component {
     this.setState({ ...newState })
   }
 
-  renderVersionLock () {
-    const {plugin,location} = this.props
-
-    if (location.pathname !== '/library/managed') return
-    if (!plugin.version_range) return
-
-    return (
-      <div
-        onClick={this.handleClickLock}
-        className="tooltipped tooltipped-n"
-        aria-label={this.state.isLocked
-          ? 'Enable auto-updates'
-          : `Lock this version at v${sanitizeSemVer(plugin.version)}` }
-      >
-        {this.state.isLocked ? '🔒' : '🔓'}
-      </div>
-    )
-  }
-
   render () {
     const {
       name,
@@ -250,8 +230,6 @@ class PluginMedia extends Component {
             { this.renderTotalDownloads() }
 
             { this.renderVersion() }
-
-            { this.renderVersionLock() }
 
             { this.renderButton() }
           </div>

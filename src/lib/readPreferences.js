@@ -14,7 +14,7 @@ const defaultSketchpack = path.join(
 const initialState = {
   sketchpack: {
     location: defaultSketchpack,
-    defaultLock: 'locked'
+    defaultLock: 'unlocked'
   },
   syncing: {
     enabled: false,

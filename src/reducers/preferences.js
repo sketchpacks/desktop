@@ -7,7 +7,6 @@ import { ipcRenderer } from 'electron'
 import { createAction, handleActions } from 'redux-actions'
 
 import readSketchpack from 'lib/readSketchpack'
-import { getInstallPath } from 'lib/utils'
 
 import {
   syncSketchpackRequest,
@@ -51,9 +50,6 @@ export const initialState = {
   syncing: {
     enabled: false,
     overwatch: false
-  },
-  plugins: {
-    install_directory: '/Library/Application Support/com.bohemiancoding.sketch3/Plugins'
   }
 }
 

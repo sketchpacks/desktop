@@ -15,8 +15,6 @@ const {
   PLUGIN_PATHS
 } = require('../config')
 
-
-
 const getInstallPath = () => {
   const installPath = find(PLUGIN_PATHS, (installPath) => {
     return IsThere(path.join(HOME_PATH,installPath))
@@ -24,7 +22,7 @@ const getInstallPath = () => {
 
   log.debug('Install path found: ', installPath)
 
-  return path.join(HOME_PATH,installPath).replace(/ /g, '\ ')
+  return path.join(HOME_PATH,installPath).replace(/ /g, '\\ ')
 }
 
 const downloadAsset = (opts) => new Promise((resolve, reject) => {

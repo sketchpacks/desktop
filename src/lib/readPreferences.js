@@ -1,10 +1,8 @@
+const electron = require('electron')
 const path = require('path')
 const Promise = require('promise')
 const json5file = require('@sketchpacks/json5file')
 const log = require('electron-log')
-const { getInstallPath } = require('./utils')
-
-const electron = require('electron')
 
 const defaultSketchpack = path.join(
   (electron.app || electron.remote.app).getPath('userData'),
@@ -19,9 +17,6 @@ const initialState = {
   syncing: {
     enabled: false,
     overwatch: false
-  },
-  plugins: {
-    install_directory: '/Library/Application Support/com.bohemiancoding.sketch3/Plugins'
   }
 }
 

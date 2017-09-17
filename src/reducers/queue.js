@@ -6,9 +6,15 @@ import {
   installPluginRequest,
   installPluginSuccess,
   installPluginError,
+
   updatePlugin,
   updatePluginSuccess,
   updatePluginError,
+
+  uninstallPluginRequest,
+  uninstallPluginSuccess,
+  uninstallPluginError,
+
   installPlugin,
   detectPlugin
 } from 'reducers/library'
@@ -21,7 +27,8 @@ import {
 
 const initialState = {
   installing: [],
-  updating: []
+  updating: [],
+  uninstalling: []
 }
 
 
@@ -60,6 +67,8 @@ export default handleActions({
     }
   },
 
+
+
   // Add reference to identifier before update
   [updatePlugin]: (state, action) => {
     const identifiers = [].concat(action.payload).map(plugin => plugin.identifier)
@@ -83,6 +92,34 @@ export default handleActions({
     return {
       ...state,
       updating: without(state.updating, action.meta.plugin)
+    }
+  },
+
+
+
+  // Add reference to identifier before update
+  [uninstallPluginRequest]: (state, action) => {
+    const identifiers = [].concat(action.payload).map(plugin => plugin.identifier)
+
+    return {
+      ...state,
+      uninstalling: uniq(state.uninstalling.concat(identifiers))
+    }
+  },
+
+  // Remove reference to identifier after update
+  [uninstallPluginSuccess]: (state, action) => {
+    return {
+      ...state,
+      uninstalling: without(state.uninstalling, action.payload)
+    }
+  },
+
+  // Remove reference to identifier after failed update
+  [uninstallPluginError]: (state, action) => {
+    return {
+      ...state,
+      uninstalling: without(state.uninstalling, action.meta.plugin)
     }
   }
 }, initialState)

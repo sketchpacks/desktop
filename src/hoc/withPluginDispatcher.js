@@ -1,8 +1,12 @@
+const pkg = require('../../package.json')
+
 import {
   __ELECTRON__,
   WEB_URL,
   API_URL
 } from 'config'
+
+import qs from 'qs'
 
 import {remote} from 'electron'
 
@@ -35,6 +39,13 @@ const withPluginDispatcher = (WrappedComponent) => {
     handlePluginEvent ({ type, plugin, author, isLocked, lock_strength, identifier, version }) {
       const {dispatch} = this.props
 
+      const utmParams = qs.stringify({
+        utm_source: 'desktop',
+        utm_medium: 'feed',
+        utm_campaign: pkg.version,
+        utm_term: this.props.search.keyword || ""
+      })
+
       switch (type) {
         case "install":
           return dispatch(installPluginRequest(plugin.identifier))
@@ -60,9 +71,9 @@ const withPluginDispatcher = (WrappedComponent) => {
             }
           }))
         case "info":
-          return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}`)
+          return remote.shell.openExternal(`${WEB_URL}/${plugin.owner.handle}/${plugin.name}?${utmParams}`)
         case "author":
-          return remote.shell.openExternal(`${WEB_URL}/@${plugin.owner.handle}`)
+          return remote.shell.openExternal(`${WEB_URL}/@${plugin.owner.handle}?${utmParams}`)
       }
     }
 

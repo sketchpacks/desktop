@@ -17,15 +17,19 @@ import {
 } from 'reducers/library'
 
 import {
-  setVersionLock
-} from 'lib/VersionLock'
+  setPreferenceRequest,
+  setPreferenceSuccess,
+  loadPreferences
+} from 'reducers/preferences'
+
+import { setVersionLock } from 'lib/VersionLock'
 
 
 
 //- Actions
 
 export const syncSketchpackRequest = createAction('sketchpack/SYNC_REQUEST')
-export const syncSketchpackSuccess = createAction('sketchpack/SYNC_SUCCESS')
+export const syncSketchpackSuccess = createAction('sketchpack/SYNC_SUCCESS', (payload) => payload, (_,meta) => meta)
 export const syncSketchpackError = createAction('sketchpack/SYNC_ERROR')
 
 export const setVersionRange = createAction('sketchpack/SET_VERSION_RANGE', (payload) => payload, (_,meta) => meta)
@@ -43,6 +47,9 @@ export const exportSketchpackError = createAction('sketchpack/EXPORT_ERROR')
 const initialState = {
   isLocked: false,
   isImporting: false,
+  isLoaded: false,
+  defaultLock: 'unlocked',
+  name: 'My Library',
   plugins: {
     allIdentifiers: [],
     byIdentifier: {}
@@ -64,12 +71,24 @@ export default handleActions({
           ...state.byIdentifier,
           ...action.payload.plugins
         },
-        allIdentifiers: uniq(
-          state.plugins.allIdentifiers.concat(
-            Object.keys(action.payload.plugins)
-          )
-        )
+        allIdentifiers: uniq(Object.keys(action.payload.plugins))
       }
+    }
+  },
+
+  [syncSketchpackSuccess]: (state, action) => {
+    return {
+      ...state,
+      isLoaded: true
+    }
+  },
+
+  [setPreferenceSuccess]: (state, action) => {
+    if (!has(action, 'payload.path')) return state
+
+    return {
+      ...state,
+      isLoaded: action.payload.path === 'sketchpack.location'
     }
   },
 
@@ -100,12 +119,13 @@ export default handleActions({
       }
     )
 
-    if (plugins.length === 0) {
-      return state
-    }
+    if (plugins.length === 0) return state
+
+    if (state.isLocked) return state
 
     return {
       ...state,
+      isLoaded: true,
       plugins: {
         ...state.plugins,
         byIdentifier: {
@@ -114,7 +134,10 @@ export default handleActions({
             result[identifier] = {
               version: has(state.plugins.byIdentifier, identifier)
                 ? state.plugins.byIdentifier[identifier].version
-                : setVersionLock({ semver: data.version, lock: 'locked'})
+                : setVersionLock({
+                    semver: data.version,
+                    lock: state.defaultLock
+                  })
             }
             return result
           }, {})
@@ -155,11 +178,28 @@ export default handleActions({
 
   [importSketchpackSuccess]: (state,action) => ({
     ...state,
-    isImporting: false
+    isImporting: false,
+    isLoaded: true
   }),
 
   [importSketchpackError]: (state,action) => ({
     ...state,
     isImporting: false
-  })
+  }),
+
+  [loadPreferences]: (state,action) => ({
+    ...state,
+    defaultLock: action.payload.sketchpack.defaultLock
+  }),
+
+  [setPreferenceRequest]: (state,action) => {
+    if (action.payload.path === "sketchpack.defaultLock") {
+      return {
+        ...state,
+        defaultLock: action.payload.value
+      }
+    } else {
+      return state
+    }
+  }
 }, initialState)

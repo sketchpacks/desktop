@@ -15,12 +15,12 @@ const {
   PLUGIN_PATHS
 } = require('../config')
 
-
-
 const getInstallPath = () => {
   const installPath = find(PLUGIN_PATHS, (installPath) => {
     return IsThere(path.join(HOME_PATH,installPath))
   })
+
+  log.debug('Install path found: ', installPath)
 
   return path.join(HOME_PATH,installPath).replace(/ /g, '\\ ')
 }
@@ -124,7 +124,7 @@ const removeAsset = (data) => new Promise((resolve, reject) => {
   const install_dir_path = getInstallPath()
 
   const assetDirectoryPath = difference(
-    install_path.replace(/ /g, '\\ ').split('/'),
+    install_path.replace(/ /g, '\ ').split('/'),
     install_dir_path.split('/')
   )[0]
 

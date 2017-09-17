@@ -1,0 +1,63 @@
+.preferences {
+  padding: 3.2rem 6.4rem;
+  position: relative;
+
+  hr {
+    border-color: #dedede;
+    margin: 2.4rem 0;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    line-height: 4;
+    letter-spacing: 0.05rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 1px solid #dedede;
+  }
+
+  h2 {
+    font-size: 2.8rem;
+    font-weight: 200;
+    letter-spacing: 0.1rem;
+    margin-bottom: 0.8rem;
+  }
+
+  h3 {
+    font-size: 2.0rem;
+    font-weight: 400;
+    margin-bottom: 0.4rem;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  &-close {
+    position: fixed;
+    top: 1.6rem;
+    right: 1.6rem;
+  }
+
+}
+
+.preference {
+  &-description {
+    color: #949494;
+    margin-bottom: 0.8rem;
+  }
+
+  &-preview {
+    width: 100%;
+    padding: 1.2rem;
+    overflow-x: scroll;
+    border: 1px solid #dedede;
+    border-radius: 0.4rem;
+    margin-bottom: 0.8rem;
+  }
+
+  &-children {
+    margin-top: 2.0rem;
+    margin-left: 4.0rem;
+  }
+}

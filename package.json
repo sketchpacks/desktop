@@ -113,6 +113,7 @@
     "parse-link-header": "^0.4.1",
     "promise": "^7.1.1",
     "qs": "^6.3.0",
+    "raven": "^2.1.2",
     "rc-switch": "^1.5.2",
     "react": "^15.4.1",
     "react-addons-create-fragment": "^15.4.1",

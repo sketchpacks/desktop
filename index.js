@@ -40,6 +40,8 @@ const {selectionMenu} = require('./src/menus/selectionMenu')
 const chokidar = require('chokidar')
 const semver = require('semver')
 
+const Raven = require('raven')
+
 const firstRun = require('first-run')
 
 const appPath = process.platform === 'darwin'
@@ -76,6 +78,9 @@ const {
   UNINSTALL_PLUGIN_ERROR
 } = require('./src/actions/plugin_manager')
 
+Raven.config('https://f20ff15a6de4457890b7754799fe94f7:318b9d5bde6f446aa37e2803555547e4@sentry.io/218116')
+  .install()
+
 const opts = {
   dir: __dirname,
   icon: __dirname + '/src/IconTemplate.png',
@@ -104,8 +109,7 @@ menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
 
   mainWindow.webContents.on('crashed', (err) => {
-    console.log(`ERROR: ${err}`)
-    log.info(`ERROR: ${err}`)
+    Raven.captureException(err)
   })
 })
 

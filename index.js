@@ -88,7 +88,7 @@ const opts = {
   alwaysOnTop: false,
   showOnAllWorkspaces: true,
   preloadWindow: true,
-  tooltip: `Sketchpacks ${pkg.version} beta`,
+  tooltip: `Sketchpacks ${pkg.version}`,
   backgroundColor: '#f8f9fa'
 }
 
@@ -103,10 +103,6 @@ let sketchpackWatcher
 menuBar.on('ready', () => {
   log.info(`Sketchpacks v${APP_VERSION} (${__PRODUCTION__ ? 'PROD' : 'DEV'}) launched`)
 
-  globalShortcut.register('CommandOrControl+,', () => {
-    mainWindow.webContents.send('NAVIGATE_TO', {path: '/preferences'})
-  })
-
   mainWindow.webContents.on('crashed', (err) => {
     console.log(`ERROR: ${err}`)
     log.info(`ERROR: ${err}`)
@@ -116,7 +112,7 @@ menuBar.on('ready', () => {
 menuBar.on('after-show', () => {
   if (__DEVELOPMENT__) {
     // require('devtron').install()
-  menuBar.window.openDevTools({ mode: 'detach' })
+    menuBar.window.openDevTools({ mode: 'detach' })
   }
 })
 
@@ -132,6 +128,14 @@ menuBar.on('after-create-window', () => {
       selectionMenu.popup(mainWindow)
     }
   })
+
+  mainWindow.on('focus', () => {
+    globalShortcut.register('CommandOrControl+,', () => {
+      mainWindow.webContents.send('NAVIGATE_TO', {path: '/preferences'})
+    })
+  })
+
+  mainWindow.on('blur', () => globalShortcut.unregisterAll())
 })
 
 menuBar.on('show', () => {

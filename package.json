@@ -3,7 +3,7 @@
   "productName": "Sketchpacks",
   "companyName": "Sketchpacks",
   "description": "Manage and sync Sketch plugins across machines and teams",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "main": "index.js",
   "scripts": {
     "postinstall": "install-app-deps",

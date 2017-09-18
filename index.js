@@ -155,8 +155,9 @@ app.on('ready', () => {
 
   protocol.registerHttpProtocol('sketchpacks', (request, callback) => {
     const uri = url.parse(request.url)
-  }, (error) => {
-    if (error) console.error('Failed to register protocol', error)
+  }, (err) => {
+    Raven.captureException(err)
+    if (err) console.error('Failed to register protocol', err)
   })
 
   Menu.setApplicationMenu(appMenu)
@@ -233,6 +234,7 @@ const installPluginTask = (identifier, callback) => {
     .then(result => callback(null))
     .catch(err => {
       log.debug(err.message)
+      Raven.captureException(err)
       callback(err)
     })
 }
@@ -261,6 +263,7 @@ const updatePluginTask = (plugin, callback) => {
     .then(result => callback(null, result))
     .catch(err => {
       log.debug(err.message)
+      Raven.captureException(err)
       callback(err)
     })
 }
@@ -300,6 +303,7 @@ const identifyPluginTask = (manifestPath, callback) => {
       resolve(unidentifiedPlugin)
     } catch (err) {
       log.error('buildPlugin', err)
+      Raven.captureException(err)
       reject(err)
     }
   })
@@ -359,6 +363,7 @@ const queueUpdate = (plugins) => {
   items.map(plugin => workQueue.push({ action: 'update', payload: plugin }, (err, result) => {
     if (err) {
       log.error(err)
+      Raven.captureException(err)
       return
     }
     log.debug('Update complete', result)
@@ -376,6 +381,7 @@ const queueRemove = (plugins) => {
   items.map(plugin => workQueue.push({ action: 'remove', payload: plugin }, (err, result) => {
     if (err) {
       log.error(err)
+      Raven.captureException(err)
       return
     }
     log.debug('Uninstall complete', result)
@@ -387,6 +393,7 @@ const queueSync = (sketchpackContents) => {
   workQueue.push({ action: 'sync', payload: sketchpackContents }, (err, result) => {
     if (err) {
       log.error(err)
+      Raven.captureException(err)
       return
     }
     mainWindow.webContents.send('sketchpack/SYNC', sketchpackContents)
@@ -436,7 +443,10 @@ ipcMain.on('sketchpack/IMPORT_REQUEST', (event, args) => {
             dialog.showMessageBox(opts)
           }
         })
-        .catch(err => log.debug(err))
+        .catch(err => {
+          log.debug(err)
+          Raven.captureException(err)
+        })
     }
   })
 })
@@ -457,6 +467,7 @@ ipcMain.on('sketchpack/EXPORT_REQUEST', (event, args) => {
     })
   } catch (err) {
     log.error(err)
+    Raven.captureException(err)
     if (err) mainWindow.webContents.send('sketchpack/EXPORT_ERROR')
   }
 })
@@ -484,11 +495,13 @@ ipcMain.on('SELECT_FILE', (event, caller) => {
       }
     })
   } catch (err) {
+    Raven.captureException(err)
     log.error(err)
   }
 })
 
 process.on('uncaughtException', (err) => {
+  Raven.captureException(err)
   log.error(err)
 })
 
@@ -538,8 +551,9 @@ const watchLibrary = (watchPath) => {
         log.debug('Plugin Bundle Removed', watchPath)
       }
     })
-    .on('error', (error) => {
-      log.debug('Error happened', error)
+    .on('error', (err) => {
+      Raven.captureException(err)
+      log.debug('Error happened', err)
     })
     .on('ready', onWatcherReady)
 }
@@ -589,8 +603,9 @@ const watchSketchpack = (watchPath) => {
         log.debug('Sketchpack Removed', watchPath)
       }
     })
-    .on('error', (error) => {
-      log.debug('Error happened', error)
+    .on('error', (err) => {
+      Raven.captureException(err)
+      log.debug('Error happened', err)
     })
     .on('ready', onWatcherReady)
 }

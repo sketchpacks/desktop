@@ -18,6 +18,7 @@ export const searchPlugins = ({ url, list, append, keyword }) => (dispatch,getSt
   const client = axios.create({
     baseURL: `${API_URL}/v1`,
     timeout: REQUEST_TIMEOUT,
+    headers: {'Content-Encoding': 'gzip'},
     transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
   })
 

@@ -32,6 +32,7 @@ export const browsePlugins = ({ url, list, append}) => (dispatch,getState) => {
   const client = axios.create({
     baseURL: `${API_URL}/v1`,
     timeout: REQUEST_TIMEOUT,
+    headers: {'Content-Encoding': 'gzip'},
     transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
   })
 
@@ -85,7 +86,8 @@ export const fetchPlugin = ({ namespace, identifiers }) => (dispatch,getState) =
   const client = axios.create({
     baseURL: `${API_URL}/v1`,
     timeout: REQUEST_TIMEOUT,
-    transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
+    transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema),
+    headers: {'Content-Encoding': 'gzip'}
   })
 
   dispatch(fetchPluginRequest())

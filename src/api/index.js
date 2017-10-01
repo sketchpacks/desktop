@@ -11,6 +11,7 @@ const client = axios.create({
   baseURL: `${API_URL}/v1`,
   timeout: REQUEST_TIMEOUT,
   transformResponse: (data) => JSON.parse(data),
+  headers: {'Content-Encoding': 'gzip'}
 })
 
 class Sketchpacks {
@@ -43,6 +44,7 @@ class Sketchpacks {
       url: `${API_URL}/v1/plugins/${pluginId}/versions?compare=${version}`,
       method: 'get',
       timeout: REQUEST_TIMEOUT,
+      headers: {'Content-Encoding': 'gzip'}
     })
   }
 }

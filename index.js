@@ -157,7 +157,7 @@ app.on('ready', () => {
   protocol.registerHttpProtocol('sketchpacks', (request, callback) => {
     const uri = url.parse(request.url)
   }, (err) => {
-    Raven.captureException(err)
+    if (err) Raven.captureException(err)
     if (err) console.error('Failed to register protocol', err)
   })
 

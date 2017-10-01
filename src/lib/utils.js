@@ -37,7 +37,7 @@ const downloadAsset = (opts) => new Promise((resolve, reject) => {
   const req = request({
     method: 'GET',
     uri: opts.download_url,
-    timeout: 1500
+    timeout: REQUEST_TIMEOUT
   })
 
   req.on('error', (err) => {

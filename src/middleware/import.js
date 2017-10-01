@@ -1,5 +1,6 @@
 import {
   API_URL,
+  REQUEST_TIMEOUT
 } from 'config'
 
 import { ipcRenderer } from 'electron'
@@ -17,12 +18,11 @@ import {
   installPluginRequest
 } from 'reducers/library'
 
-const DEFAULT_TIMEOUT = 1500
 const DEFAULT_BATCH_SIZE = 25
 
 const client = axios.create({
   baseURL: `${API_URL}/v1`,
-  timeout: DEFAULT_TIMEOUT,
+  timeout: REQUEST_TIMEOUT,
   transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema),
   headers: {'Content-Encoding': 'gzip'}
 })

@@ -23,6 +23,8 @@ module.exports = {
 
   API_URL: 'https://api.sketchpacks.com',
 
+  REQUEST_TIMEOUT: 5000,
+
   PLUGIN_AUTOUPDATE_DELAY: '2m',
 
   PLUGIN_AUTOUPDATE_INTERVAL: process.env.NODE_ENV === 'development'

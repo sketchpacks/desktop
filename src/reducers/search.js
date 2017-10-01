@@ -1,4 +1,4 @@
-import { API_URL } from 'config'
+import { API_URL, REQUEST_TIMEOUT } from 'config'
 import { createAction, handleActions } from 'redux-actions'
 import axios from 'axios'
 import qs from 'qs'
@@ -6,8 +6,6 @@ import linkHeader from 'parse-link-header'
 import { normalize } from 'normalizr'
 import * as schemas from 'schemas'
 import { addPlugin } from 'reducers/plugins'
-
-const DEFAULT_TIMEOUT = 1500
 
 
 //- Actions
@@ -19,7 +17,7 @@ export const searchError = createAction('search/FETCH_ERROR')
 export const searchPlugins = ({ url, list, append, keyword }) => (dispatch,getState) => {
   const client = axios.create({
     baseURL: `${API_URL}/v1`,
-    timeout: DEFAULT_TIMEOUT,
+    timeout: REQUEST_TIMEOUT,
     transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
   })
 

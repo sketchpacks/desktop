@@ -1,7 +1,7 @@
 import {
-  API_URL
+  API_URL,
+  REQUEST_TIMEOUT
 } from 'config'
-const DEFAULT_TIMEOUT = 1500
 
 import axios from 'axios'
 import linkHeader from 'parse-link-header'
@@ -9,7 +9,7 @@ import qs from 'qs'
 
 const client = axios.create({
   baseURL: `${API_URL}/v1`,
-  timeout: DEFAULT_TIMEOUT,
+  timeout: REQUEST_TIMEOUT,
   transformResponse: (data) => JSON.parse(data),
 })
 
@@ -19,7 +19,7 @@ class Sketchpacks {
   }
 
   getUserPlugins (endpoint) {
-    return axios.request({ url: endpoint, method: 'get', timeout: DEFAULT_TIMEOUT })
+    return axios.request({ url: endpoint, method: 'get', timeout: REQUEST_TIMEOUT })
   }
 
   getPlugin ({userId, pluginId}) {
@@ -31,7 +31,7 @@ class Sketchpacks {
   }
 
   getPluginReadme (endpoint) {
-    return axios.request({ url: endpoint, method: 'get', timeout: DEFAULT_TIMEOUT })
+    return axios.request({ url: endpoint, method: 'get', timeout: REQUEST_TIMEOUT })
   }
 
   getCatalog ({query}) {
@@ -42,7 +42,7 @@ class Sketchpacks {
     return axios.request({
       url: `${API_URL}/v1/plugins/${pluginId}/versions?compare=${version}`,
       method: 'get',
-      timeout: DEFAULT_TIMEOUT,
+      timeout: REQUEST_TIMEOUT,
     })
   }
 }

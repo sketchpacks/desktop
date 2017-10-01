@@ -1,4 +1,7 @@
-import { API_URL } from 'config'
+import {
+  API_URL,
+  REQUEST_TIMEOUT
+ } from 'config'
 import { createAction, handleActions } from 'redux-actions'
 import axios from 'axios'
 import qs from 'qs'
@@ -8,7 +11,6 @@ import * as schemas from 'schemas'
 import { createSelector } from 'reselect'
 import { reduce, uniq } from 'lodash'
 
-const DEFAULT_TIMEOUT = 1500
 
 
 //- Actions
@@ -29,7 +31,7 @@ export const browseError = createAction('browse/FETCH_ERROR')
 export const browsePlugins = ({ url, list, append}) => (dispatch,getState) => {
   const client = axios.create({
     baseURL: `${API_URL}/v1`,
-    timeout: DEFAULT_TIMEOUT,
+    timeout: REQUEST_TIMEOUT,
     transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
   })
 
@@ -82,7 +84,7 @@ export const fetchPlugin = ({ namespace, identifiers }) => (dispatch,getState) =
 
   const client = axios.create({
     baseURL: `${API_URL}/v1`,
-    timeout: DEFAULT_TIMEOUT,
+    timeout: REQUEST_TIMEOUT,
     transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
   })
 

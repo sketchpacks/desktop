@@ -1,6 +1,7 @@
 import {
   API_URL,
-  REQUEST_TIMEOUT
+  REQUEST_TIMEOUT,
+  REQUEST_PER_PAGE
 } from 'config'
 
 import { delay } from 'redux-saga'

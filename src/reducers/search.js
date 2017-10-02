@@ -1,4 +1,4 @@
-import { API_URL, REQUEST_TIMEOUT } from 'config'
+import { API_URL, REQUEST_TIMEOUT, REQUEST_PER_PAGE } from 'config'
 import { createAction, handleActions } from 'redux-actions'
 import axios from 'axios'
 import qs from 'qs'
@@ -22,6 +22,10 @@ export const searchPlugins = ({ url, list, append, keyword }) => (dispatch,getSt
     transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
   })
 
+  const params = {
+    per_page: REQUEST_PER_PAGE
+  }
+
   dispatch(
     searchRequest({
       keyword
@@ -37,7 +41,7 @@ export const searchPlugins = ({ url, list, append, keyword }) => (dispatch,getSt
     })
   )
 
-  client.get(url)
+  client.get(url, params)
     .then(
       data => {
         // data.data => { entities, result }

@@ -1,6 +1,7 @@
 import {
   API_URL,
-  REQUEST_TIMEOUT
+  REQUEST_TIMEOUT,
+  REQUEST_PER_PAGE
  } from 'config'
 import { createAction, handleActions } from 'redux-actions'
 import axios from 'axios'
@@ -36,9 +37,13 @@ export const browsePlugins = ({ url, list, append}) => (dispatch,getState) => {
     transformResponse: (data) => normalize(JSON.parse(data), schemas.pluginListSchema)
   })
 
+  const params = {
+    per_page: REQUEST_PER_PAGE
+  }
+
   dispatch(browseRequest({ list }))
 
-  client.get(url)
+  client.get(url, params)
     .then(
       data => {
         // data.data => { entities, result }

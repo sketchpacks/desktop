@@ -12,7 +12,8 @@ const contentDisposition = require('content-disposition')
 
 const {
   HOME_PATH,
-  PLUGIN_PATHS
+  PLUGIN_PATHS,
+  REQUEST_TIMEOUT
 } = require('../config')
 
 const getInstallPath = () => {
@@ -43,7 +44,7 @@ const downloadAsset = (opts) => new Promise((resolve, reject) => {
   req.on('error', (err) => {
     if (err.code === 'ETIMEDOUT') log.debug('Timeout')
     if (err.connect === true) log.debug('Connection Timeout')
-    reject(new Error('Download failed'))
+    reject(new Error('Download failed due to timeout'))
   })
 
   req.on('response', (data) => {
